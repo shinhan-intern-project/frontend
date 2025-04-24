@@ -23,8 +23,12 @@ jobs:
           ISSUE_TITLE="${{ github.event.issue.title }}"
           echo "Issue Title: $ISSUE_TITLE"
 
-          # Jira 키 추출 (P4-4 형식으로 추출)
-          JIRA_KEY=$(echo "$ISSUE_TITLE" | grep -oE '[A-Z]+-[0-9]+')
+          # 대괄호만 제거 후 Jira 키 추출 (P4-4 형식으로 추출)
+          ISSUE_TITLE_NO_BRACKETS=$(echo "$ISSUE_TITLE" | sed 's/[[]//g' | sed 's/[]]//g')  # 대괄호만 제거
+          echo "Issue Title without brackets: $ISSUE_TITLE_NO_BRACKETS"
+
+          # 띄어쓰기를 기준으로 첫 번째 단어만 추출
+          JIRA_KEY=$(echo "$ISSUE_TITLE_NO_BRACKETS" | cut -d' ' -f1)
 
           # Jira 키가 추출되었는지 확인
           if [[ -z "$JIRA_KEY" ]]; then
@@ -33,7 +37,6 @@ jobs:
           fi
 
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
-          
           echo "Extracted JIRA_KEY: $JIRA_KEY"
 
       - name: Close Jira issue
@@ -41,4 +44,4 @@ jobs:
         uses: atlassian/gajira-transition@v3
         with:
           issue: ${{ env.JIRA_KEY }}
-          transition: Done
+          transition: 완료
