@@ -1,11 +1,14 @@
 <template>
-    <div>
-      <h1>종목 페이지</h1>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'StockPage'
-  }
-  </script>
+  <DetailLayout />
+</template>
+
+<script>
+import DetailLayout from "@/components/detailPage/Layout.vue";
+
+export default {
+  name: "StockPage",
+  components: {
+    DetailLayout,
+  },
+};
+</script>
