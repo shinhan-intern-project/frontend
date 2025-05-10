@@ -9,6 +9,18 @@ export default {
 </script>
 
 <style>
+@font-face {
+  font-family: 'Pretendard';
+  src: url('@/assets/fonts/Pretendard-Regular.otf') format('opentype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('@/assets/fonts/Pretendard-Bold.otf') format('opentype');
+  font-weight: 700;
+}
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -36,6 +48,7 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
 	line-height: 1;
+  font-family: Pretendard;
 }
 ol, ul {
 	list-style: none;
