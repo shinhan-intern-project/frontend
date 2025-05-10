@@ -114,6 +114,14 @@
           </div>
           <div class="detail-layout-content-item">
             <span class="header">관련 뉴스</span>
+            <div class="news-container">
+              <NewsItem
+                :isBadge="true"
+                v-for="news in relatedNews"
+                :key="news.id"
+                :news="news"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -124,12 +132,20 @@
 <script>
 import DetailHeader from "./Header.vue";
 import DetailFloating from "./Floating.vue";
+import NewsItem from "../news/NewsItem.vue";
 
 export default {
   name: "DetailLayout",
   components: {
     DetailHeader,
     DetailFloating,
+    NewsItem,
+  },
+  props: {
+    relatedNews: {
+      type: Array,
+      required: true,
+    },
   },
 };
 </script>
@@ -334,5 +350,24 @@ export default {
   color: #000c37;
   font-size: 14px;
   line-height: 20px;
+}
+
+/* 관련 뉴스 */
+.news-container {
+  display: flex;
+  width: 100%;
+  margin-top: 20px;
+  gap: 20px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* scrollbar-width: thin; */
+  /* scrollbar-color: #ccc transparent; */
+}
+
+.news-container::-webkit-scrollbar {
+  display: none;
 }
 </style>
