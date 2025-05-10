@@ -13,13 +13,13 @@ const routes = [
     component: MainPage
   },
   {
-    path: '/stocks',
-    name: 'stocks',
+    path: '/stock',
+    name: 'stock',
     component: StockPage
   },
   {
-    path: '/commodities',
-    name: 'commodities',
+    path: '/commoditie',
+    name: 'commoditie',
     component: CommodityPage
   }
 ];
