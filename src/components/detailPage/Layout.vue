@@ -21,7 +21,19 @@
               <div class="info-right">
                 <div class="badge">
                   <span>호재</span>
-                  <img src="@/assets/images/icons/caution.png" />
+
+                  <div class="tooltip-wrapper">
+                    <img src="@/assets/images/icons/caution.png" />
+
+                    <div class="tooltip">
+                      최근 2개월 동안의 뉴스 <br />분석 기반의 결과입니다.
+                      <div class="tooltip-value">
+                        <span class="tooltip-positive">호재 (80)</span>
+                        <span class="tooltip-negative">악재 (12)</span>
+                        <span class="tooltip-neutral">중립 (0)</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="price-container">
                   <div>
@@ -256,11 +268,67 @@ export default {
   font-weight: 700;
   gap: 4px;
   width: fit-content;
+  position: relative;
 }
 
 .detail-layout-content-item .info-right .badge img {
   width: 16px;
   height: 16px;
+  display: flex;
+  cursor: pointer;
+}
+
+/* 툴팁 */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  transform: translateX(-50%);
+  background: #fff;
+
+  color: #665b5b;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+
+  padding: 12px 16px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: none;
+  z-index: 10;
+
+  width: 162px;
+  height: 124px;
+}
+
+.tooltip-wrapper:hover .tooltip {
+  display: block;
+}
+
+.tooltip-value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.tooltip-positive {
+  color: #f04452;
+  font-weight: 700;
+}
+.tooltip-negative {
+  color: #3182f6;
+  font-weight: 700;
+}
+.tooltip-neutral {
+  color: #868686;
+  font-weight: 700;
 }
 
 .detail-layout-content-item .info-right .price-container {
