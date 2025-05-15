@@ -47,8 +47,11 @@
                 <div class="price-container">
                   <div>
                     <div class="sub-title">현재가</div>
-                    <span class="price"
-                      >{{ Math.floor(stockInfo?.currentPrice) }}원</span
+                    <span class="price">
+                      <!-- {{ Math.floor(stockInfo?.currentPrice) }} -->
+                      {{ stockInfo?.currentPrice }}
+
+                      원</span
                     >
                   </div>
                   <div>
@@ -97,38 +100,14 @@
           <div class="detail-layout-content-item" ref="section2">
             <span class="header">관련 품목</span>
             <div class="relation">
-              <div class="relation-item">
-                <img src="@/assets/images/icons/1.png" />
-                <span class="relation-title"
-                  >품목명 어쩌구 저쩌구 아무거나</span
-                >
-                <span class="relation-code">2320</span>
-                <span class="relation-content"
-                  >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
-                  종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
-                  관련이 있냐면... GPT가 설명해줄거야</span
-                >
-              </div>
-
-              <div class="relation-item">
-                <img src="@/assets/images/icons/2.png" />
-                <span class="relation-title"
-                  >품목명 어쩌구 저쩌구 아무거나</span
-                >
-                <span class="relation-code">2320</span>
-                <span class="relation-content"
-                  >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
-                  종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
-                  관련이 있냐면... GPT가 설명해줄거야</span
-                >
-              </div>
-
-              <div class="relation-item">
-                <img src="@/assets/images/icons/3.png" />
-                <span class="relation-title"
-                  >품목명 어쩌구 저쩌구 아무거나</span
-                >
-                <span class="relation-code">2320</span>
+              <div
+                class="relation-item"
+                v-for="(prod, i) in stockInfo?.relatedProducts"
+                :key="prod.hscodeId"
+              >
+                <img :src="icons[i]" alt="icon" />
+                <span class="relation-title">{{ prod.hscodeName }}</span>
+                <span class="relation-code">{{ prod.hscodeId }}</span>
                 <span class="relation-content"
                   >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
                   종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
@@ -164,6 +143,13 @@ import DetailHeader from "./Header.vue";
 import DetailFloating from "./Floating.vue";
 import NewsItem from "../news/NewsItem.vue";
 
+// 관련 품목 숫자 아이콘
+export const icons = [
+  require("@/assets/images/icons/1.png"),
+  require("@/assets/images/icons/2.png"),
+  require("@/assets/images/icons/3.png"),
+];
+
 export default {
   name: "DetailLayout",
   components: {
@@ -184,6 +170,7 @@ export default {
   data() {
     return {
       activeSection: 0,
+      icons,
     };
   },
   methods: {
@@ -489,6 +476,11 @@ export default {
   font-size: 18px;
   font-weight: 700;
   line-height: 20px;
+
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .relation-code {
   color: #ababab;
