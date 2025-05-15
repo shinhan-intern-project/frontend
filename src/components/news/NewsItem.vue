@@ -1,0 +1,126 @@
+<template>
+  <div class="news-item" @click="clickNews">
+    <img src="@/assets/images/news.png" />
+
+    <div class="badge" v-if="isBadge" :class="badgeColor">
+      <span>{{ news.tag }}</span>
+    </div>
+    <span class="news-item-title">{{ news.title }}</span>
+    <div class="news-item-writer">
+      <span class="publisher">{{ news.publisher }}</span>
+      <span>•</span>
+      <span> {{ news.date }}</span>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "NewsItem",
+  props: {
+    news: {
+      type: Object,
+      required: true,
+    },
+    isBadge: {
+      type: Boolean,
+    },
+  },
+  computed: {
+    badgeColor() {
+      switch (this.news.tag) {
+        case "호재":
+          return "badge-positive";
+        case "악재":
+          return "badge-negative";
+        case "중립":
+          return "badge-neutral";
+        default:
+          return "";
+      }
+    },
+  },
+  methods: {
+    clickNews() {
+      window.open(this.news.url, "_blank");
+    },
+  },
+};
+</script>
+
+<style scoped>
+.news-item {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.news-item .badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  padding: 4px 10px;
+
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.badge-positive {
+  background-color: #e5484d;
+}
+
+.badge-negative {
+  background-color: #3182f6;
+}
+
+.badge-neutral {
+  background-color: #9f9f9f;
+}
+
+.news-item img {
+  width: 180px;
+  height: 120px;
+  border-radius: 8px;
+}
+
+.news-item-title {
+  color: #000;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.news-item-writer {
+  display: flex;
+  align-items: center;
+  color: #6b7684;
+  font-size: 10px;
+  gap: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.publisher {
+  display: inline-block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
