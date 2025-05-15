@@ -1,9 +1,11 @@
 <template>
-  <DetailLayout :relatedNews="relatedNews" />
+  <DetailLayout :relatedNews="relatedNews" :stockInfo="stockInfo" />
 </template>
 
 <script>
 import DetailLayout from "@/components/detailPage/Layout.vue";
+import { getStockAPI } from "@/apis/stock.js";
+
 const relatedNews = [
   {
     id: 1,
@@ -72,7 +74,30 @@ export default {
   data() {
     return {
       relatedNews,
+      stockInfo: null,
+      isStockInfoLoading: false,
     };
+  },
+  methods: {
+    async getStockInfo(id) {
+      this.isStockInfoLoading = true;
+      try {
+        const res = await getStockAPI(id);
+        this.stockInfo = res.data;
+      } catch (e) {
+        this.error = e;
+      } finally {
+        this.isStockInfoLoading = false;
+      }
+    },
+  },
+  mounted() {
+    this.getStockInfo(this.$route.params.stockId);
+  },
+  watch: {
+    "$route.params.stockId"(newId) {
+      this.getStockInfo(newId);
+    },
   },
 };
 </script>
