@@ -13,17 +13,17 @@
               <div class="info-left">
                 <img src="@/assets/images/stocks/samsung.png" />
                 <div class="info-left-summary">
-                  <div class="sector">반도체</div>
-                  <span class="title">삼성전자</span>
+                  <div class="sector">{{ stockInfo?.sector }}</div>
+                  <span class="title">{{ stockInfo?.companyName }}</span>
                   <div class="market-ticker">
-                    <span>KOSPI</span>
-                    <span>005930</span>
+                    <span>{{ stockInfo?.marketType }}</span>
+                    <span>{{ stockInfo?.ticker }}</span>
                   </div>
                 </div>
               </div>
               <div class="info-right">
                 <div class="badge">
-                  <span>호재</span>
+                  <span>{{ topSentiment() }}</span>
 
                   <div class="tooltip-wrapper">
                     <img src="@/assets/images/icons/caution.png" />
@@ -31,9 +31,15 @@
                     <div class="tooltip">
                       최근 2개월 동안의 뉴스 <br />분석 기반의 결과입니다.
                       <div class="tooltip-value">
-                        <span class="tooltip-positive">호재 (80)</span>
-                        <span class="tooltip-negative">악재 (12)</span>
-                        <span class="tooltip-neutral">중립 (0)</span>
+                        <span class="tooltip-positive"
+                          >호재 ({{ stockInfo?.sentiment.호재 }})</span
+                        >
+                        <span class="tooltip-negative"
+                          >악재 ({{ stockInfo?.sentiment.악재 }})</span
+                        >
+                        <span class="tooltip-neutral"
+                          >중립 ({{ stockInfo?.sentiment.중립 }})</span
+                        >
                       </div>
                     </div>
                   </div>
@@ -41,7 +47,9 @@
                 <div class="price-container">
                   <div>
                     <div class="sub-title">현재가</div>
-                    <span class="price">58,600원</span>
+                    <span class="price"
+                      >{{ Math.floor(stockInfo?.currentPrice) }}원</span
+                    >
                   </div>
                   <div>
                     <span class="per">-2.4%</span>
@@ -50,31 +58,34 @@
               </div>
             </div>
             <div class="content">
-              한국 및 DX부문 해외 9개 지역총괄과 DS부문 해외 5개 지역총괄, SDC,
-              Harman 등 229개의 종속기업으로 구성된 글로벌 전자기업임. 한국 및
-              DX부문 해외 9개 지역총괄과 DS부문 해외 5개 지역총괄, SDC, Harman
-              등 229개의 종속기업으로 구성된 글로
+              {{ stockInfo?.companyOverview }}
             </div>
             <div class="indicator">
               <div class="indicator-item">
                 <span class="sub-title">시가총액</span>
-                <span class="value">393.32조</span>
+                <span class="value">{{ stockInfo?.marketCap }}조</span>
               </div>
               <div class="indicator-item">
                 <span class="sub-title">eps</span>
-                <span class="value">4,359원</span>
+                <span class="value">{{ stockInfo?.eps }}원</span>
               </div>
               <div class="indicator-item">
                 <span class="sub-title">pbr</span>
-                <span class="value">1.01배</span>
+                <span class="value">{{ stockInfo?.pbr }}배</span>
               </div>
               <div class="indicator-item">
                 <span class="sub-title">bps</span>
-                <span class="value">44,359원</span>
+                <span class="value">{{ stockInfo?.bps }}원</span>
               </div>
               <div class="indicator-item">
                 <span class="sub-title">배당수익률</span>
-                <span class="value">2.47%</span>
+                <span class="value"
+                  >{{
+                    stockInfo?.dividendYield
+                      ? stockInfo?.dividendYield
+                      : "0.00"
+                  }}%</span
+                >
               </div>
             </div>
           </div>
@@ -165,6 +176,10 @@ export default {
       type: Array,
       required: true,
     },
+    stockInfo: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -204,6 +219,17 @@ export default {
         return best;
       }, 0);
       this.activeSection = idx;
+    },
+
+    // 호재, 악재, 중립 판단 함수
+    topSentiment() {
+      const s = this.stockInfo && this.stockInfo.sentiment;
+      if (!s || Object.keys(s).length === 0) {
+        return "";
+      }
+      const entries = Object.entries(s);
+      entries.sort(([, a], [, b]) => b - a);
+      return entries[0][0];
     },
   },
   mounted() {
