@@ -1,1 +1,1 @@
-import commodityAPI from '@/api/commodity';
+import productAPI from "@/api/product";

@@ -1,5 +1,9 @@
 <template>
-  <DetailLayout :relatedNews="relatedNews" :stockInfo="stockInfo" />
+  <DetailLayout
+    :relatedNews="relatedNews"
+    :stockInfo="stockInfo"
+    type="stock"
+  />
 </template>
 
 <script>
