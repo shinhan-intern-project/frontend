@@ -6,6 +6,7 @@
         <DetailFloating
           :active-index="activeSection"
           @navigate="scrollToSection"
+          :type="type"
         />
         <div class="detail-layout-content-items" ref="container">
           <!-- 개별 주식 페이지인 경우 -->

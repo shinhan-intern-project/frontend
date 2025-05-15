@@ -5,7 +5,7 @@
       :class="{ active: activeIndex === 0 }"
       @click="$emit('navigate', 0)"
     >
-      주식 개요
+      {{ type === "stock" ? "주식 개요" : "품목 개요" }}
     </div>
     <div
       class="floating-item"
@@ -19,14 +19,14 @@
       :class="{ active: activeIndex === 2 }"
       @click="$emit('navigate', 2)"
     >
-      관련 품목
+      {{ type === "stock" ? "관련 품목" : "관련 종목" }}
     </div>
     <div
       class="floating-item"
       :class="{ active: activeIndex === 3 }"
       @click="$emit('navigate', 3)"
     >
-      캔들 차트
+      {{ type === "stock" ? "캔들 차트" : "수출입량 통계" }}
     </div>
     <div
       class="floating-item"
@@ -42,6 +42,10 @@
 export default {
   name: "DetailFloating",
   props: {
+    type: {
+      type: String,
+      validator: (v) => ["stock", "product"].includes(v),
+    },
     activeIndex: {
       type: Number,
       default: 0,
