@@ -99,7 +99,7 @@
           </div>
           <div class="detail-layout-content-item" ref="section2">
             <span class="header">관련 품목</span>
-            <div class="relation">
+            <div class="relation" v-if="stockInfo?.relatedProducts.length">
               <div
                 class="relation-item"
                 v-for="(prod, i) in stockInfo?.relatedProducts"
@@ -114,6 +114,12 @@
                   관련이 있냐면... GPT가 설명해줄거야</span
                 >
               </div>
+            </div>
+
+            <!-- 관련 품목이 없거나 빈 배열일 때 -->
+            <div class="no-relation" v-else>
+              <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+              <p>관련된 품목이 없습니다.</p>
             </div>
           </div>
           <div class="detail-layout-content-item" ref="section3">
@@ -491,6 +497,26 @@ export default {
   color: #000c37;
   font-size: 14px;
   line-height: 20px;
+}
+
+.no-relation {
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.no-relation img {
+  width: 58px;
+  height: 58px;
+}
+
+.no-relation p {
+  color: #000c37;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 /* 관련 뉴스 */
