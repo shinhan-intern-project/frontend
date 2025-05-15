@@ -8,7 +8,12 @@
           @navigate="scrollToSection"
         />
         <div class="detail-layout-content-items" ref="container">
-          <div class="detail-layout-content-item" ref="section0">
+          <!-- 개별 주식 페이지인 경우 -->
+          <div
+            v-if="type === 'stock'"
+            class="detail-layout-content-item"
+            ref="section0"
+          >
             <div class="info">
               <div class="info-left">
                 <img src="@/assets/images/stocks/samsung.png" />
@@ -22,28 +27,7 @@
                 </div>
               </div>
               <div class="info-right">
-                <div class="badge">
-                  <span>{{ topSentiment() }}</span>
-
-                  <div class="tooltip-wrapper">
-                    <img src="@/assets/images/icons/caution.png" />
-
-                    <div class="tooltip">
-                      최근 2개월 동안의 뉴스 <br />분석 기반의 결과입니다.
-                      <div class="tooltip-value">
-                        <span class="tooltip-positive"
-                          >호재 ({{ stockInfo?.sentiment.호재 }})</span
-                        >
-                        <span class="tooltip-negative"
-                          >악재 ({{ stockInfo?.sentiment.악재 }})</span
-                        >
-                        <span class="tooltip-neutral"
-                          >중립 ({{ stockInfo?.sentiment.중립 }})</span
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <SentimentBadge :sentiment="stockInfo?.sentiment" />
                 <div class="price-container">
                   <div>
                     <div class="sub-title">현재가</div>
@@ -92,6 +76,34 @@
               </div>
             </div>
           </div>
+          <!-- 개별 주식 페이지인 경우 -->
+
+          <!-- 개별 품목 페이지인 경우 -->
+          <div
+            v-if="type === 'product'"
+            class="detail-layout-content-item"
+            ref="section0"
+          >
+            <div class="product">
+              <div class="product-header">
+                <div class="product-hscode">
+                  <div class="product-hscode-wrapper">HS코드</div>
+                  <span>7312</span>
+                </div>
+                <SentimentBadge :sentiment="stockInfo?.sentiment" />
+              </div>
+              <span class="product-title">철강로프</span>
+              <span class="product-description"
+                >와이어로프 형태의 철강 제품으로, 건설·해양·중장비 산업에 사용됨
+                와이어로프 형태의 철강 제품으로, 건설·해양·중장비
+                산업에와이어로프 형태의 철강 제품으로, 건설·해양·중장비 산업에
+                사용됨 와이어로프 형태의 철강 제품으로, 건설·해양·중장비 산업에
+                사용됨 사용됨</span
+              >
+            </div>
+          </div>
+          <!-- 개별 품목 페이지인 경우 -->
+
           <div class="detail-layout-content-item" ref="section1">
             <span class="header">네트워크 그래프</span>
             <!-- 임시 -->
@@ -148,6 +160,7 @@
 import DetailHeader from "./Header.vue";
 import DetailFloating from "./Floating.vue";
 import NewsItem from "../news/NewsItem.vue";
+import SentimentBadge from "./SentimentBadge.vue";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -162,8 +175,13 @@ export default {
     DetailHeader,
     DetailFloating,
     NewsItem,
+    SentimentBadge,
   },
   props: {
+    type: {
+      type: String,
+      validator: (v) => ["stock", "product"].includes(v),
+    },
     relatedNews: {
       type: Array,
       required: true,
@@ -330,80 +348,6 @@ export default {
   justify-content: space-between;
   align-items: flex-end;
 }
-.detail-layout-content-item .info-right .badge {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 20px;
-  background: #f04452;
-  padding: 8px 16px;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  gap: 4px;
-  width: fit-content;
-  position: relative;
-}
-
-.detail-layout-content-item .info-right .badge img {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  cursor: pointer;
-}
-
-/* 툴팁 */
-.tooltip-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip {
-  position: absolute;
-  top: 32px;
-  left: 32px;
-  transform: translateX(-50%);
-  background: #fff;
-
-  color: #665b5b;
-  font-size: 12px;
-  line-height: 18px;
-  font-weight: 400;
-
-  padding: 12px 16px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  display: none;
-  z-index: 10;
-
-  width: 162px;
-  height: 124px;
-}
-
-.tooltip-wrapper:hover .tooltip {
-  display: block;
-}
-
-.tooltip-value {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
-}
-
-.tooltip-positive {
-  color: #f04452;
-  font-weight: 700;
-}
-.tooltip-negative {
-  color: #3182f6;
-  font-weight: 700;
-}
-.tooltip-neutral {
-  color: #868686;
-  font-weight: 700;
-}
 
 .detail-layout-content-item .info-right .price-container {
   display: flex;
@@ -536,5 +480,53 @@ export default {
 
 .news-container::-webkit-scrollbar {
   display: none;
+}
+
+/* 품목 페이지 */
+/* 품목 개요 */
+.product {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.product-hscode {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-hscode span {
+  color: #000c37;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.product-hscode-wrapper {
+  width: fit-content;
+  height: fit-content;
+  border-radius: 4px;
+  background: #000c37;
+  color: #fff;
+  font-size: 14px;
+  padding: 4px 18px;
+}
+
+.product-title {
+  color: #000c37;
+  font-size: 36px;
+  font-weight: 700;
+  margin: 28px 0;
+}
+
+.product-description {
+  color: #000c37;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
 }
 </style>
