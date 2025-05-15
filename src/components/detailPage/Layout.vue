@@ -111,7 +111,9 @@
             <div style="height: 300px"></div>
           </div>
           <div class="detail-layout-content-item" ref="section2">
-            <span class="header">관련 품목</span>
+            <span class="header">
+              {{ type === "stock" ? "관련 품목" : "관련 종목" }}</span
+            >
             <div class="relation" v-if="stockInfo?.relatedProducts.length">
               <div
                 class="relation-item"
@@ -132,14 +134,33 @@
             <!-- 관련 품목이 없거나 빈 배열일 때 -->
             <div class="no-relation" v-else>
               <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
-              <p>관련된 품목이 없습니다.</p>
+              <p>관련된 {{ type === "stock" ? "품목" : "종목" }}이 없습니다.</p>
             </div>
           </div>
-          <div class="detail-layout-content-item" ref="section3">
+
+          <!-- 개별 주식 페이지 - 캔들차트 -->
+          <div
+            v-if="type === 'stock'"
+            class="detail-layout-content-item"
+            ref="section3"
+          >
             <span class="header">캔들 차트</span>
             <!-- 임시 -->
             <div style="height: 300px"></div>
           </div>
+          <!-- 개별 주식 페이지 - 캔들차트 -->
+
+          <!-- 개별 품목 페이지 - 수출입량 통계 -->
+          <div
+            v-if="type === 'product'"
+            class="detail-layout-content-item"
+            ref="section3"
+          >
+            <span class="header">수출입량 통계</span>
+            <!-- 임시 -->
+            <div style="height: 300px"></div>
+          </div>
+          <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
             <span class="header">관련 뉴스</span>
             <div class="news-container">
