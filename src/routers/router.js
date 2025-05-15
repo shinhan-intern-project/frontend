@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 // 페이지 컴포넌트 - 상대 경로 사용
 const MainPage = () => import("../views/MainPage.vue");
 const StockPage = () => import("../views/StockPage.vue");
-const CommodityPage = () => import("../views/CommodityPage.vue");
+const ProductPage = () => import("../views/ProductPage.vue");
 
 // 라우트 정의
 const routes = [
@@ -19,9 +19,9 @@ const routes = [
     props: true,
   },
   {
-    path: "/commoditie",
-    name: "commoditie",
-    component: CommodityPage,
+    path: "/product/:productId",
+    name: "product",
+    component: ProductPage,
   },
 ];
 

@@ -11,8 +11,8 @@ export const stockAPI = axios.create({
 });
 
 // 품목 API
-export const commodityAPI = axios.create({
-  baseURL: `${baseURL}/commodity/api/commodities`,
+export const productAPI = axios.create({
+  baseURL: `${baseURL}/product/api/commodities`,
   headers: {
     "Content-Type": "application/json",
   },
