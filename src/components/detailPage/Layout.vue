@@ -3,9 +3,12 @@
     <div class="detail-layout-content-container">
       <DetailHeader />
       <div class="detail-layout-content">
-        <DetailFloating />
-        <div class="detail-layout-content-items">
-          <div class="detail-layout-content-item">
+        <DetailFloating
+          :active-index="activeSection"
+          @navigate="scrollToSection"
+        />
+        <div class="detail-layout-content-items" ref="container">
+          <div class="detail-layout-content-item" ref="section0">
             <div class="info">
               <div class="info-left">
                 <img src="@/assets/images/stocks/samsung.png" />
@@ -75,10 +78,12 @@
               </div>
             </div>
           </div>
-          <div class="detail-layout-content-item">
+          <div class="detail-layout-content-item" ref="section1">
             <span class="header">네트워크 그래프</span>
+            <!-- 임시 -->
+            <div style="height: 300px"></div>
           </div>
-          <div class="detail-layout-content-item">
+          <div class="detail-layout-content-item" ref="section2">
             <span class="header">관련 품목</span>
             <div class="relation">
               <div class="relation-item">
@@ -121,10 +126,12 @@
               </div>
             </div>
           </div>
-          <div class="detail-layout-content-item">
+          <div class="detail-layout-content-item" ref="section3">
             <span class="header">캔들 차트</span>
+            <!-- 임시 -->
+            <div style="height: 300px"></div>
           </div>
-          <div class="detail-layout-content-item">
+          <div class="detail-layout-content-item" ref="section4">
             <span class="header">관련 뉴스</span>
             <div class="news-container">
               <NewsItem
@@ -158,6 +165,54 @@ export default {
       type: Array,
       required: true,
     },
+  },
+  data() {
+    return {
+      activeSection: 0,
+    };
+  },
+  methods: {
+    scrollToSection(idx) {
+      const el = this.$refs[`section${idx}`];
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    },
+    onScroll() {
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+      const visibleHeight = window.innerHeight;
+      const totalHeight = document.documentElement.scrollHeight;
+
+      if (scrollY + visibleHeight >= totalHeight - 5) {
+        // 바닥에 거의 닿았으면 무조건 마지막(4)로
+        this.activeSection = 4;
+        return;
+      }
+
+      // 페이지 상단에서 얼마나 스크롤됐는지 기준선 설정
+      const baseline = 150;
+      // 각 섹션의 화면 위치(top) 배열로 구하기
+      const tops = [0, 1, 2, 3, 4].map((i) => {
+        const el = this.$refs[`section${i}`];
+        return el ? el.getBoundingClientRect().top : Infinity;
+      });
+      // baseline 보다 크면서 가장 작은 top 의 인덱스 찾기
+      const idx = tops.reduce((best, cur, i) => {
+        // cur ≤ baseline에 가까운(=큰) 값 선택
+        if (cur <= baseline && cur > tops[best]) {
+          return i;
+        }
+        return best;
+      }, 0);
+      this.activeSection = idx;
+    },
+  },
+  mounted() {
+    window.addEventListener("scroll", this.onScroll, { passive: true });
+    // 초기 한번 실행
+    this.onScroll();
+  },
+  beforeUnmount() {
+    window.removeEventListener("scroll", this.onScroll);
   },
 };
 </script>
@@ -424,7 +479,7 @@ export default {
 .news-container {
   display: flex;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 24px;
   gap: 20px;
 
   overflow-x: auto;

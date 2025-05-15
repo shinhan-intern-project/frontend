@@ -1,16 +1,52 @@
 <template>
   <div class="floating-container">
-    <div class="floating-item active">주식 개요</div>
-    <div class="floating-item">네트워크 그래프</div>
-    <div class="floating-item">관련 품목</div>
-    <div class="floating-item">캔들 차트</div>
-    <div class="floating-item">관련 뉴스</div>
+    <div
+      class="floating-item"
+      :class="{ active: activeIndex === 0 }"
+      @click="$emit('navigate', 0)"
+    >
+      주식 개요
+    </div>
+    <div
+      class="floating-item"
+      :class="{ active: activeIndex === 1 }"
+      @click="$emit('navigate', 1)"
+    >
+      네트워크 그래프
+    </div>
+    <div
+      class="floating-item"
+      :class="{ active: activeIndex === 2 }"
+      @click="$emit('navigate', 2)"
+    >
+      관련 품목
+    </div>
+    <div
+      class="floating-item"
+      :class="{ active: activeIndex === 3 }"
+      @click="$emit('navigate', 3)"
+    >
+      캔들 차트
+    </div>
+    <div
+      class="floating-item"
+      :class="{ active: activeIndex === 4 }"
+      @click="$emit('navigate', 4)"
+    >
+      관련 뉴스
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: "DetailFloating",
+  props: {
+    activeIndex: {
+      type: Number,
+      default: 0,
+    },
+  },
 };
 </script>
 
@@ -36,9 +72,9 @@ export default {
   border-radius: 30px;
   background: #fff;
   box-shadow: 0px 4px 15px 0px rgba(58, 112, 191, 0.1);
-
   color: rgba(0, 12, 55, 0.3);
   font-weight: 700;
+  cursor: pointer;
 }
 
 .floating-item.active {
