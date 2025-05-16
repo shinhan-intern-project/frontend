@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('git clone') {
             steps {
-                git branch: 'P4-47-feature/CICD-설정', credentialsId: 'github-signin', url: 'https://github.com/shinhan-intern-project/frontend.git'
+                git branch: 'develop', credentialsId: 'github-signin', url: 'https://github.com/shinhan-intern-project/frontend.git'
             }
         }
 
