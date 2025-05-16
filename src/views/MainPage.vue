@@ -608,15 +608,7 @@ export default {
 }
 
 /* 배경을 위한 별도의 레이어 추가 */
-.page-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: 1; /* 가장 낮은 z-index */
-  background: linear-gradient(to bottom, #f0f8ff, #e6f2ff); /* 파란흰색 배경 */
-}
+
 .content-wrapper {
   position: relative;
   z-index: 3;
