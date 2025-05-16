@@ -30,6 +30,8 @@ const initGlobe = async () => {
 
   globeInstance = Globe()(container.value)
     .backgroundColor("rgba(240, 248, 255, 0)")
+    .polygonsData(countries)
+
     .globeImageUrl("//unpkg.com/three-globe/example/img/earth-blue-marble.jpg")
     .bumpImageUrl("//unpkg.com/three-globe/example/img/earth-topology.png")
     .width(window.innerWidth * 0.5)
