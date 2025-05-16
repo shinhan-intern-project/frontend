@@ -40,7 +40,13 @@
                     >
                   </div>
                   <div>
-                    <span class="per">-2.4%</span>
+                    <span class="per">
+                      {{
+                        stockInfo?.changeRate != null
+                          ? Number(stockInfo.changeRate).toFixed(2)
+                          : "0.00"
+                      }}%</span
+                    >
                   </div>
                 </div>
               </div>
