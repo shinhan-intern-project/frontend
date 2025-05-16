@@ -3,10 +3,7 @@
     <div class="page-background"></div>
 
     <!-- 백그라운드 지구본 추가 -->
-    <div
-      class="background-globe-container"
-      ref="backgroundGlobeContainer"
-    ></div>
+    <BackgroundGlobe />
     <div class="content-wrapper">
       <!-- 헤더 영역 -->
       <header>
@@ -18,12 +15,21 @@
       </header>
 
       <!-- 탭 영역 -->
-      <div class="tab-section">
-        <div class="tab-container">
-          <button class="tab-button active">종목</button>
+
+      <ToggleSwitch v-model="type" />
+      <!-- 선택된 타입에 따라 다른 내용 표시 -->
+      <div class="content">
+        <div v-if="type === 'stock'">
+          <!-- 종목 관련 내용 -->
+          <!-- 종목 관련 컴포넌트들 -->
+        </div>
+
+        <div v-else>
+          <!-- 품목 관련 내용 -->
+
+          <!-- 품목 관련 컴포넌트들 -->
         </div>
       </div>
-
       <!-- 검색창 영역 -->
       <div class="search-container">
         <input
@@ -186,11 +192,21 @@
     </div>
   </div>
 </template>
+<script setup>
+// import { ref } from "vue";
+// import SegmentedControl from "./components/SegmentedControl.vue";
 
+// 기본값으로 'stock' (종목) 선택
+const type = ref("stock");
+
+// type 값에 따라 다른 API 호출이나 로직 처리 가능
+</script>
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import Globe from "globe.gl";
 import * as THREE from "three";
+import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
+import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
 const countries = {
   features: [], // 여기에 국가 데이터가 들어갑니다, 아래 참고
 };
