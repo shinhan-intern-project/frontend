@@ -16,97 +16,25 @@
 
       <!-- 탭 영역 -->
       <ToggleSwitch v-model="type" style="margin-bottom: 20px" />
+
       <!-- 선택된 타입에 따라 다른 내용 표시 -->
       <div class="content">
         <div v-if="type === 'stock'">
-          <!-- 종목 관련 내용 -->
-          <!-- 종목 관련 컴포넌트들 -->
+          <!-- 통합된 종목 검색 및 정보 컴포넌트 -->
+          <StockSearchAndInfo
+            :is-loading="isLoading"
+            :stock-items="stockItems"
+            :related-items="relatedItems"
+            :selected-stock-index="selectedStockIndex"
+            :search-keyword="searchKeyword"
+            @search="handleSearch"
+            @select-stock="selectStock"
+          />
         </div>
 
         <div v-else>
           <!-- 품목 관련 내용 -->
           <!-- 품목 관련 컴포넌트들 -->
-        </div>
-      </div>
-
-      <!-- 검색창 영역 -->
-      <div class="search-container">
-        <input
-          type="text"
-          v-model="searchKeyword"
-          placeholder="검색어를 입력해주세요"
-          class="search-input"
-          @keyup.enter="searchStocks"
-        />
-        <button class="search-button" @click="searchStocks">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-
-      <!-- 로딩 표시 -->
-      <div v-if="isLoading" class="loading-indicator">
-        <span>검색 중...</span>
-      </div>
-
-      <!-- 종목 정보 영역 -->
-      <div v-else class="stock-info-card">
-        <div class="stock-info-header">
-          <div class="header-left">종목</div>
-          <div class="header-right">종목과 관련된 품목</div>
-        </div>
-
-        <div class="stock-info-content">
-          <!-- 왼쪽: 종목 리스트 -->
-          <div class="stock-list">
-            <div v-if="stockItems.length === 0" class="no-results">
-              <span>검색 결과가 없습니다</span>
-            </div>
-            <div
-              v-else
-              v-for="(item, index) in stockItems"
-              :key="`top-${index}`"
-              class="stock-item"
-              :class="{ active: selectedStockIndex === index }"
-              @click="selectStock(item, index)"
-            >
-              <div class="company-info">
-                <div class="company-logo"></div>
-                <div class="company-details">
-                  <div class="company-name">{{ item.name }}</div>
-                  <div class="company-code">{{ item.code }}</div>
-                </div>
-              </div>
-              <div class="price-info">
-                <div class="current-price">{{ item.price }}</div>
-                <div
-                  class="price-change"
-                  :class="{
-                    'zero-change': item.changePercent === '0.0%',
-                    'positive-change': parseFloat(item.changePercent) > 0,
-                    'negative-change': parseFloat(item.changePercent) < 0,
-                  }"
-                >
-                  {{ item.changePercent }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 오른쪽: 관련 품목 -->
-          <div class="related-items-list">
-            <div v-if="relatedItems.length === 0" class="no-related-items">
-              <span>관련 품목이 없습니다</span>
-            </div>
-            <div
-              v-else
-              v-for="(item, index) in relatedItems"
-              :key="`related-${index}`"
-              class="related-item"
-            >
-              <div class="related-item-name">{{ item.name }}</div>
-              <div class="related-item-code">{{ item.stockName }}</div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -192,6 +120,7 @@
           </div>
         </div>
       </div>
+
       <!-- 뉴스 섹션 -->
       <div class="content-card">
         <h2>관련 뉴스</h2>
@@ -219,7 +148,9 @@ import Globe from "globe.gl";
 import * as THREE from "three";
 import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
+import StockSearchAndInfo from "@/components/search/StockSearchAndInfo.vue";
 import { getSearchAPI } from "@/apis/stock";
+
 const countries = {
   features: [],
 };
@@ -241,6 +172,7 @@ export default {
   components: {
     ToggleSwitch,
     BackgroundGlobe,
+    StockSearchAndInfo,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
@@ -378,8 +310,13 @@ export default {
 
   data() {
     return {
+      type: "stock",
+      searchKeyword: "",
+      isLoading: false,
       stockItems: [],
       relatedItems: [],
+      selectedStock: null,
+      selectedStockIndex: -1,
       topStocks: [
         {
           name: "삼성전자",
@@ -388,69 +325,7 @@ export default {
           changePercent: "0.0%",
           volume: "93,000",
         },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
+        // 더 많은 주식 데이터...
       ],
       exportStats: [
         {
@@ -459,30 +334,7 @@ export default {
           exportValue: "8,327,139",
           change: 3.6,
         },
-        {
-          name: "한국정보통신서비스",
-          importValue: "8,327,139",
-          exportValue: "8,327,139",
-          change: 3.6,
-        },
-        {
-          name: "한국정보통신서비스",
-          importValue: "8,327,139",
-          exportValue: "8,327,139",
-          change: 3.6,
-        },
-        {
-          name: "한국정보통신서비스",
-          importValue: "8,327,139",
-          exportValue: "8,327,139",
-          change: 3.6,
-        },
-        {
-          name: "한국정보통신서비스",
-          importValue: "8,327,139",
-          exportValue: "8,327,139",
-          change: 3.6,
-        },
+        // 더 많은 수출입 데이터...
       ],
       newsItems: [
         {
@@ -495,39 +347,18 @@ export default {
           publisher: "조선 미디어",
           date: "3일 전",
         },
-        {
-          id: 2,
-          tag: "악재",
-          tagColor: "#3D8BFF",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 3,
-          tag: "중립",
-          tagColor: "#A5A5A5",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 4,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
+        // 더 많은 뉴스 데이터...
       ],
     };
   },
   methods: {
+    // 검색어 처리 핸들러
+    handleSearch(keyword) {
+      this.searchKeyword = keyword;
+      this.searchStocks();
+    },
+
+    // 종목 검색 API 호출 함수
     async searchStocks() {
       if (!this.searchKeyword) return;
 
@@ -556,6 +387,7 @@ export default {
       }
     },
 
+    // 모든 관련 품목 표시
     showAllRelatedProducts() {
       const allRelatedProducts = [];
       const uniqueHscodes = new Set();
@@ -563,7 +395,6 @@ export default {
       this.stockItems.forEach((stock) => {
         if (stock.relatedProducts && stock.relatedProducts.length > 0) {
           stock.relatedProducts.forEach((product) => {
-            // 이미 추가된 hscode인지 확인
             if (!uniqueHscodes.has(product.hscode)) {
               uniqueHscodes.add(product.hscode);
 
@@ -581,6 +412,7 @@ export default {
       this.selectedStockIndex = -1;
     },
 
+    // 종목 선택 처리
     selectStock(stock, index) {
       this.selectedStock = stock;
       this.selectedStockIndex = index;
@@ -605,23 +437,21 @@ export default {
         this.relatedItems = [];
       }
     },
+
+    // 초기 데이터 로드 (필요 시 추가 구현)
+    loadInitialData() {
+      // 초기 데이터 로드 로직
+    },
+  },
+  mounted() {
+    // 초기 데이터 로드
+    this.loadInitialData();
   },
 };
 </script>
 
 <style scoped>
-.no-results,
-.no-related-items {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-  padding: 20px;
-  color: #888;
-  font-size: 16px;
-  text-align: center;
-}
-
+/* 전체 앱 스타일 */
 .logo-image {
   max-width: 300px;
   height: auto;
@@ -689,234 +519,7 @@ header {
   margin-bottom: 30px;
 }
 
-.logo {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.slogan {
-  color: #4e8df5;
-  font-size: 16px;
-  margin-top: 0;
-}
-
-.tab-section {
-  margin-bottom: 20px;
-}
-
-.tab-container {
-  display: flex;
-  gap: 10px;
-}
-
-.tab-button {
-  padding: 8px 20px;
-  border-radius: 20px;
-  border: none;
-  background-color: #f0f0f0;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.tab-button.active {
-  background-color: #101c42;
-  color: white;
-}
-
-/* 검색창 스타일 */
-.search-container {
-  display: flex;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.search-input {
-  flex: 1;
-  padding: 15px;
-  border: none;
-  outline: none;
-  font-size: 16px;
-}
-
-.search-button {
-  width: 50px;
-  background-color: #101c42;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-/* 종목 정보 카드 스타일 */
-.stock-info-card {
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
-
-.stock-info-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.stock-info-content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-.stock-list,
-.related-items-list {
-  flex: 1;
-  max-height: 400px;
-  overflow-y: auto;
-  border-right: 1px solid #eee;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
-}
-
-.related-items-list {
-  border-right: none;
-}
-
-.stock-item {
-  display: flex;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.related-item {
-  display: flex;
-  flex-direction: column;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.company-info {
-  display: flex;
-  align-items: center;
-  flex: 2;
-  min-width: 0;
-}
-
-.company-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #034ea2;
-  margin-right: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: bold;
-}
-
-.company-logo::after {
-  content: "삼성";
-  font-size: 11px;
-}
-
-.company-logo-small {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: #034ea2;
-  margin-right: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: bold;
-}
-
-.company-logo-small::after {
-  content: "삼성";
-  font-size: 9px;
-}
-
-.company-details {
-  flex: 1;
-}
-
-.company-name,
-.company-name-small {
-  font-weight: 500;
-}
-
-.company-code,
-.company-code-small {
-  color: #888;
-  font-size: 14px;
-}
-
-.price-info {
-  text-align: right;
-  min-width: 100px;
-}
-
-.current-price {
-  font-weight: 500;
-}
-
-.price-change {
-  font-size: 14px;
-  color: #f03e3e;
-}
-
-.zero-change {
-  color: #333;
-}
-
-.related-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.related-item-name {
-  font-weight: 500;
-  margin-bottom: 8px;
-  width: 100%;
-  white-space: normal;
-  line-height: 1.4;
-  max-height: 4.2em;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
-}
-
-.related-item-code {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-}
-
-.related-item-code::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #034ea2;
-  margin-right: 6px;
-}
-
+/* 중앙 화살표 스타일 */
 .center-arrow {
   text-align: center;
   margin: 20px 0;
@@ -924,6 +527,7 @@ header {
   color: #888;
 }
 
+/* 종목 거래량 섹션 스타일 */
 .volume-section {
   margin-bottom: 40px;
 }
@@ -940,25 +544,6 @@ header {
   margin: 0;
 }
 
-.tab-buttons.small {
-  display: flex;
-}
-
-.tab-button-small {
-  padding: 5px 15px;
-  border-radius: 15px;
-  border: 1px solid #ddd;
-  background-color: white;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.tab-button-small.active {
-  background-color: #101c42;
-  color: white;
-  border-color: #101c42;
-}
-
 .volume-table-header {
   display: flex;
   padding: 10px 15px;
@@ -967,7 +552,6 @@ header {
   border: 1px solid #eee;
   border-bottom: none;
 }
-
 .col-header {
   flex: 1;
   font-size: 14px;
@@ -1002,8 +586,35 @@ header {
   align-items: center;
 }
 
+.company-logo-small {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #034ea2;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+}
+
+.company-logo-small::after {
+  content: "삼성";
+  font-size: 9px;
+}
+
 .company-details-small {
   margin-left: 10px;
+}
+
+.company-name-small {
+  font-weight: 500;
+}
+
+.company-code-small {
+  color: #888;
+  font-size: 14px;
 }
 
 .item-price,
@@ -1013,6 +624,7 @@ header {
   text-align: right;
 }
 
+/* 수출입 통계 섹션 스타일 */
 .export-import-section {
   margin-bottom: 40px;
 }
@@ -1065,13 +677,20 @@ header {
   color: #1971c2;
 }
 
-.news-section {
-  margin-bottom: 40px;
+/* 뉴스 섹션 스타일 */
+.content-card {
+  margin-top: 40px !important;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0px 4px 20px #cfdef1;
+  border-radius: 12px;
+  padding: 30px;
+  box-sizing: border-box;
 }
 
-.news-section h2 {
+.content-card h2 {
   font-size: 18px;
-  margin-bottom: 20px;
+  margin: 0 0 20px 0;
 }
 
 .news-container {
@@ -1079,12 +698,12 @@ header {
   width: 100%;
   margin-top: 24px;
   gap: 20px;
-
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 .news-container::-webkit-scrollbar {
   display: none;
 }
@@ -1094,6 +713,8 @@ header {
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: relative;
+  min-width: 250px;
+  max-width: 300px;
 }
 
 .news-image-placeholder {
@@ -1140,38 +761,38 @@ header {
   max-width: 70%;
 }
 
+/* 반응형 스타일 */
 @media (max-width: 992px) {
-  .stock-info-content {
+  .layout {
     flex-direction: column;
   }
 
-  .stock-list,
-  .related-items-list {
-    border-right: none;
-    border-bottom: 1px solid #eee;
+  .volume-section,
+  .export-import-section {
+    width: 100%;
   }
 
   .news-container {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .news-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 
   .volume-table-header,
   .volume-item {
     font-size: 14px;
   }
+
+  .logo-image {
+    max-width: 200px;
+  }
 }
 
 @media (max-width: 576px) {
-  .news-container {
-    grid-template-columns: 1fr;
-  }
-
   .company-details-small {
     display: none;
   }
@@ -1179,98 +800,9 @@ header {
   .item-volume {
     display: none;
   }
-}
-.stock-app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-.main-content-items {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  margin-top: 30px;
-}
 
-.content-card {
-  margin-top: 40px !important;
-  width: 100%;
-  background-color: #fff;
-  box-shadow: 0px 4px 20px #cfdef1;
-  border-radius: 12px;
-  padding: 30px;
-  box-sizing: border-box;
-}
-
-.card-header {
-  color: #000c37;
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 0;
-  margin-bottom: 24px;
-}
-.globe-visualization {
-  position: relative;
-  margin: 20px 0;
-  padding: 20px;
-  z-index: 20;
-}
-
-.globe-section {
-  margin: 40px 0;
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.globe-section h2 {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
-
-.globe-container-wrapper {
-  display: flex;
-  height: 600px;
-}
-
-.globe-container {
-  flex: 4;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-.globe-info {
-  flex: 1;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.globe-point-info {
-  margin-bottom: 30px;
-  padding: 15px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.point-location {
-  font-weight: 500;
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-.point-value {
-  font-size: 24px;
-  color: #f03e3e;
-  font-weight: bold;
+  .statistics-table {
+    font-size: 12px;
+  }
 }
 </style>
