@@ -112,10 +112,13 @@
           <!-- 개별 품목 페이지인 경우 -->
 
           <div class="detail-layout-content-item" ref="section1">
-            {{ console.log("stockId", this.stockId) }}
             <span class="header">네트워크 그래프</span>
             <!-- 임시 -->
-            <NetworkGraph :stockId="stockId" />
+            <NetworkGraph
+              :stockId="stockId"
+              :productId="productId"
+              :type="type"
+            />
           </div>
           <div class="detail-layout-content-item" ref="section2">
             <span class="header">
@@ -285,7 +288,11 @@ export default {
     },
     stockId: {
       type: String,
-      required: true,
+      // required: true,
+    },
+    productId: {
+      type: String,
+      //   required: true,
     },
   },
   data() {

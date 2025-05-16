@@ -4,13 +4,22 @@ import * as vNG from "v-network-graph";
 
 import { ForceLayout } from "v-network-graph/lib/force-layout";
 import { getStockNetworkAPI } from "@/apis/stock";
+import { getProductNetworkAPI } from "@/apis/product";
 
 export default {
   name: "NetworkGraph",
   props: {
     stockId: {
       type: String,
-      required: true,
+      //   required: true,
+    },
+    productId: {
+      type: String,
+      //   required: true,
+    },
+    type: {
+      type: String,
+      validator: (v) => ["stock", "product"].includes(v),
     },
   },
   data() {
@@ -59,6 +68,10 @@ export default {
               visible: (node) => node.id === "node0",
               direction: "south",
               directionAutoAdjustment: true,
+              text: (node) => {
+                const name = node.name || "";
+                return name.length > 20 ? name.slice(0, 20) + "…" : name;
+              },
             },
             draggable: true,
           },
@@ -90,7 +103,12 @@ export default {
   methods: {
     onNodeClick({ node }) {
       const link = this.nodes[node].link_id;
-      window.location.href = "/product/" + link;
+      const type = this.nodes[node].type;
+      if (type === "국내" || type === "해외")
+        window.location.href = "/stock/" + link;
+      else {
+        window.location.href = "/product/" + link;
+      }
     },
     onPointerOver({ node }) {
       this.targetNodeId = node;
@@ -115,7 +133,12 @@ export default {
       Object.keys(this.edges).forEach((k) => delete this.edges[k]);
 
       try {
-        const res = await getStockNetworkAPI(this.stockId);
+        let res = null;
+        if (this.type === "stock") {
+          res = await getStockNetworkAPI(this.stockId);
+        } else {
+          res = await getProductNetworkAPI(this.productId);
+        }
         const data = res.data;
 
         Object.assign(this.nodes, data?.nodes);
