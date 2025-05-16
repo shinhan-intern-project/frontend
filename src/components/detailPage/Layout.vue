@@ -131,7 +131,7 @@
                 >
                   <img :src="icons[i]" alt="icon" />
                   <span class="relation-title">{{ prod.hscodeName }}</span>
-                  <span class="relation-code">{{ prod.hscodeId }}</span>
+                  <span class="relation-code">{{ prod.hscode }}</span>
                   <span class="relation-content"
                     >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
                     종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
