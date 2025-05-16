@@ -17,3 +17,12 @@ export async function getStockChartAPI(stockId, type) {
     console.error(error);
   }
 }
+
+export async function getSearchAPI(searchKeyword) {
+  try {
+    const response = await stockAPI.get(`/search?keyword=${searchKeyword}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
