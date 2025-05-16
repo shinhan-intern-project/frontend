@@ -114,11 +114,13 @@
           <div class="detail-layout-content-item" ref="section1">
             <span class="header">네트워크 그래프</span>
             <!-- 임시 -->
-            <NetworkGraph
-              :stockId="stockId"
-              :productId="productId"
-              :type="type"
-            />
+            <div class="network-graph-wrapper">
+              <NetworkGraph
+                :stockId="stockId"
+                :productId="productId"
+                :type="type"
+              />
+            </div>
           </div>
           <div class="detail-layout-content-item" ref="section2">
             <span class="header">
@@ -678,5 +680,10 @@ export default {
   font-size: 16px;
   font-weight: 400;
   line-height: 28px;
+}
+
+/* 네트워크 그래프 */
+.network-graph-wrapper {
+  margin-top: 28px;
 }
 </style>
