@@ -15,8 +15,7 @@
       </header>
 
       <!-- 탭 영역 -->
-
-      <ToggleSwitch v-model="type" />
+      <ToggleSwitch v-model="type" style="margin-bottom: 20px" />
       <!-- 선택된 타입에 따라 다른 내용 표시 -->
       <div class="content">
         <div v-if="type === 'stock'">
@@ -26,24 +25,31 @@
 
         <div v-else>
           <!-- 품목 관련 내용 -->
-
           <!-- 품목 관련 컴포넌트들 -->
         </div>
       </div>
+
       <!-- 검색창 영역 -->
       <div class="search-container">
         <input
           type="text"
+          v-model="searchKeyword"
           placeholder="검색어를 입력해주세요"
           class="search-input"
+          @keyup.enter="searchStocks"
         />
-        <button class="search-button">
+        <button class="search-button" @click="searchStocks">
           <i class="fas fa-search"></i>
         </button>
       </div>
 
+      <!-- 로딩 표시 -->
+      <div v-if="isLoading" class="loading-indicator">
+        <span>검색 중...</span>
+      </div>
+
       <!-- 종목 정보 영역 -->
-      <div class="stock-info-card">
+      <div v-else class="stock-info-card">
         <div class="stock-info-header">
           <div class="header-left">종목</div>
           <div class="header-right">종목과 관련된 품목</div>
@@ -52,10 +58,16 @@
         <div class="stock-info-content">
           <!-- 왼쪽: 종목 리스트 -->
           <div class="stock-list">
+            <div v-if="stockItems.length === 0" class="no-results">
+              <span>검색 결과가 없습니다</span>
+            </div>
             <div
+              v-else
               v-for="(item, index) in stockItems"
               :key="`top-${index}`"
               class="stock-item"
+              :class="{ active: selectedStockIndex === index }"
+              @click="selectStock(item, index)"
             >
               <div class="company-info">
                 <div class="company-logo"></div>
@@ -65,10 +77,14 @@
                 </div>
               </div>
               <div class="price-info">
-                <div class="current-price">{{ item.price }}원</div>
+                <div class="current-price">{{ item.price }}</div>
                 <div
                   class="price-change"
-                  :class="{ 'zero-change': item.changePercent === '0.0%' }"
+                  :class="{
+                    'zero-change': item.changePercent === '0.0%',
+                    'positive-change': parseFloat(item.changePercent) > 0,
+                    'negative-change': parseFloat(item.changePercent) < 0,
+                  }"
                 >
                   {{ item.changePercent }}
                 </div>
@@ -78,13 +94,17 @@
 
           <!-- 오른쪽: 관련 품목 -->
           <div class="related-items-list">
+            <div v-if="relatedItems.length === 0" class="no-related-items">
+              <span>관련 품목이 없습니다</span>
+            </div>
             <div
+              v-else
               v-for="(item, index) in relatedItems"
               :key="`related-${index}`"
               class="related-item"
             >
               <div class="related-item-name">{{ item.name }}</div>
-              <div class="related-item-code">{{ item.code }}</div>
+              <div class="related-item-code">{{ item.stockName }}</div>
             </div>
           </div>
         </div>
@@ -192,26 +212,18 @@
     </div>
   </div>
 </template>
-<script setup>
-// import { ref } from "vue";
-// import SegmentedControl from "./components/SegmentedControl.vue";
 
-// 기본값으로 'stock' (종목) 선택
-const type = ref("stock");
-
-// type 값에 따라 다른 API 호출이나 로직 처리 가능
-</script>
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import Globe from "globe.gl";
 import * as THREE from "three";
 import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
+import { getSearchAPI } from "@/apis/stock";
 const countries = {
-  features: [], // 여기에 국가 데이터가 들어갑니다, 아래 참고
+  features: [],
 };
 
-// 기본 국가 데이터를 불러오는 함수
 const fetchCountries = async () => {
   try {
     const res = await fetch(
@@ -223,8 +235,13 @@ const fetchCountries = async () => {
     console.error("국가 데이터를 불러오는 데 실패했습니다:", error);
   }
 };
+
 export default {
   name: "MainPage",
+  components: {
+    ToggleSwitch,
+    BackgroundGlobe,
+  },
   setup() {
     const backgroundGlobeContainer = ref(null);
     let backgroundGlobe = null;
@@ -236,7 +253,6 @@ export default {
     ]);
 
     onMounted(async () => {
-      // 국가 데이터 먼저 불러오기
       try {
         const res = await fetch(
           "https://unpkg.com/world-atlas/countries-110m.json"
@@ -244,16 +260,15 @@ export default {
         const data = await res.json();
         countries.features = data.features;
 
-        // 데이터가 준비된 후 지구본 초기화
         initGlobe();
       } catch (error) {
         console.error("국가 데이터를 불러오는 데 실패했습니다:", error);
-        // 오류 발생해도 기본 지구본은 초기화
         initGlobe();
       }
 
       window.addEventListener("resize", handleResize);
     });
+
     onBeforeUnmount(() => {
       window.removeEventListener("resize", handleResize);
       if (backgroundGlobe) {
@@ -264,26 +279,26 @@ export default {
     const initGlobe = () => {
       if (backgroundGlobeContainer.value) {
         backgroundGlobe = Globe()(backgroundGlobeContainer.value)
-          .backgroundColor("rgba(240, 248, 255, 0)") // 완전 투명한 배경
+          .backgroundColor("rgba(240, 248, 255, 0)")
           .globeImageUrl(
             "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-          ) // 기본 지구본 이미지 사용
+          )
           .bumpImageUrl(
             "//unpkg.com/three-globe/example/img/earth-topology.png"
-          ) // 범프 맵 추가 (지형 효과)
-          .width(window.innerWidth * 0.5) // 적절한 너비
-          .height(window.innerHeight * 0.8) // 적절한 높이
+          )
+          .width(window.innerWidth * 0.5)
+          .height(window.innerHeight * 0.8)
           .showGlobe(true)
           .showAtmosphere(true)
-          .atmosphereColor("rgba(200, 219, 255, 0.3)") // 밝은 푸른 대기
-          .atmosphereAltitude(0.15) // 두꺼운 대기층
+          .atmosphereColor("rgba(200, 219, 255, 0.3)")
+          .atmosphereAltitude(0.15)
           .globeMaterial(
             new THREE.MeshPhongMaterial({
-              color: 0xffffff, // 흰색 베이스
-              transparent: true, // 투명도 활성화
-              opacity: 0.9, // 약간 투명하게
-              shininess: 0.2, // 낮은 광택
-              specular: 0x77bbff, // 푸른빛 반사
+              color: 0xffffff,
+              transparent: true,
+              opacity: 0.9,
+              shininess: 0.2,
+              specular: 0x77bbff,
             })
           )
           .pointsData([
@@ -293,7 +308,6 @@ export default {
             { lat: 1.3521, lng: 103.8198, value: 1.5, name: "싱가포르" },
           ])
           .pointColor((d) => {
-            // 포인트 색상 맞춤화
             const colors = {
               서울: "rgba(25, 118, 210, 0.8)",
               도쿄: "rgba(56, 142, 60, 0.8)",
@@ -334,13 +348,11 @@ export default {
           .arcDashAnimateTime(1500)
           .arcStroke(0.5);
 
-        // 자동 회전 설정
         backgroundGlobe.controls().autoRotate = true;
         backgroundGlobe.controls().autoRotateSpeed = 0.3;
-        backgroundGlobe.controls().enableZoom = false; // 줌 기능 비활성화
+        backgroundGlobe.controls().enableZoom = false;
         backgroundGlobe.pointOfView({ lat: 25, lng: 120, altitude: 2.5 }, 1000);
 
-        // 조명 설정 추가
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         backgroundGlobe.scene().add(ambientLight);
 
@@ -349,6 +361,7 @@ export default {
         backgroundGlobe.scene().add(directionalLight);
       }
     };
+
     const handleResize = () => {
       if (backgroundGlobe) {
         backgroundGlobe
@@ -365,52 +378,8 @@ export default {
 
   data() {
     return {
-      stockItems: [
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-        },
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-        },
-      ],
-      relatedItems: [
-        { name: "한국정보통신서비스", code: "9967" },
-        { name: "한국정보통신서비스", code: "9967" },
-        { name: "한국정보통신서비스", code: "9967" },
-        { name: "한국정보통신서비스", code: "9967" },
-        { name: "한국정보통신서비스", code: "9967" },
-        { name: "한국정보통신서비스", code: "9967" },
-      ],
+      stockItems: [],
+      relatedItems: [],
       topStocks: [
         {
           name: "삼성전자",
@@ -514,12 +483,12 @@ export default {
           exportValue: "8,327,139",
           change: 3.6,
         },
-      ], // 뉴스 데이터 추가
+      ],
       newsItems: [
         {
           id: 1,
           tag: "호재",
-          tagColor: "#E5484D", // 빨강
+          tagColor: "#E5484D",
           url: "https://google.com",
           title:
             "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
@@ -529,7 +498,7 @@ export default {
         {
           id: 2,
           tag: "악재",
-          tagColor: "#3D8BFF", // 파랑
+          tagColor: "#3D8BFF",
           url: "https://google.com",
           title:
             "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
@@ -539,7 +508,7 @@ export default {
         {
           id: 3,
           tag: "중립",
-          tagColor: "#A5A5A5", // 회색
+          tagColor: "#A5A5A5",
           title:
             "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
           publisher: "조선 미디어",
@@ -558,11 +527,101 @@ export default {
       ],
     };
   },
+  methods: {
+    async searchStocks() {
+      if (!this.searchKeyword) return;
+
+      this.isLoading = true;
+      try {
+        const responseData = await getSearchAPI(this.searchKeyword);
+        if (responseData && responseData.status === "OK") {
+          this.stockItems = responseData.data.map((item) => ({
+            name: item.companyName,
+            code: item.ticker,
+            price: `${parseInt(item.currentPrice).toLocaleString()}원`,
+            changePercent: `${(parseFloat(item.changeRate) * 100).toFixed(1)}%`,
+            stockId: item.stockId,
+            relatedProducts: item.relatedProducts || [],
+          }));
+
+          this.showAllRelatedProducts();
+        }
+      } catch (error) {
+        console.error("종목 검색 오류:", error);
+        this.stockItems = [];
+        this.selectedStock = null;
+        this.relatedItems = [];
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    showAllRelatedProducts() {
+      const allRelatedProducts = [];
+      const uniqueHscodes = new Set();
+
+      this.stockItems.forEach((stock) => {
+        if (stock.relatedProducts && stock.relatedProducts.length > 0) {
+          stock.relatedProducts.forEach((product) => {
+            // 이미 추가된 hscode인지 확인
+            if (!uniqueHscodes.has(product.hscode)) {
+              uniqueHscodes.add(product.hscode);
+
+              allRelatedProducts.push({
+                name: product.hscodeName,
+                code: product.hscode,
+                stockName: stock.name,
+              });
+            }
+          });
+        }
+      });
+
+      this.relatedItems = allRelatedProducts;
+      this.selectedStockIndex = -1;
+    },
+
+    selectStock(stock, index) {
+      this.selectedStock = stock;
+      this.selectedStockIndex = index;
+
+      if (stock.relatedProducts && stock.relatedProducts.length > 0) {
+        const uniqueHscodes = new Set();
+
+        this.relatedItems = stock.relatedProducts
+          .filter((product) => {
+            if (uniqueHscodes.has(product.hscode)) {
+              return false;
+            }
+            uniqueHscodes.add(product.hscode);
+            return true;
+          })
+          .map((product) => ({
+            name: product.hscodeName,
+            code: product.hscode,
+            stockName: stock.name,
+          }));
+      } else {
+        this.relatedItems = [];
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
-/* 전체 앱 스타일 */
+.no-results,
+.no-related-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  padding: 20px;
+  color: #888;
+  font-size: 16px;
+  text-align: center;
+}
+
 .logo-image {
   max-width: 300px;
   height: auto;
@@ -571,7 +630,6 @@ export default {
 .arrow-image {
   max-width: 50px;
   height: auto;
-  /* width: 30%; */
 }
 .stock-app {
   max-width: 1200px;
@@ -587,10 +645,8 @@ export default {
 }
 .volume-section,
 .export-import-section {
-  flex: 1; /* 동일한 너비로 */
+  flex: 1;
   padding: 20px;
-  /* background-color: #f2f2f2;
-  border: 1px solid #ccc; */
   box-sizing: border-box;
 }
 .background-globe-container {
@@ -603,11 +659,9 @@ export default {
   pointer-events: none;
   background: transparent;
   display: flex;
-  justify-content: flex-end; /* 컨텐츠를 오른쪽으로 정렬 */
-  align-items: flex-start; /* 수직 가운데 정렬 */
+  justify-content: flex-end;
+  align-items: flex-start;
 }
-
-/* 배경을 위한 별도의 레이어 추가 */
 
 .content-wrapper {
   position: relative;
@@ -631,7 +685,6 @@ export default {
 
 /* 헤더 스타일 */
 header {
-  /* background-color: rgba(255, 255, 255, 0.8); */
   margin-top: 5%;
   margin-bottom: 30px;
 }
@@ -648,7 +701,6 @@ header {
   margin-top: 0;
 }
 
-/* 탭 섹션 스타일 */
 .tab-section {
   margin-bottom: 20px;
 }
@@ -710,41 +762,51 @@ header {
   display: flex;
   justify-content: space-between;
   padding: 15px 20px;
-  /* background-color: #f8f9fa; */
   border-bottom: 1px solid #eee;
 }
 
-/* 왼쪽, 오른쪽 컨텐츠 컨테이너 */
 .stock-info-content {
   display: flex;
-  flex-direction: row; /* 명시적으로 가로 방향 지정 */
-  flex-wrap: nowrap; /* 줄바꿈 방지 */
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 .stock-list,
 .related-items-list {
   flex: 1;
   max-height: 400px;
-  /* overflow-y: auto; */
+  overflow-y: auto;
   border-right: 1px solid #eee;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
 .related-items-list {
   border-right: none;
 }
 
-.stock-item,
-.related-item {
+.stock-item {
   display: flex;
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.related-item {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
 }
 
 .company-info {
   display: flex;
   align-items: center;
-  flex: 1;
+  flex: 2;
+  min-width: 0;
 }
 
 .company-logo {
@@ -809,14 +871,13 @@ header {
 
 .price-change {
   font-size: 14px;
-  color: #f03e3e; /* 상승 */
+  color: #f03e3e;
 }
 
 .zero-change {
-  color: #333; /* 변동 없음 */
+  color: #333;
 }
 
-/* 관련 품목 스타일 */
 .related-item {
   display: flex;
   justify-content: space-between;
@@ -826,14 +887,36 @@ header {
 
 .related-item-name {
   font-weight: 500;
+  margin-bottom: 8px;
+  width: 100%;
+  white-space: normal;
+  line-height: 1.4;
+  max-height: 4.2em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 }
 
 .related-item-code {
-  color: #888;
+  color: #666;
   font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
 }
 
-/* 중앙 화살표 스타일 */
+.related-item-code::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #034ea2;
+  margin-right: 6px;
+}
+
 .center-arrow {
   text-align: center;
   margin: 20px 0;
@@ -841,7 +924,6 @@ header {
   color: #888;
 }
 
-/* 종목 거래량 섹션 스타일 */
 .volume-section {
   margin-bottom: 40px;
 }
@@ -931,7 +1013,6 @@ header {
   text-align: right;
 }
 
-/* 수출입 통계 섹션 스타일 */
 .export-import-section {
   margin-bottom: 40px;
 }
@@ -984,7 +1065,6 @@ header {
   color: #1971c2;
 }
 
-/* 뉴스 섹션 스타일 */
 .news-section {
   margin-bottom: 40px;
 }
@@ -1021,7 +1101,6 @@ header {
   background-color: #e9ecef;
 }
 
-/* 뉴스 태그 스타일 추가 */
 .news-tag {
   position: absolute;
   top: 10px;
@@ -1046,7 +1125,6 @@ header {
   -webkit-box-orient: vertical;
 }
 
-/* 뉴스 footer 스타일 추가 */
 .news-footer {
   display: flex;
   justify-content: space-between;
@@ -1062,7 +1140,6 @@ header {
   max-width: 70%;
 }
 
-/* 반응형 스타일 */
 @media (max-width: 992px) {
   .stock-info-content {
     flex-direction: column;
@@ -1136,9 +1213,9 @@ header {
   position: relative;
   margin: 20px 0;
   padding: 20px;
-  z-index: 20; /* 지구본보다 높은 z-index */
+  z-index: 20;
 }
-/* 3D 지구본 섹션 스타일 추가 */
+
 .globe-section {
   margin: 40px 0;
   background-color: white;
@@ -1196,20 +1273,4 @@ header {
   color: #f03e3e;
   font-weight: bold;
 }
-/* 
-@media (max-width: 768px) {
-  .globe-container-wrapper {
-    flex-direction: column;
-    height: auto;
-  }
-
-  .globe-container {
-    height: 400px;
-  }
-
-  .globe-info {
-    margin-left: 0;
-    margin-top: 20px;
-  }
-} */
 </style>

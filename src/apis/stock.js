@@ -18,9 +18,19 @@ export async function getStockChartAPI(stockId, type) {
   }
 }
 
+
 export async function getStockNetworkAPI(stockId) {
   try {
     const response = await networkAPI.get(`/stock/${stockId}?depth=3`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getSearchAPI(searchKeyword) {
+  try {
+    const response = await stockAPI.get(`/search?keyword=${searchKeyword}`);
     return response.data;
   } catch (error) {
     console.error(error);
