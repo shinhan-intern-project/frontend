@@ -4,15 +4,12 @@ pipeline {
     environment {
         SSH_HOST = 'ubuntu@192.168.20.63'
         SSH_CRED_ID = '2-ssh-key'
+        IMAGE_NAME = "hamgeonwook/stockport_front:${env.BUILD_NUMBER}"
 
     }
 
     tools {
         nodejs "nodeJs"
-    }
-
-    environment {
-        IMAGE_NAME = "hamgeonwook/stockport_front:${env.BUILD_NUMBER}"
     }
 
     stages {
