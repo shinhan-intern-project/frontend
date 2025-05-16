@@ -40,7 +40,13 @@
                     >
                   </div>
                   <div>
-                    <span class="per">-2.4%</span>
+                    <span class="per">
+                      {{
+                        stockInfo?.changeRate != null
+                          ? Number(stockInfo.changeRate).toFixed(2)
+                          : "0.00"
+                      }}%</span
+                    >
                   </div>
                 </div>
               </div>
@@ -124,10 +130,11 @@
                   :key="prod.hscodeId"
                 >
                   <img :src="icons[i]" alt="icon" />
-                  <span class="relation-title">{{ prod.hscodeName }}</span>
-                  <span class="relation-code">{{ prod.hscodeId }}</span>
-                  <span class="relation-content"
-                    >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
+                  <span class="relation-title">{{ prod?.hscodeName }}</span>
+                  <span class="relation-code">{{ prod?.hscode }}</span>
+                  <span class="relation-content">
+                    {{ prod?.hscodeDescription }}
+                    왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
                     종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
                     관련이 있냐면... GPT가 설명해줄거야</span
                   >
@@ -199,8 +206,9 @@
             ref="section3"
           >
             <span class="header">캔들 차트</span>
-            <!-- 임시 -->
-            <div style="height: 300px"></div>
+            <div class="candle-line-wrppaer">
+              <CandleLine />
+            </div>
           </div>
           <!-- 개별 주식 페이지 - 캔들차트 -->
 
@@ -237,6 +245,7 @@ import DetailHeader from "./Header.vue";
 import DetailFloating from "./Floating.vue";
 import NewsItem from "../news/NewsItem.vue";
 import SentimentBadge from "./SentimentBadge.vue";
+import CandleLine from "../candleLine/CandleLine.vue";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -252,6 +261,7 @@ export default {
     DetailFloating,
     NewsItem,
     SentimentBadge,
+    CandleLine,
   },
   props: {
     type: {

@@ -8,3 +8,12 @@ export async function getStockAPI(stockId) {
     console.error(error);
   }
 }
+
+export async function getStockChartAPI(stockId, type) {
+  try {
+    const response = await stockAPI.get(`/charts/${stockId}?type=${type}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
