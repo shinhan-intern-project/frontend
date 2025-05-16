@@ -1,156 +1,168 @@
 <template>
   <div class="stock-app">
-    <!-- 헤더 영역 -->
-    <header>
-      <img
-        src="@/assets/logo/image.png"
-        alt="STOCKPORT 로고"
-        class="logo-image"
-      />
-    </header>
+    <div class="page-background"></div>
 
-    <!-- 탭 영역 -->
-    <div class="tab-section">
-      <div class="tab-container">
-        <button class="tab-button active">종목</button>
-      </div>
-    </div>
+    <!-- 백그라운드 지구본 추가 -->
+    <div
+      class="background-globe-container"
+      ref="backgroundGlobeContainer"
+    ></div>
+    <div class="content-wrapper">
+      <!-- 헤더 영역 -->
+      <header>
+        <img
+          src="@/assets/logo/image.png"
+          alt="STOCKPORT 로고"
+          class="logo-image"
+        />
+      </header>
 
-    <!-- 검색창 영역 -->
-    <div class="search-container">
-      <input
-        type="text"
-        placeholder="검색어를 입력해주세요"
-        class="search-input"
-      />
-      <button class="search-button">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
-
-    <!-- 종목 정보 영역 -->
-    <div class="stock-info-card">
-      <div class="stock-info-header">
-        <div class="header-left">종목</div>
-        <div class="header-right">종목과 관련된 품목</div>
+      <!-- 탭 영역 -->
+      <div class="tab-section">
+        <div class="tab-container">
+          <button class="tab-button active">종목</button>
+        </div>
       </div>
 
-      <div class="stock-info-content">
-        <!-- 왼쪽: 종목 리스트 -->
-        <div class="stock-list">
-          <div
-            v-for="(item, index) in stockItems"
-            :key="`top-${index}`"
-            class="stock-item"
-          >
-            <div class="company-info">
-              <div class="company-logo"></div>
-              <div class="company-details">
-                <div class="company-name">{{ item.name }}</div>
-                <div class="company-code">{{ item.code }}</div>
+      <!-- 검색창 영역 -->
+      <div class="search-container">
+        <input
+          type="text"
+          placeholder="검색어를 입력해주세요"
+          class="search-input"
+        />
+        <button class="search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+
+      <!-- 종목 정보 영역 -->
+      <div class="stock-info-card">
+        <div class="stock-info-header">
+          <div class="header-left">종목</div>
+          <div class="header-right">종목과 관련된 품목</div>
+        </div>
+
+        <div class="stock-info-content">
+          <!-- 왼쪽: 종목 리스트 -->
+          <div class="stock-list">
+            <div
+              v-for="(item, index) in stockItems"
+              :key="`top-${index}`"
+              class="stock-item"
+            >
+              <div class="company-info">
+                <div class="company-logo"></div>
+                <div class="company-details">
+                  <div class="company-name">{{ item.name }}</div>
+                  <div class="company-code">{{ item.code }}</div>
+                </div>
+              </div>
+              <div class="price-info">
+                <div class="current-price">{{ item.price }}원</div>
+                <div
+                  class="price-change"
+                  :class="{ 'zero-change': item.changePercent === '0.0%' }"
+                >
+                  {{ item.changePercent }}
+                </div>
               </div>
             </div>
-            <div class="price-info">
-              <div class="current-price">{{ item.price }}원</div>
+          </div>
+
+          <!-- 오른쪽: 관련 품목 -->
+          <div class="related-items-list">
+            <div
+              v-for="(item, index) in relatedItems"
+              :key="`related-${index}`"
+              class="related-item"
+            >
+              <div class="related-item-name">{{ item.name }}</div>
+              <div class="related-item-code">{{ item.code }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 중앙 화살표 -->
+      <div class="center-arrow">
+        <img
+          src="@/assets/images/icons/arrow.png"
+          alt="arrow"
+          class="arrow-image"
+        />
+        <i class="fas fa-chevron-down"></i>
+      </div>
+
+      <!-- 종목 거래량 / 수출입 통계 그래프  -->
+      <div class="layout">
+        <!-- 종목 거래량 섹션 -->
+        <div class="volume-section">
+          <div class="section-header">
+            <h2>종목 거래량 Top 10</h2>
+          </div>
+
+          <div class="volume-table-header">
+            <div class="col-header">번호</div>
+            <div class="col-header">종목명</div>
+            <div class="col-header">현재가</div>
+            <div class="col-header">등락률</div>
+            <div class="col-header">거래량</div>
+          </div>
+
+          <div class="volume-table">
+            <div
+              v-for="(item, index) in topStocks"
+              :key="`volume-${index}`"
+              class="volume-item"
+            >
+              <div class="item-rank">{{ index + 1 }}</div>
+              <div class="item-company">
+                <div class="company-logo-small"></div>
+                <div class="company-details-small">
+                  <div class="company-name-small">{{ item.name }}</div>
+                  <div class="company-code-small">{{ item.code }}</div>
+                </div>
+              </div>
+              <div class="item-price">{{ item.price }}원</div>
               <div
-                class="price-change"
+                class="item-change"
                 :class="{ 'zero-change': item.changePercent === '0.0%' }"
               >
                 {{ item.changePercent }}
               </div>
+              <div class="item-volume">{{ item.volume }}주</div>
             </div>
           </div>
         </div>
 
-        <!-- 오른쪽: 관련 품목 -->
-        <div class="related-items-list">
-          <div
-            v-for="(item, index) in relatedItems"
-            :key="`related-${index}`"
-            class="related-item"
-          >
-            <div class="related-item-name">{{ item.name }}</div>
-            <div class="related-item-code">{{ item.code }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
+        <!-- 수출입 통계 섹션 -->
+        <div class="export-import-section">
+          <h2>수출입 통계 그래프</h2>
 
-    <!-- 중앙 화살표 -->
-    <div class="center-arrow">
-      <img
-        src="@/assets/images/icons/arrow.png"
-        alt="arrow"
-        class="arrow-image"
-      />
-      <i class="fas fa-chevron-down"></i>
-    </div>
-
-    <!-- 종목 거래량 섹션 -->
-    <div class="volume-section">
-      <div class="section-header">
-        <h2>종목 거래량 Top 10</h2>
-      </div>
-
-      <div class="volume-table-header">
-        <div class="col-header">번호</div>
-        <div class="col-header">종목명</div>
-        <div class="col-header">현재가</div>
-        <div class="col-header">등락률</div>
-        <div class="col-header">거래량</div>
-      </div>
-
-      <div class="volume-table">
-        <div
-          v-for="(item, index) in topStocks"
-          :key="`volume-${index}`"
-          class="volume-item"
-        >
-          <div class="item-rank">{{ index + 1 }}</div>
-          <div class="item-company">
-            <div class="company-logo-small"></div>
-            <div class="company-details-small">
-              <div class="company-name-small">{{ item.name }}</div>
-              <div class="company-code-small">{{ item.code }}</div>
+          <div class="statistics-table">
+            <div class="stats-header">
+              <div>품목</div>
+              <div>수입</div>
+              <div>수출 금액</div>
+              <div>수출 증감</div>
             </div>
-          </div>
-          <div class="item-price">{{ item.price }}원</div>
-          <div
-            class="item-change"
-            :class="{ 'zero-change': item.changePercent === '0.0%' }"
-          >
-            {{ item.changePercent }}
-          </div>
-          <div class="item-volume">{{ item.volume }}주</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 수출입 통계 섹션 -->
-    <div class="export-import-section">
-      <h2>수출입 통계 그래프</h2>
-
-      <div class="statistics-table">
-        <div class="stats-header">
-          <div>품목</div>
-          <div>수입</div>
-          <div>수출 금액</div>
-          <div>수출 증감</div>
-        </div>
-
-        <div
-          v-for="(stat, index) in exportStats"
-          :key="`stat-${index}`"
-          class="stat-item"
-        >
-          <div class="stat-name">{{ stat.name }}</div>
-          <div class="stat-import">{{ stat.importValue }}</div>
-          <div class="stat-export">{{ stat.exportValue }}</div>
-          <div
-            class="stat-change"
-            :class="stat.change > 0 ? 'positive-change' : 'negative-change'"
-          >
-            {{ stat.change > 0 ? "+" : "" }}{{ stat.change }}
+            <div
+              v-for="(stat, index) in exportStats"
+              :key="`stat-${index}`"
+              class="stat-item"
+            >
+              <div class="stat-name">{{ stat.name }}</div>
+              <div class="stat-import">{{ stat.importValue }}</div>
+              <div class="stat-export">{{ stat.exportValue }}</div>
+              <div
+                class="stat-change"
+                :class="stat.change > 0 ? 'positive-change' : 'negative-change'"
+              >
+                {{ stat.change > 0 ? "+" : "" }}{{ stat.change }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -176,8 +188,164 @@
 </template>
 
 <script>
+import { onMounted, onBeforeUnmount, ref } from "vue";
+import Globe from "globe.gl";
+import * as THREE from "three";
+const countries = {
+  features: [], // 여기에 국가 데이터가 들어갑니다, 아래 참고
+};
+
+// 기본 국가 데이터를 불러오는 함수
+const fetchCountries = async () => {
+  try {
+    const res = await fetch(
+      "https://unpkg.com/world-atlas/countries-110m.json"
+    );
+    const data = await res.json();
+    countries.features = data.features;
+  } catch (error) {
+    console.error("국가 데이터를 불러오는 데 실패했습니다:", error);
+  }
+};
 export default {
   name: "MainPage",
+  setup() {
+    const backgroundGlobeContainer = ref(null);
+    let backgroundGlobe = null;
+    fetchCountries();
+    const activePoints = ref([
+      { city: "서울", country: "한국", value: 3.2 },
+      { city: "도쿄", country: "일본", value: 1.8 },
+      { city: "뉴욕", country: "미국", value: 2.5 },
+    ]);
+
+    onMounted(async () => {
+      // 국가 데이터 먼저 불러오기
+      try {
+        const res = await fetch(
+          "https://unpkg.com/world-atlas/countries-110m.json"
+        );
+        const data = await res.json();
+        countries.features = data.features;
+
+        // 데이터가 준비된 후 지구본 초기화
+        initGlobe();
+      } catch (error) {
+        console.error("국가 데이터를 불러오는 데 실패했습니다:", error);
+        // 오류 발생해도 기본 지구본은 초기화
+        initGlobe();
+      }
+
+      window.addEventListener("resize", handleResize);
+    });
+    onBeforeUnmount(() => {
+      window.removeEventListener("resize", handleResize);
+      if (backgroundGlobe) {
+        backgroundGlobe._destructor && backgroundGlobe._destructor();
+      }
+    });
+
+    const initGlobe = () => {
+      if (backgroundGlobeContainer.value) {
+        backgroundGlobe = Globe()(backgroundGlobeContainer.value)
+          .backgroundColor("rgba(240, 248, 255, 0)") // 완전 투명한 배경
+          .globeImageUrl(
+            "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+          ) // 기본 지구본 이미지 사용
+          .bumpImageUrl(
+            "//unpkg.com/three-globe/example/img/earth-topology.png"
+          ) // 범프 맵 추가 (지형 효과)
+          .width(window.innerWidth * 0.5) // 적절한 너비
+          .height(window.innerHeight * 0.8) // 적절한 높이
+          .showGlobe(true)
+          .showAtmosphere(true)
+          .atmosphereColor("rgba(200, 219, 255, 0.3)") // 밝은 푸른 대기
+          .atmosphereAltitude(0.15) // 두꺼운 대기층
+          .globeMaterial(
+            new THREE.MeshPhongMaterial({
+              color: 0xffffff, // 흰색 베이스
+              transparent: true, // 투명도 활성화
+              opacity: 0.9, // 약간 투명하게
+              shininess: 0.2, // 낮은 광택
+              specular: 0x77bbff, // 푸른빛 반사
+            })
+          )
+          .pointsData([
+            { lat: 37.5665, lng: 126.978, value: 3.2, name: "서울" },
+            { lat: 35.6762, lng: 139.6503, value: 1.8, name: "도쿄" },
+            { lat: 40.7128, lng: -74.006, value: 2.5, name: "뉴욕" },
+            { lat: 1.3521, lng: 103.8198, value: 1.5, name: "싱가포르" },
+          ])
+          .pointColor((d) => {
+            // 포인트 색상 맞춤화
+            const colors = {
+              서울: "rgba(25, 118, 210, 0.8)",
+              도쿄: "rgba(56, 142, 60, 0.8)",
+              뉴욕: "rgba(245, 124, 0, 0.8)",
+              싱가포르: "rgba(156, 39, 176, 0.8)",
+            };
+            return colors[d.name] || "rgba(255, 255, 255, 0.8)";
+          })
+          .pointRadius(0.4)
+          .pointAltitude(0.02)
+          .arcsData([
+            {
+              startLat: 37.5665,
+              startLng: 126.978,
+              endLat: 35.6762,
+              endLng: 139.6503,
+            },
+            {
+              startLat: 37.5665,
+              startLng: 126.978,
+              endLat: 40.7128,
+              endLng: -74.006,
+            },
+            {
+              startLat: 35.6762,
+              startLng: 139.6503,
+              endLat: 1.3521,
+              endLng: 103.8198,
+            },
+          ])
+          .arcColor(() => [
+            "rgba(0, 127, 255, 0.5)",
+            "rgba(44, 186, 0, 0.5)",
+            "rgba(255, 197, 0, 0.5)",
+          ])
+          .arcDashLength(0.4)
+          .arcDashGap(0.2)
+          .arcDashAnimateTime(1500)
+          .arcStroke(0.5);
+
+        // 자동 회전 설정
+        backgroundGlobe.controls().autoRotate = true;
+        backgroundGlobe.controls().autoRotateSpeed = 0.3;
+        backgroundGlobe.controls().enableZoom = false; // 줌 기능 비활성화
+        backgroundGlobe.pointOfView({ lat: 25, lng: 120, altitude: 2.5 }, 1000);
+
+        // 조명 설정 추가
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        backgroundGlobe.scene().add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        directionalLight.position.set(1, 1, 1);
+        backgroundGlobe.scene().add(directionalLight);
+      }
+    };
+    const handleResize = () => {
+      if (backgroundGlobe) {
+        backgroundGlobe
+          .width(window.innerWidth * 0.4)
+          .height(window.innerHeight * 0.7);
+      }
+    };
+
+    return {
+      backgroundGlobeContainer,
+      activePoints,
+    };
+  },
 
   data() {
     return {
@@ -396,7 +564,48 @@ export default {
   color: #333;
   position: relative;
 }
+.layout {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.volume-section,
+.export-import-section {
+  flex: 1; /* 동일한 너비로 */
+  padding: 20px;
+  /* background-color: #f2f2f2;
+  border: 1px solid #ccc; */
+  box-sizing: border-box;
+}
+.background-globe-container {
+  position: absolute;
+  top: 0%;
+  right: -100px;
+  width: 70%;
+  height: 100vh;
+  z-index: 2;
+  pointer-events: none;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end; /* 컨텐츠를 오른쪽으로 정렬 */
+  align-items: flex-start; /* 수직 가운데 정렬 */
+}
 
+/* 배경을 위한 별도의 레이어 추가 */
+.page-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1; /* 가장 낮은 z-index */
+  background: linear-gradient(to bottom, #f0f8ff, #e6f2ff); /* 파란흰색 배경 */
+}
+.content-wrapper {
+  position: relative;
+  z-index: 3;
+  max-width: 1200px;
+}
 .stock-app::before {
   content: "";
   position: fixed;
@@ -406,7 +615,7 @@ export default {
   height: 100%;
   background: radial-gradient(
     circle at top right,
-    rgba(200, 220, 255, 0.1),
+    rgba(36, 40, 47, 0.1),
     transparent 70%
   );
   z-index: -1;
@@ -414,7 +623,8 @@ export default {
 
 /* 헤더 스타일 */
 header {
-  margin-top: 10%;
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  margin-top: 5%;
   margin-bottom: 30px;
 }
 
@@ -499,6 +709,8 @@ header {
 /* 왼쪽, 오른쪽 컨텐츠 컨테이너 */
 .stock-info-content {
   display: flex;
+  flex-direction: row; /* 명시적으로 가로 방향 지정 */
+  flex-wrap: nowrap; /* 줄바꿈 방지 */
 }
 
 .stock-list,
@@ -912,4 +1124,84 @@ header {
   margin-top: 0;
   margin-bottom: 24px;
 }
+.globe-visualization {
+  position: relative;
+  margin: 20px 0;
+  padding: 20px;
+  z-index: 20; /* 지구본보다 높은 z-index */
+}
+/* 3D 지구본 섹션 스타일 추가 */
+.globe-section {
+  margin: 40px 0;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.globe-section h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.globe-container-wrapper {
+  display: flex;
+  height: 600px;
+}
+
+.globe-container {
+  flex: 4;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.globe-info {
+  flex: 1;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.globe-point-info {
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.point-location {
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.point-value {
+  font-size: 24px;
+  color: #f03e3e;
+  font-weight: bold;
+}
+/* 
+@media (max-width: 768px) {
+  .globe-container-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .globe-container {
+    height: 400px;
+  }
+
+  .globe-info {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+} */
 </style>
