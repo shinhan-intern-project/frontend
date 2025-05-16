@@ -1,4 +1,16 @@
 <template>
+  <!-- 기간 토글 버튼 -->
+  <div class="chart-controls">
+    <button
+      v-for="opt in periodOptions"
+      :key="opt.value"
+      :class="{ active: chartType === opt.value }"
+      @click="onChangeType(opt.value)"
+    >
+      {{ opt.label }}
+    </button>
+  </div>
+
   <div id="chart">
     <apexchart
       ref="chart"
@@ -16,6 +28,14 @@ export default {
   name: "CandleLine",
   data() {
     return {
+      chartType: "month",
+      periodOptions: [
+        { label: "일", value: "day" },
+        { label: "주", value: "week" },
+        { label: "월", value: "month" },
+        { label: "분기", value: "quarter" },
+        { label: "년", value: "year" },
+      ],
       series: [
         {
           name: "Candle",
@@ -91,59 +111,77 @@ export default {
       },
     };
   },
+  methods: {
+    async getChartData() {
+      try {
+        this.series = [
+          {
+            name: "Candle",
+            type: "candlestick",
+            data: [],
+            yAxisIndex: 0,
+          },
+        ];
+
+        // 1) 경로에서 stockId 꺼내기
+        const stockId = this.$route.params.stockId;
+        // 2) API 호출
+        const res = await getStockChartAPI(stockId, this.chartType);
+        // 3) 값 저장
+        const stock = res.data.data[0].stock;
+        const relatedProducts = res.data.data[0].relatedProducts || [];
+        // 4) 캔들 시리즈에 매핑
+        this.series[0].data = stock.prices.map((p) => ({
+          // 날짜 문자열을 timestamp 로 변환
+          x: new Date(
+            p.date.slice(0, 4),
+            Number(p.date.slice(4, 6)) - 1,
+            p.date.slice(6, 8) || "01"
+          ).getTime(),
+          y: [p.open_price, p.high_price, p.low_price, p.close_price],
+        }));
+
+        // 5) 수출입량 라인 그래프
+        relatedProducts.forEach((prod) => {
+          // 5-1) 수출 라인
+          this.series.push({
+            name: `수출: ${prod.hscodeId}`,
+            type: "line",
+            data: prod.kr.map((item) => ({
+              x: new Date(
+                +item.date.slice(0, 4),
+                +item.date.slice(4, 6) - 1
+              ).getTime(),
+              y: item.exportValue,
+            })),
+            yAxisIndex: 1,
+          });
+          // 5-2) 수입 라인
+          this.series.push({
+            name: ` 수입: ${prod.hscodeId}`,
+            type: "line",
+            data: prod.kr.map((item) => ({
+              x: new Date(
+                +item.date.slice(0, 4),
+                +item.date.slice(4, 6) - 1
+              ).getTime(),
+              y: item.importValue,
+            })),
+            yAxisIndex: 1,
+          });
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    onChangeType(type) {
+      if (this.chartType === type) return;
+      this.chartType = type;
+      this.getChartData();
+    },
+  },
   async mounted() {
-    try {
-      // 1) 경로에서 stockId 꺼내기
-      const stockId = this.$route.params.stockId;
-      // 2) API 호출
-      const res = await getStockChartAPI(stockId, "day");
-      // 3) 값 저장
-      const stock = res.data.data[0].stock;
-      const relatedProducts = res.data.data[0].relatedProducts || [];
-
-      // 4) 캔들 시리즈에 매핑
-      this.series[0].data = stock.prices.map((p) => ({
-        // 날짜 문자열을 timestamp 로 변환
-        x: new Date(
-          p.date.slice(0, 4),
-          Number(p.date.slice(4, 6)) - 1,
-          p.date.slice(6, 8) || "01"
-        ).getTime(),
-        y: [p.open_price, p.high_price, p.low_price, p.close_price],
-      }));
-
-      // 5) 수출입량 라인 그래프
-      relatedProducts.forEach((prod) => {
-        // 5-1) 수출 라인
-        this.series.push({
-          name: `수출: ${prod.hscodeId}`, // 혹은 prod.hscodeId
-          type: "line",
-          data: prod.kr.map((item) => ({
-            x: new Date(
-              +item.date.slice(0, 4),
-              +item.date.slice(4, 6) - 1
-            ).getTime(),
-            y: item.exportValue,
-          })),
-          yAxisIndex: 1,
-        });
-        // 5-2) 수입 라인
-        this.series.push({
-          name: ` 수입: ${prod.hscodeId}`,
-          type: "line",
-          data: prod.kr.map((item) => ({
-            x: new Date(
-              +item.date.slice(0, 4),
-              +item.date.slice(4, 6) - 1
-            ).getTime(),
-            y: item.importValue,
-          })),
-          yAxisIndex: 1,
-        });
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    await this.getChartData();
   },
 };
 </script>
@@ -152,5 +190,24 @@ export default {
 #chart {
   width: -webkit-fill-available;
   margin: 0 auto;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.chart-controls button {
+  padding: 4px 16px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.chart-controls button.active {
+  background: #2d7aff;
+  color: white;
 }
 </style>
