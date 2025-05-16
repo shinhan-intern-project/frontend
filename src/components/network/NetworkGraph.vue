@@ -89,8 +89,8 @@ export default {
   },
   methods: {
     onNodeClick({ node }) {
-      const link = this.nodes[node].hscode;
-      window.location.href = "/hscode/" + link;
+      const link = this.nodes[node].link_id;
+      window.location.href = "/product/" + link;
     },
     onPointerOver({ node }) {
       this.targetNodeId = node;
