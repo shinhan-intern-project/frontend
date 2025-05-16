@@ -1,4 +1,4 @@
-import { networkAPI, networkAPI, stockAPI } from "@/apis";
+import { stockAPI } from "@/apis";
 
 export async function getStockAPI(stockId) {
   try {
