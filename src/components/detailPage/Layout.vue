@@ -198,7 +198,10 @@
               </div>
 
               <!-- 관련 품목이 없거나 빈 배열일 때 -->
-              <div class="no-relation" v-else>
+              <div
+                class="no-relation"
+                v-if="!relatedStocks?.kr?.length && !relatedStocks?.us?.length"
+              >
                 <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
                 <p>관련된 종목이 없습니다.</p>
               </div>
