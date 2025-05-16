@@ -4,6 +4,10 @@ pipeline {
         nodejs "nodeJs"
     }
 
+    environment {
+        IMAGE_NAME = "hamgeonwook/stockport_front:${env.BUILD_NUMBER}"
+    }
+
     stages {
         stage('git clone') {
             steps {
@@ -18,6 +22,26 @@ pipeline {
                     docker.withRegistry('https://registry.hub.docker.com/repository/docker/hamgeonwook/stockport_front/', 'dockerHubPwd') {
                         nginxImage.push("${env.BUILD_NUMBER}")
                     }
+                }
+            }
+        }
+
+        stage('Deploy to web Server') {
+            steps {
+                sshagent (credentials: [SSH_CRED_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no $SSH_HOST '
+                        set -e
+                        docker pull $IMAGE_NAME || exit 1
+
+                        docker stop frontend || true
+                        docker rm frontend || true
+
+                        docker image prune -f
+
+                        docker run -d --name frontend -p 80:80 $IMAGE_NAME
+                    '
+                    """
                 }
             }
         }
