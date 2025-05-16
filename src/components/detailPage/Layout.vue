@@ -127,7 +127,7 @@
                 <div
                   class="relation-item"
                   v-for="(prod, i) in stockInfo?.relatedProducts"
-                  :key="prod.hscodeId"
+                  :key="prod.hscode"
                 >
                   <img :src="icons[i]" alt="icon" />
                   <span class="relation-title">{{ prod?.hscodeName }}</span>
