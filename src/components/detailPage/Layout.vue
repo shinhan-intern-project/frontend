@@ -206,8 +206,9 @@
             ref="section3"
           >
             <span class="header">캔들 차트</span>
-            <!-- 임시 -->
-            <div style="height: 300px"></div>
+            <div class="candle-line-wrppaer">
+              <CandleLine />
+            </div>
           </div>
           <!-- 개별 주식 페이지 - 캔들차트 -->
 
@@ -244,6 +245,7 @@ import DetailHeader from "./Header.vue";
 import DetailFloating from "./Floating.vue";
 import NewsItem from "../news/NewsItem.vue";
 import SentimentBadge from "./SentimentBadge.vue";
+import CandleLine from "../candleLine/CandleLine.vue";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -259,6 +261,7 @@ export default {
     DetailFloating,
     NewsItem,
     SentimentBadge,
+    CandleLine,
   },
   props: {
     type: {
