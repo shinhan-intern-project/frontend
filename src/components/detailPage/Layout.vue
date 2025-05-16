@@ -112,9 +112,10 @@
           <!-- 개별 품목 페이지인 경우 -->
 
           <div class="detail-layout-content-item" ref="section1">
+            {{ console.log("stockId", this.stockId) }}
             <span class="header">네트워크 그래프</span>
             <!-- 임시 -->
-            <div style="height: 300px"></div>
+            <NetworkGraph :stockId="stockId" />
           </div>
           <div class="detail-layout-content-item" ref="section2">
             <span class="header">
@@ -246,6 +247,7 @@ import DetailFloating from "./Floating.vue";
 import NewsItem from "../news/NewsItem.vue";
 import SentimentBadge from "./SentimentBadge.vue";
 import CandleLine from "../candleLine/CandleLine.vue";
+import NetworkGraph from "../network/NetworkGraph.vue";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -262,6 +264,7 @@ export default {
     NewsItem,
     SentimentBadge,
     CandleLine,
+    NetworkGraph,
   },
   props: {
     type: {
@@ -278,6 +281,10 @@ export default {
     },
     relatedStocks: {
       type: Object,
+      required: true,
+    },
+    stockId: {
+      type: String,
       required: true,
     },
   },
