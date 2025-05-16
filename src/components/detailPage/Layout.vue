@@ -114,7 +114,13 @@
           <div class="detail-layout-content-item" ref="section1">
             <span class="header">네트워크 그래프</span>
             <!-- 임시 -->
-            <div style="height: 300px"></div>
+            <div class="network-graph-wrapper">
+              <NetworkGraph
+                :stockId="stockId"
+                :productId="productId"
+                :type="type"
+              />
+            </div>
           </div>
           <div class="detail-layout-content-item" ref="section2">
             <span class="header">
@@ -127,7 +133,7 @@
                 <div
                   class="relation-item"
                   v-for="(prod, i) in stockInfo?.relatedProducts"
-                  :key="prod.hscodeId"
+                  :key="prod.hscode"
                 >
                   <img :src="icons[i]" alt="icon" />
                   <span class="relation-title">{{ prod?.hscodeName }}</span>
@@ -192,7 +198,10 @@
               </div>
 
               <!-- 관련 품목이 없거나 빈 배열일 때 -->
-              <div class="no-relation" v-else>
+              <div
+                class="no-relation"
+                v-if="!relatedStocks?.kr?.length && !relatedStocks?.us?.length"
+              >
                 <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
                 <p>관련된 종목이 없습니다.</p>
               </div>
@@ -246,6 +255,7 @@ import DetailFloating from "./Floating.vue";
 import NewsItem from "../news/NewsItem.vue";
 import SentimentBadge from "./SentimentBadge.vue";
 import CandleLine from "../candleLine/CandleLine.vue";
+import NetworkGraph from "../network/NetworkGraph.vue";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -262,6 +272,7 @@ export default {
     NewsItem,
     SentimentBadge,
     CandleLine,
+    NetworkGraph,
   },
   props: {
     type: {
@@ -279,6 +290,14 @@ export default {
     relatedStocks: {
       type: Object,
       required: true,
+    },
+    stockId: {
+      type: String,
+      // required: true,
+    },
+    productId: {
+      type: String,
+      //   required: true,
     },
   },
   data() {
@@ -664,5 +683,10 @@ export default {
   font-size: 16px;
   font-weight: 400;
   line-height: 28px;
+}
+
+/* 네트워크 그래프 */
+.network-graph-wrapper {
+  margin-top: 28px;
 }
 </style>
