@@ -95,18 +95,15 @@
               <div class="product-header">
                 <div class="product-hscode">
                   <div class="product-hscode-wrapper">HS코드</div>
-                  <span>7312</span>
+                  <span>{{ productInfo?.hsCode }}</span>
                 </div>
-                <SentimentBadge :sentiment="stockInfo?.sentiment" />
+                <SentimentBadge :sentiment="productInfo?.sentiment" />
               </div>
-              <span class="product-title">철강로프</span>
-              <span class="product-description"
-                >와이어로프 형태의 철강 제품으로, 건설·해양·중장비 산업에 사용됨
-                와이어로프 형태의 철강 제품으로, 건설·해양·중장비
-                산업에와이어로프 형태의 철강 제품으로, 건설·해양·중장비 산업에
-                사용됨 와이어로프 형태의 철강 제품으로, 건설·해양·중장비 산업에
-                사용됨 사용됨</span
-              >
+              <span class="product-title">{{ productInfo?.hsName }}</span>
+              <div
+                class="product-description markdown-body"
+                v-html="md.render(productInfo?.description || '')"
+              ></div>
             </div>
           </div>
           <!-- 개별 품목 페이지인 경우 -->
@@ -256,6 +253,7 @@ import NewsItem from "../news/NewsItem.vue";
 import SentimentBadge from "./SentimentBadge.vue";
 import CandleLine from "../candleLine/CandleLine.vue";
 import NetworkGraph from "../network/NetworkGraph.vue";
+import MarkdownIt from "markdown-it";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -287,6 +285,10 @@ export default {
       type: Object,
       required: true,
     },
+    productInfo: {
+      type: Object,
+      required: true,
+    },
     relatedStocks: {
       type: Object,
       required: true,
@@ -304,8 +306,14 @@ export default {
     return {
       activeSection: 0,
       icons,
+      md: new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true,
+      }),
     };
   },
+
   methods: {
     scrollToSection(idx) {
       const el = this.$refs[`section${idx}`];
@@ -364,6 +372,8 @@ export default {
 </script>
 
 <style scoped>
+@import "github-markdown-css/github-markdown.css";
+
 .detail-layout-container {
   padding: 100px 0px;
   width: 100%;
@@ -667,8 +677,8 @@ export default {
   border-radius: 4px;
   background: #000c37;
   color: #fff;
-  font-size: 14px;
-  padding: 4px 18px;
+  font-size: 16px;
+  padding: 8px 18px;
 }
 
 .product-title {
@@ -676,6 +686,12 @@ export default {
   font-size: 36px;
   font-weight: 700;
   margin: 28px 0;
+  line-height: 48px;
+
+  /* 한 단어 붙이고 싶을 때 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .product-description {
