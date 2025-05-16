@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SSH_HOST = 'ubuntu@192.168.20.63'
+        SSH_HOST = 'ubuntu@192.168.5.61'
         SSH_CRED_ID = '2-ssh-key'
         IMAGE_NAME = "hamgeonwook/stockport_front:${env.BUILD_NUMBER}"
 
