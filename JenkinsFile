@@ -7,34 +7,17 @@ pipeline {
     stages {
         stage('git clone') {
             steps {
-                git branch: 'P4-47-feature/CICD-설정', credentialsId: 'github-token', url: 'https://github.com/shinhan-intern-project/frontend.git'
+                git branch: 'P4-47-feature/CICD-설정', credentialsId: 'github-signin', url: 'https://github.com/shinhan-intern-project/frontend.git'
             }
         }
 
         stage('Build Nginx') {
             steps {
                 script {
-                    def nginxImage = docker.build('kjk7212/release_note_front', '--file Dockerfile .')
-                    docker.withRegistry('https://registry.hub.docker.com/repository/docker/kjk7212/release_note_front/', 'dockerHubPwd') {
+                    def nginxImage = docker.build('hamgeonwook/stockport_front', '--file Dockerfile .')
+                    docker.withRegistry('https://registry.hub.docker.com/repository/docker/hamgeonwook/stockport_front/', 'dockerHubPwd') {
                         nginxImage.push("${env.BUILD_NUMBER}")
                     }
-                }
-            }
-        }
-
-        stage('AgroCD Manifest Update') {
-            steps {
-                git credentialsId: 'kjk7212',
-                    url: 'https://github.com/SwaveReleaseNote/argocd-front',
-                    branch: 'main'
-
-                sh "sed -i 's/# build-version:.*/# build-version: ${env.BUILD_NUMBER}/g' front.yaml"
-                sh "sed -i 's/release_note_front.*/release_note_front:${env.BUILD_NUMBER}/g' front.yaml"
-                sh "git add front.yaml"
-                sshagent(credentials: ['git-ssh']) {
-                    sh "git commit -m '[UPDATE] v${env.BUILD_NUMBER} image versioning'"
-                    sh "git remote set-url origin git@github.com:SwaveReleaseNote/argocd-front.git"
-                    sh "git push -u origin main"
                 }
             }
         }
