@@ -114,28 +114,82 @@
             <span class="header">
               {{ type === "stock" ? "관련 품목" : "관련 종목" }}</span
             >
-            <div class="relation" v-if="stockInfo?.relatedProducts.length">
-              <div
-                class="relation-item"
-                v-for="(prod, i) in stockInfo?.relatedProducts"
-                :key="prod.hscodeId"
-              >
-                <img :src="icons[i]" alt="icon" />
-                <span class="relation-title">{{ prod.hscodeName }}</span>
-                <span class="relation-code">{{ prod.hscodeId }}</span>
-                <span class="relation-content"
-                  >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
-                  종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
-                  관련이 있냐면... GPT가 설명해줄거야</span
-                >
-              </div>
-            </div>
 
-            <!-- 관련 품목이 없거나 빈 배열일 때 -->
-            <div class="no-relation" v-else>
-              <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
-              <p>관련된 {{ type === "stock" ? "품목" : "종목" }}이 없습니다.</p>
-            </div>
+            <!-- 개별 종목 페이지 - 관련 품목 -->
+            <template v-if="type === 'stock'">
+              <div class="relation" v-if="stockInfo?.relatedProducts.length">
+                <div
+                  class="relation-item"
+                  v-for="(prod, i) in stockInfo?.relatedProducts"
+                  :key="prod.hscodeId"
+                >
+                  <img :src="icons[i]" alt="icon" />
+                  <span class="relation-title">{{ prod.hscodeName }}</span>
+                  <span class="relation-code">{{ prod.hscodeId }}</span>
+                  <span class="relation-content"
+                    >왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
+                    종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
+                    관련이 있냐면... GPT가 설명해줄거야</span
+                  >
+                </div>
+              </div>
+              <!-- 관련 품목이 없거나 빈 배열일 때 -->
+              <div class="no-relation" v-else>
+                <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+                <p>관련된 품목이 없습니다.</p>
+              </div>
+            </template>
+
+            <!-- 개별 품목 페이지 - 관련 종목 -->
+            <template v-if="type === 'product'">
+              <div
+                class="relation-stocks-container"
+                v-if="relatedStocks?.kr?.length"
+              >
+                <div class="relation-stocks-title">국내</div>
+                <div class="relation-stocks">
+                  <div
+                    class="relation-item"
+                    v-for="stock in relatedStocks?.kr"
+                    :key="stock.stockId"
+                  >
+                    <!-- <img :src="icons[i]" alt="icon" /> -->
+                    <span class="relation-title">{{ stock?.name }}</span>
+                    <span class="relation-code">{{ stock?.ticker }}</span>
+                    <span class="relation-content">{{
+                      stock?.companyOverview
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="relation-stocks-container"
+                v-if="relatedStocks?.us?.length"
+              >
+                <div class="relation-stocks-title">미국</div>
+                <div class="relation-stocks">
+                  <div
+                    class="relation-item"
+                    v-for="stock in relatedStocks?.us"
+                    :key="stock.stockId"
+                  >
+                    <!-- <img :src="icons[i]" alt="icon" /> -->
+                    <span class="relation-title">{{ stock?.name }}</span>
+                    <span class="relation-code">{{ stock?.ticker }}</span>
+                    <span class="relation-content">{{
+                      stock?.companyOverview
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 관련 품목이 없거나 빈 배열일 때 -->
+              <div class="no-relation" v-else>
+                <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+                <p>관련된 종목이 없습니다.</p>
+              </div>
+            </template>
           </div>
 
           <!-- 개별 주식 페이지 - 캔들차트 -->
@@ -209,6 +263,10 @@ export default {
       required: true,
     },
     stockInfo: {
+      type: Object,
+      required: true,
+    },
+    relatedStocks: {
       type: Object,
       required: true,
     },
@@ -429,6 +487,44 @@ export default {
   margin-top: 40px;
 }
 
+/* ----- 개별 품목 페이지 > 관련 종목 ----- */
+.relation-stocks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  justify-content: space-around;
+}
+
+.relation-stocks-title {
+  width: fit-content;
+  padding: 8px 20px;
+  border-radius: 12px;
+  background: #000c37;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 40px;
+}
+
+.relation-stocks {
+  display: flex;
+  justify-content: flex-start;
+  gap: 40px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.relation-stocks::-webkit-scrollbar {
+  display: none;
+}
+
+.relation-stocks .relation-item {
+  flex: 0 0 auto;
+  width: 220px;
+}
+/* -------------------------------- */
+
 .relation-item {
   display: flex;
   flex-direction: column;
@@ -448,21 +544,29 @@ export default {
   font-size: 18px;
   font-weight: 700;
   line-height: 20px;
-
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .relation-code {
   color: #ababab;
   font-size: 14px;
   font-weight: 700;
 }
+
 .relation-content {
   color: #000c37;
   font-size: 14px;
   line-height: 20px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 10;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .no-relation {
