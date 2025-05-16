@@ -1,4 +1,4 @@
-import { stockAPI } from "@/apis";
+import { networkAPI, stockAPI } from "@/apis";
 
 export async function getStockAPI(stockId) {
   try {
@@ -12,6 +12,14 @@ export async function getStockAPI(stockId) {
 export async function getStockChartAPI(stockId, type) {
   try {
     const response = await stockAPI.get(`/charts/${stockId}?type=${type}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+export async function getStockNetworkAPI(stockId) {
+  try {
+    const response = await networkAPI.get(`/stock/${stockId}?depth=3`);
     return response.data;
   } catch (error) {
     console.error(error);
