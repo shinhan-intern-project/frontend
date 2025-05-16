@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { data } from "./data.js";
+import { getStockChartAPI } from "@/apis/stock.js";
 
 export default {
   name: "CandleLine",
@@ -91,59 +91,65 @@ export default {
       },
     };
   },
-  mounted() {
-    // 1) data.js 에서 prices 배열 꺼내기
-    const prices = data[0].stock.prices;
+  async mounted() {
+    try {
+      // 1) 경로에서 stockId 꺼내기
+      const stockId = this.$route.params.stockId;
+      // 2) API 호출
+      const res = await getStockChartAPI(stockId, "day");
+      // 3) 값 저장
+      const stock = res.data.data[0].stock;
+      const relatedProducts = res.data.data[0].relatedProducts || [];
 
-    // 2) 캔들 시리즈에 매핑
-    this.series[0].data = prices.map((p) => ({
-      // 날짜 문자열을 timestamp 로 변환
-      x: new Date(
-        p.date.slice(0, 4),
-        Number(p.date.slice(4, 6)) - 1,
-        p.date.slice(6, 8) || "01"
-      ).getTime(),
-      // [open, high, low, close]
-      y: [p.open_price, p.high_price, p.low_price, p.close_price],
-    }));
+      // 4) 캔들 시리즈에 매핑
+      this.series[0].data = stock.prices.map((p) => ({
+        // 날짜 문자열을 timestamp 로 변환
+        x: new Date(
+          p.date.slice(0, 4),
+          Number(p.date.slice(4, 6)) - 1,
+          p.date.slice(6, 8) || "01"
+        ).getTime(),
+        y: [p.open_price, p.high_price, p.low_price, p.close_price],
+      }));
 
-    // 3) 수출입량 라인 그래프
-    const line = data[0].relatedProducts || [];
-    line.forEach((prod) => {
-      // 1) 수출 라인
-      this.series.push({
-        name: `수출: ${prod.hscodeId}`, // 혹은 prod.hscodeId
-        type: "line",
-        data: prod.kr.map((item) => ({
-          x: new Date(
-            +item.date.slice(0, 4),
-            +item.date.slice(4, 6) - 1
-          ).getTime(),
-          y: item.exportValue,
-        })),
-        yAxisIndex: 1,
+      // 5) 수출입량 라인 그래프
+      relatedProducts.forEach((prod) => {
+        // 5-1) 수출 라인
+        this.series.push({
+          name: `수출: ${prod.hscodeId}`, // 혹은 prod.hscodeId
+          type: "line",
+          data: prod.kr.map((item) => ({
+            x: new Date(
+              +item.date.slice(0, 4),
+              +item.date.slice(4, 6) - 1
+            ).getTime(),
+            y: item.exportValue,
+          })),
+          yAxisIndex: 1,
+        });
+        // 5-2) 수입 라인
+        this.series.push({
+          name: ` 수입: ${prod.hscodeId}`,
+          type: "line",
+          data: prod.kr.map((item) => ({
+            x: new Date(
+              +item.date.slice(0, 4),
+              +item.date.slice(4, 6) - 1
+            ).getTime(),
+            y: item.importValue,
+          })),
+          yAxisIndex: 1,
+        });
       });
-      // 2) 수입 라인
-      this.series.push({
-        name: ` 수입: ${prod.hscodeId}`,
-        type: "line",
-        data: prod.kr.map((item) => ({
-          x: new Date(
-            +item.date.slice(0, 4),
-            +item.date.slice(4, 6) - 1
-          ).getTime(),
-          y: item.importValue,
-        })),
-        yAxisIndex: 1,
-      });
-    });
+    } catch (e) {
+      console.error(e);
+    }
   },
 };
 </script>
 
 <style scoped>
 #chart {
-  /* max-width: 900px; */
   width: -webkit-fill-available;
   margin: 0 auto;
 }
