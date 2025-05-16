@@ -1,6 +1,7 @@
 <template>
   <DetailLayout
     :relatedNews="relatedNews"
+    :productInfo="productInfo"
     type="product"
     :relatedStocks="relatedStocks"
     :productId="productId"
@@ -10,6 +11,7 @@
 <script>
 import DetailLayout from "@/components/detailPage/Layout.vue";
 import { getRelatedStocksAPI } from "@/apis/product";
+import { getProductAPI } from "@/apis/product.js";
 const relatedNews = [
   {
     id: 1,
@@ -77,7 +79,9 @@ export default {
   },
   data() {
     return {
+      productInfo: null,
       relatedNews,
+      isProductInfoLoading: false,
       isRelatedStocksLoading: false,
       relatedStocks: null,
     };
@@ -88,6 +92,19 @@ export default {
     },
   },
   methods: {
+    async getProductInfo(id) {
+      console.log("id", id);
+
+      this.isProductInfoLoading = true;
+      try {
+        const res = await getProductAPI(id);
+        this.productInfo = res.data;
+      } catch (e) {
+        this.error = e;
+      } finally {
+        this.isProductInfoLoading = false;
+      }
+    },
     async getRelatedStocks(id) {
       this.isRelatedStocksLoading = true;
       try {
@@ -102,6 +119,7 @@ export default {
   },
   mounted() {
     this.getRelatedStocks(this.$route.params.productId);
+    this.getProductInfo(this.$route.params.productId);
   },
   watch: {
     productId(newId) {
