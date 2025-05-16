@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        SSH_HOST = 'ubuntu@192.168.5.61'
+        SSH_CRED_ID = '2-ssh-key'
+        IMAGE_NAME = "hamgeonwook/stockport_front:${env.BUILD_NUMBER}"
+
+    }
+
+    tools {
+        nodejs "nodeJs"
+    }
+
+    stages {
+        stage('git clone') {
+            steps {
+                git branch: 'develop', credentialsId: 'github-signin', url: 'https://github.com/shinhan-intern-project/frontend.git'
+            }
+        }
+
+        stage('Build Nginx') {
+            steps {
+                script {
+                    def nginxImage = docker.build('hamgeonwook/stockport_front', '--file Dockerfile .')
+                    docker.withRegistry('https://registry.hub.docker.com/repository/docker/hamgeonwook/stockport_front/', 'dockerHubPwd') {
+                        nginxImage.push("${env.BUILD_NUMBER}")
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to web Server') {
+            steps {
+                sshagent (credentials: [SSH_CRED_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no $SSH_HOST '
+                        set -e
+                        docker pull $IMAGE_NAME || exit 1
+
+                        docker stop frontend || true
+                        docker rm frontend || true
+
+                        docker image prune -f
+
+                        docker run -d --name frontend -p 80:80 $IMAGE_NAME
+                    '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "SUCCESS: Job ${env.JOB_NAME}"
+        }
+        failure {
+            echo "FAIL: Job ${env.JOB_NAME}"
+        }
+    }
+}
