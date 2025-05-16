@@ -3,6 +3,7 @@
     :relatedNews="relatedNews"
     :stockInfo="stockInfo"
     type="stock"
+    :stockId="stockId"
   />
 </template>
 
@@ -82,6 +83,11 @@ export default {
       isStockInfoLoading: false,
     };
   },
+  computed: {
+    stockId() {
+      return this.$route.params.stockId;
+    },
+  },
   methods: {
     async getStockInfo(id) {
       this.isStockInfoLoading = true;
@@ -99,7 +105,7 @@ export default {
     this.getStockInfo(this.$route.params.stockId);
   },
   watch: {
-    "$route.params.stockId"(newId) {
+    stockId(newId) {
       this.getStockInfo(newId);
     },
   },

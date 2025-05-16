@@ -3,6 +3,7 @@
     :relatedNews="relatedNews"
     type="product"
     :relatedStocks="relatedStocks"
+    :productId="productId"
   />
 </template>
 
@@ -81,6 +82,11 @@ export default {
       relatedStocks: null,
     };
   },
+  computed: {
+    productId() {
+      return this.$route.params.productId;
+    },
+  },
   methods: {
     async getRelatedStocks(id) {
       this.isRelatedStocksLoading = true;
@@ -98,7 +104,7 @@ export default {
     this.getRelatedStocks(this.$route.params.productId);
   },
   watch: {
-    "$route.params.productId"(newId) {
+    productId(newId) {
       this.getRelatedStocks(newId);
     },
   },

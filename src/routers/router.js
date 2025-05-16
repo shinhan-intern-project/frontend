@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 // 페이지 컴포넌트 - 상대 경로 사용
 const MainPage = () => import("../views/MainPage.vue");
@@ -27,7 +27,7 @@ const routes = [
 
 // 라우터 인스턴스 생성
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 
