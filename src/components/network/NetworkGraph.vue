@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       // depth
-      depth: ref(5),
+      depth: ref(2),
       // reactive 상태
       nodes: reactive({}),
       edges: reactive({}),
@@ -44,6 +44,7 @@ export default {
             layoutHandler: new ForceLayout({
               positionFixedByDrag: false,
               positionFixedByClickWithAltKey: true,
+
               createSimulation: (d3, nodes, edges) => {
                 const forceLink = d3.forceLink(edges).id((d) => d.id);
                 return d3
