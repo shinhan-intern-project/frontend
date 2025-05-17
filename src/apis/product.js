@@ -18,9 +18,9 @@ export async function getRelatedStocksAPI(hscodeId) {
   }
 }
 
-export async function getProductNetworkAPI(productId) {
+export async function getProductNetworkAPI(productId, depth) {
   try {
-    const response = await networkAPI.get(`/hs/${productId}?depth=1`);
+    const response = await networkAPI.get(`/hs/${productId}?depth=${depth}`);
     return response.data;
   } catch (error) {
     console.error(error);
