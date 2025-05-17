@@ -56,3 +56,12 @@ export async function getTradeRankAPI(
     return { status: "ERROR", data: { items: [] } };
   }
 }
+
+export async function getSearchProductAPI(searchKeyword) {
+  try {
+    const response = await productAPI.get(`/search?keyword=${searchKeyword}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

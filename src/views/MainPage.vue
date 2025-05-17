@@ -21,6 +21,7 @@
           { value: 'stock', label: '종목' },
           { value: 'product', label: '품목' },
         ]"
+        @change="handleTypeChange"
         style="margin-bottom: 20px"
       />
 
@@ -40,8 +41,18 @@
         </div>
 
         <div v-else>
-          <!-- 품목 관련 내용 -->
-          <!-- 품목 관련 컴포넌트들 -->
+          <!-- 품목 검색 및 정보 컴포넌트 -->
+          <ProductSearchAndInfo
+            :is-loading="isProductLoading"
+            :product-items="productItems"
+            :selected-product-index="selectedProductIndex"
+            :search-keyword="productSearchKeyword"
+            @search="handleProductSearch"
+            @select-product="selectProduct"
+            :format-price="formatPrice"
+            :format-change-rate="formatChangeRate"
+            :get-change-class="getChangeClass"
+          />
         </div>
       </div>
 
@@ -114,6 +125,8 @@ import ExportImportStats from "@/components/main/ExportImportStats.vue";
 import RecentTrades from "@/components/main/RecentTrades.vue";
 import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 import NewsItem from "@/components/news/NewsItem.vue";
+import ProductSearchAndInfo from "@/components/search/ProductSearchAndInfo.vue";
+import { getSearchProductAPI } from "@/apis/product";
 const countries = {
   features: [],
 };
@@ -140,6 +153,7 @@ export default {
     ExportImportStats,
     RecentTrades,
     NewsItem,
+    ProductSearchAndInfo,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
@@ -277,6 +291,7 @@ export default {
 
   data() {
     return {
+      marketCode: "KR",
       type: "stock",
       searchKeyword: "",
       isLoading: false,
@@ -284,6 +299,12 @@ export default {
       relatedItems: [],
       selectedStock: null,
       selectedStockIndex: -1,
+      // 품목 검색 관련 데이터
+      productSearchKeyword: "",
+      isProductLoading: false,
+      productItems: [],
+      selectedProductIndex: -1,
+      selectedProduct: null,
       topStocks: [
         {
           name: "삼성전자",
@@ -378,11 +399,61 @@ export default {
     };
   },
   methods: {
+    // 타입 변경 핸들러
+    handleTypeChange(value) {
+      console.log(`타입 변경: ${value}`);
+      // 필요에 따라 추가 로직
+    },
+    // 품목 검색 핸들러
+    handleProductSearch(keyword) {
+      this.productSearchKeyword = keyword;
+      this.searchProducts();
+    },
+
+    // 품목 검색 API 호출
+    async searchProducts() {
+      if (!this.productSearchKeyword) return;
+
+      this.isProductLoading = true;
+      try {
+        const responseData = await getSearchProductAPI(
+          this.productSearchKeyword
+        );
+        if (responseData && responseData.status === "OK") {
+          // this.productItems = responseData.data.map((item) => ({
+          //   name: item.hscodeName || item.name,
+          //   code: item.hscode || item.code,
+          //   // 필요한 다른 데이터 필드 매핑
+          // }));
+          this.productItems = responseData.data;
+        } else {
+          console.error(
+            "품목 API 응답 형식이 올바르지 않습니다.",
+            responseData
+          );
+          this.productItems = [];
+        }
+      } catch (error) {
+        console.error("품목 검색 오류:", error);
+        this.productItems = [];
+        this.selectedProduct = null;
+      } finally {
+        this.isProductLoading = false;
+      }
+    },
+
+    // 품목 선택 핸들러
+    selectProduct(product, index) {
+      this.selectedProduct = product;
+      this.selectedProductIndex = index;
+      // 선택된 품목에 대한 추가 정보 가져오기 (필요한 경우)
+    },
+
     // 거래량 상위 Top 10 데이터 가져오기
     async fetchTopStocks() {
       this.isTopStocksLoading = true;
       try {
-        const responseData = await getTopStocksAPI("KR");
+        const responseData = await getTopStocksAPI(this.marketCode);
         if (responseData && responseData.status === "OK") {
           this.topStocks = responseData.data;
         } else {
@@ -397,7 +468,10 @@ export default {
         this.isTopStocksLoading = false;
       }
     },
-
+    handleMarketChange(value) {
+      this.marketCode = value === "domestic" ? "KR" : "US";
+      this.fetchTopStocks();
+    },
     // 가격 포맷 함수
     formatPrice(price) {
       return parseFloat(price).toLocaleString();

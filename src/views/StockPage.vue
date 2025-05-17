@@ -4,12 +4,14 @@
     :stockInfo="stockInfo"
     type="stock"
     :stockId="stockId"
+    :sentiment="sentiment"
   />
 </template>
 
 <script>
 import DetailLayout from "@/components/detailPage/Layout.vue";
 import { getStockAPI } from "@/apis/stock.js";
+import { getStockSentimentAPI } from "@/apis/news.js";
 
 const relatedNews = [
   {
@@ -100,13 +102,25 @@ export default {
         this.isStockInfoLoading = false;
       }
     },
+    async getSentiment(id) {
+      try {
+        const res = await getStockSentimentAPI(id)
+        if (res.data && res.status === "OK") {
+          this.sentiment = res.data;
+        }
+      } catch (e) {
+        this.sentiment = { 호재: 0, 악재: 0, 중립: 0 };
+      }
+    },
   },
   mounted() {
     this.getStockInfo(this.$route.params.stockId);
+    this.getSentiment(this.$route.params.stockId);
   },
   watch: {
     stockId(newId) {
       this.getStockInfo(newId);
+      this.getSentiment(newId);
     },
   },
 };

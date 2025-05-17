@@ -5,11 +5,11 @@
 
       <ToggleSwitch
         v-model="marketType"
-        @change="onMarketTypeChange"
         :options="[
           { value: 'domestic', label: '국내' },
           { value: 'overseas', label: '미국' },
         ]"
+        @change="onMarketTypeChange"
       />
     </div>
 
@@ -136,11 +136,12 @@ export default {
 
 <style scoped>
 .volume-ranking {
+  box-shadow: 0px 4px 20px #cfdef1 !important;
+
   background-color: #f9fafb;
   border-radius: 16px;
   overflow: hidden;
   width: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header-section {
