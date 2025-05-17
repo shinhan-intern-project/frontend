@@ -80,6 +80,7 @@
         <!-- 오른쪽 영역: 수출입 통계와 무역 품목 최근 수출입량 -->
         <div class="export-stats-section">
           <!-- 수출입 통계 그래프 -->
+
           <ExportImportStats
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
@@ -315,15 +316,15 @@ export default {
         },
         // 더 많은 주식 데이터...
       ],
-      exportStats: [
-        {
-          name: "라인그래프",
-          importValue: "라인그래프",
-          exportValue: "라인그래프",
-          change: 3.6,
-        },
-        // 더 많은 수출입 데이터...
-      ],
+      // exportStats: [
+      //   {
+      //     name: "라인그래프",
+      //     importValue: "라인그래프",
+      //     exportValue: "라인그래프",
+      //     change: 3.6,
+      //   },
+      //   // 더 많은 수출입 데이터...
+      // ],
       newsItems: [
         {
           id: 1,
