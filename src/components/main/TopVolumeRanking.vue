@@ -8,7 +8,7 @@
         @change="onMarketTypeChange"
         :options="[
           { value: 'domestic', label: '국내' },
-          { value: 'overseas', label: '해외' },
+          { value: 'overseas', label: '미국' },
         ]"
       />
     </div>

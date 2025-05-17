@@ -77,8 +77,10 @@
           <!-- 무역 품목 최근 수출입량 (바로 아래에 배치) -->
           <div class="recent-trades-wrapper">
             <RecentTrades
-              :trade-items="tradeItems"
               :is-loading="isTradeItemsLoading"
+              :country="selectedCountry"
+              @direction-change="handleDirectionChange"
+              @country-change="handleCountryChange"
             />
           </div>
         </div>
@@ -424,7 +426,26 @@ export default {
       this.searchKeyword = keyword;
       this.searchStocks();
     },
+    // 국가 변경 핸들러
+    // handleCountryChange(value) {
+    //   this.fetchTradeData();
+    //   this.$emit("country-change", value);
+    // },
+    handleCountryChange(country) {
+      console.log(`국가 변경: ${country}`);
+      this.selectedCountry = country;
+      // this.fetchTradeData(); // 이 줄을 제거
+    },
+    // 정렬 방향 변경 핸들러
+    handleDirectionChange(direction) {
+      console.log(`정렬 방향 변경: ${direction}`);
+      this.sortDirection = direction;
+    },
 
+    loadInitialData() {
+      console.log("초기 데이터 로드 시작");
+      this.fetchTopStocks();
+    },
     // 종목 검색 API 호출 함수
     async searchStocks() {
       if (!this.searchKeyword) return;
@@ -504,10 +525,10 @@ export default {
       }
     },
 
-    loadInitialData() {
-      console.log("초기 데이터 로드 시작");
-      this.fetchTopStocks();
-    },
+    // loadInitialData() {
+    //   console.log("초기 데이터 로드 시작");
+    //   this.fetchTopStocks();
+    // },
   },
   mounted() {
     // 초기 데이터 로드
