@@ -277,6 +277,7 @@ export default {
 
   data() {
     return {
+      marketCode: "KR",
       type: "stock",
       searchKeyword: "",
       isLoading: false,
@@ -382,7 +383,7 @@ export default {
     async fetchTopStocks() {
       this.isTopStocksLoading = true;
       try {
-        const responseData = await getTopStocksAPI("KR");
+        const responseData = await getTopStocksAPI(this.marketCode);
         if (responseData && responseData.status === "OK") {
           this.topStocks = responseData.data;
         } else {
@@ -397,7 +398,10 @@ export default {
         this.isTopStocksLoading = false;
       }
     },
-
+    handleMarketChange(value) {
+      this.marketCode = value === "domestic" ? "KR" : "US";
+      this.fetchTopStocks();
+    },
     // 가격 포맷 함수
     formatPrice(price) {
       return parseFloat(price).toLocaleString();
