@@ -25,3 +25,12 @@ export const productAPI = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+
+// 뉴스 API
+export const newsAPI = axios.create({
+  baseURL: `${baseURL}/api/news`,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});

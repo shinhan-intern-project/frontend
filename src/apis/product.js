@@ -20,7 +20,7 @@ export async function getRelatedStocksAPI(hscodeId) {
 
 export async function getProductNetworkAPI(productId) {
   try {
-    const response = await networkAPI.get(`/hs/${productId}?depth=10`);
+    const response = await networkAPI.get(`/hs/${productId}?depth=1`);
     return response.data;
   } catch (error) {
     console.error(error);

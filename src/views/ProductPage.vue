@@ -5,6 +5,7 @@
     type="product"
     :relatedStocks="relatedStocks"
     :productId="productId"
+    :sentiment="sentiment"
   />
 </template>
 
@@ -12,6 +13,8 @@
 import DetailLayout from "@/components/detailPage/Layout.vue";
 import { getRelatedStocksAPI } from "@/apis/product";
 import { getProductAPI } from "@/apis/product.js";
+import { getProductSentimentAPI } from "@/apis/news.js";
+
 const relatedNews = [
   {
     id: 1,
@@ -116,14 +119,26 @@ export default {
         this.isRelatedStocksLoading = false;
       }
     },
+    async getSentiment(id) {
+      try {
+        const res = await getProductSentimentAPI(id);
+        if (res.data && res.status === "OK") {
+          this.sentiment = res.data;
+        }
+      } catch (e) {
+        this.sentiment = { 호재: 0, 악재: 0, 중립: 0 };
+      }
+    },
   },
   mounted() {
     this.getRelatedStocks(this.$route.params.productId);
     this.getProductInfo(this.$route.params.productId);
+    this.getSentiment(this.$route.params.productId);
   },
   watch: {
     productId(newId) {
       this.getRelatedStocks(newId);
+      this.getSentiment(newId);
     },
   },
 };
