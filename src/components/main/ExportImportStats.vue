@@ -1,9 +1,13 @@
 <template>
   <div class="export-import-stats">
     <div class="header-section">
-      <h2>수출입 통계 그래프</h2>
+      <div class="header-section-inside">
+        <h2>수출입 통계 그래프</h2>
+
+        <slot name="extra"></slot>
+      </div>
       <div class="graph-section">
-        <LineGraph :apiMode="'all'" />
+        <LineGraph :country="country" :apiMode="'all'" />
       </div>
     </div>
 
@@ -49,6 +53,10 @@ import LineGraph from "../line/LineGraph.vue";
 export default {
   name: "ExportImportStats",
   props: {
+    country: {
+      type: String,
+      default: "KR",
+    },
     statsItems: {
       type: Array,
       default: () => [],
@@ -86,7 +94,11 @@ export default {
   padding: 30px 20px 20px 20px;
   margin-bottom: 0;
 }
-
+.header-section-inside {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .header-section h2 {
   font-size: 18px;
   font-weight: 600;
