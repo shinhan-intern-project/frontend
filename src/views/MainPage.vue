@@ -84,20 +84,16 @@
         </div>
       </div>
       <!-- 뉴스 섹션 -->
-      <div class="content-card">
-        <h2>관련 뉴스</h2>
+
+      <div class="detail-layout-content-item" ref="section4">
+        <span class="header">무역 관련 뉴스</span>
         <div class="news-container">
-          <div v-for="news in newsItems" :key="news.id" class="news-item">
-            <div class="news-image-placeholder"></div>
-            <div class="news-tag" :style="{ backgroundColor: news.tagColor }">
-              {{ news.tag }}
-            </div>
-            <h3 class="news-title">{{ news.title }}</h3>
-            <div class="news-footer">
-              <span class="news-publisher">{{ news.publisher }}</span>
-              <span class="news-date">{{ news.date }}</span>
-            </div>
-          </div>
+          <NewsItem
+            :isBadge="true"
+            v-for="news in newsItems"
+            :key="news.id"
+            :news="news"
+          />
         </div>
       </div>
     </div>
@@ -115,7 +111,7 @@ import TopVolumeRanking from "@/components/main/TopVolumeRanking.vue";
 import ExportImportStats from "@/components/main/ExportImportStats.vue";
 import RecentTrades from "@/components/main/RecentTrades.vue";
 import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
-
+import NewsItem from "@/components/news/NewsItem.vue";
 const countries = {
   features: [],
 };
@@ -141,6 +137,7 @@ export default {
     TopVolumeRanking,
     ExportImportStats,
     RecentTrades,
+    NewsItem,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
@@ -315,7 +312,66 @@ export default {
           publisher: "조선 미디어",
           date: "3일 전",
         },
-        // 더 많은 뉴스 데이터...
+        {
+          id: 2,
+          tag: "악재",
+          tagColor: "#2D7AFF",
+          url: "https://google.com",
+          title:
+            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
+          publisher: "경제 일보",
+          date: "5일 전",
+        },
+        {
+          id: 3,
+          tag: "중립",
+          tagColor: "#6B6F76",
+          url: "https://google.com",
+          title:
+            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
+          publisher: "한국 경제",
+          date: "1주일 전",
+        },
+        {
+          id: 1,
+          tag: "호재",
+          tagColor: "#E5484D",
+          url: "https://google.com",
+          title:
+            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
+          publisher: "조선 미디어",
+          date: "3일 전",
+        },
+        {
+          id: 1,
+          tag: "호재",
+          tagColor: "#E5484D",
+          url: "https://google.com",
+          title:
+            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
+          publisher: "조선 미디어",
+          date: "3일 전",
+        },
+        {
+          id: 1,
+          tag: "호재",
+          tagColor: "#E5484D",
+          url: "https://google.com",
+          title:
+            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
+          publisher: "조선 미디어",
+          date: "3일 전",
+        },
+        {
+          id: 1,
+          tag: "호재",
+          tagColor: "#E5484D",
+          url: "https://google.com",
+          title:
+            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
+          publisher: "조선 미디어",
+          date: "3일 전",
+        },
       ],
     };
   },
@@ -706,20 +762,20 @@ html body {
   color: #1971c2;
 }
 
-/* 뉴스 섹션 스타일 */
-.content-card {
-  margin-top: 40px !important;
+.detail-layout-content-item {
   width: 100%;
   background-color: #fff;
   box-shadow: 0px 4px 20px #cfdef1;
   border-radius: 12px;
-  padding: 30px;
+  padding: 48px;
   box-sizing: border-box;
+  margin-top: 40px;
 }
 
-.content-card h2 {
-  font-size: 18px;
-  margin: 0 0 20px 0;
+.detail-layout-content-item .header {
+  color: #000c37;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .news-container {
@@ -735,59 +791,6 @@ html body {
 
 .news-container::-webkit-scrollbar {
   display: none;
-}
-
-.news-item {
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: relative;
-  min-width: 250px;
-  max-width: 300px;
-}
-
-.news-image-placeholder {
-  height: 150px;
-  background-color: #e9ecef;
-}
-
-.news-tag {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 4px 8px;
-  color: white;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 4px;
-}
-
-.news-title {
-  padding: 10px;
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
-  height: 60px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.news-footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px 10px;
-  font-size: 12px;
-  color: #888;
-}
-
-.news-publisher {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 70%;
 }
 
 @media (max-width: 992px) {
