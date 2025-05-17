@@ -24,6 +24,8 @@ export default {
   },
   data() {
     return {
+      // depth
+      depth: ref(5),
       // reactive 상태
       nodes: reactive({}),
       edges: reactive({}),
@@ -108,6 +110,9 @@ export default {
     },
   },
   methods: {
+    onDepthChange() {
+      this.getGraphData();
+    },
     onNodeClick({ node }) {
       const link = this.nodes[node].link_id;
       const type = this.nodes[node].type;
@@ -142,9 +147,9 @@ export default {
       try {
         let res = null;
         if (this.type === "stock") {
-          res = await getStockNetworkAPI(this.stockId);
+          res = await getStockNetworkAPI(this.stockId, this.depth);
         } else {
-          res = await getProductNetworkAPI(this.productId);
+          res = await getProductNetworkAPI(this.productId, this.depth);
         }
         const data = res.data;
 
@@ -197,6 +202,23 @@ export default {
 </script>
 
 <template>
+  <!-- 커스텀 슬라이더 -->
+  <div class="slider-wrapper">
+    <input
+      type="range"
+      v-model="depth"
+      :min="1"
+      :max="10"
+      :step="1"
+      class="slider-range"
+      :style="{
+        '--percent': ((depth - 1) / (10 - 1)) * 100 + '%',
+      }"
+      @change="onDepthChange"
+    />
+    <span class="slider-value">{{ depth }}</span>
+  </div>
+
   <div class="tooltip-wrapper">
     <v-network-graph
       ref="graph"
@@ -223,6 +245,29 @@ export default {
 </template>
 
 <style scoped>
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 40px;
+}
+
+.slider-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 300px;
+  height: 8px;
+  border-radius: 6px;
+  background: linear-gradient(
+    to right,
+    #0088ff 0%,
+    #0088ff var(--percent),
+    #d7e1fb var(--percent),
+    #d7e1fb 100%
+  );
+  outline: none;
+}
+
 .tooltip-wrapper {
   position: relative;
 }
