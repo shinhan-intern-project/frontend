@@ -65,3 +65,12 @@ export async function getSearchProductAPI(searchKeyword) {
     console.error(error);
   }
 }
+
+export async function getTradeStatsGraph() {
+  try {
+    const response = await productAPI.get(`/trade-stats/graph`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
