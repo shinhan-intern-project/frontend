@@ -2,9 +2,27 @@
   <div class="recent-trades">
     <div class="header-section">
       <h2>무역 품목 최근 수출입량</h2>
-      <div class="sort-direction">
-        <span>수출 금액순</span>
-        <i class="fas fa-arrow-down"></i>
+      <div class="country-tabs">
+        <button
+          :class="['tab-button', localCountry === 'KR' ? 'active' : '']"
+          @click="changeCountry('KR')"
+        >
+          국내
+        </button>
+        <button
+          :class="['tab-button', localCountry === 'US' ? 'active' : '']"
+          @click="changeCountry('US')"
+        >
+          해외
+        </button>
+      </div>
+      <div class="sort-direction" @click="toggleSortDirection">
+        <span>{{ sortLabel }}</span>
+        <img
+          src="@/assets/images/icons/vuesax/linear/arrow-3.png"
+          alt="정렬 방향"
+          class="sort-arrow"
+        />
       </div>
     </div>
 
@@ -15,41 +33,34 @@
         <div class="header-item">수출</div>
       </div>
 
-      <div v-if="isLoading" class="loading-indicator">
+      <div v-if="effectiveIsLoading" class="loading-indicator">
         <div class="spinner"></div>
         <p>데이터를 불러오는 중...</p>
       </div>
 
+      <div v-else-if="effectiveTradeItems.length === 0" class="empty-state">
+        <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+        <p>데이터가 없습니다</p>
+      </div>
+
       <div v-else class="trades-items">
         <div
-          v-for="(item, index) in tradeItems"
+          v-for="(item, index) in effectiveTradeItems"
           :key="`trade-${index}`"
           :class="['trade-item', index % 2 === 0 ? 'even-row' : '']"
+          @click="goToProductDetail(item.hsCodeId)"
         >
-          <div class="item-name">{{ item.name }}</div>
-          <div class="item-values">
-            <div class="item-value">{{ formatNumber(item.importValue) }}</div>
-            <div
-              class="item-change"
-              :class="{
-                'positive-change': item.importChange > 0,
-                'negative-change': item.importChange < 0,
-              }"
-            >
-              {{ formatPercentage(item.importChange) }}
+          <div class="item-name">
+            <div class="item-name-content">
+              <span class="hs-name">{{ item.hsName }}</span>
+              <span class="hs-code">{{ item.hsCode }}</span>
             </div>
           </div>
           <div class="item-values">
-            <div class="item-value">{{ formatNumber(item.exportValue) }}</div>
-            <div
-              class="item-change"
-              :class="{
-                'positive-change': item.exportChange > 0,
-                'negative-change': item.exportChange < 0,
-              }"
-            >
-              {{ formatPercentage(item.exportChange) }}
-            </div>
+            <div class="item-value">{{ formatCurrency(item.importValue) }}</div>
+          </div>
+          <div class="item-values">
+            <div class="item-value">{{ formatCurrency(item.exportValue) }}</div>
           </div>
         </div>
       </div>
@@ -58,6 +69,8 @@
 </template>
 
 <script>
+import { getTradeRankAPI } from "@/apis/product";
+
 export default {
   name: "RecentTrades",
   props: {
@@ -69,13 +82,112 @@ export default {
       type: Boolean,
       default: false,
     },
+    country: {
+      type: String,
+      default: "KR",
+    },
+  },
+  data() {
+    return {
+      sortDirection: "import", // 'import' 또는 'export'
+      localTradeItems: [],
+      localIsLoading: false,
+      localCountry: this.country || "KR",
+    };
+  },
+  computed: {
+    sortLabel() {
+      return this.sortDirection === "import" ? "수입 금액순" : "수출 금액순";
+    },
+    effectiveTradeItems() {
+      // props로 전달된 데이터가 있으면 props 사용, 없으면 로컬 데이터 사용
+      return this.tradeItems.length > 0
+        ? this.tradeItems
+        : this.localTradeItems;
+    },
+    effectiveIsLoading() {
+      // props로 전달된 로딩 상태가 있으면 props 사용, 없으면 로컬 상태 사용
+      return this.isLoading !== undefined
+        ? this.isLoading
+        : this.localIsLoading;
+    },
   },
   methods: {
     formatNumber(value) {
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
-    formatPercentage(value) {
-      return `${value > 0 ? "+" : ""}${value}%`;
+    formatCurrency(value) {
+      // 값이 1,000,000 이상이면 백만 단위로 표시
+      if (value >= 1000000) {
+        return `${(value / 1000000).toFixed(1)}백만`;
+      }
+      // 값이 1,000 이상이면 천 단위로 표시
+      else if (value >= 1000) {
+        return `${(value / 1000).toFixed(1)}천`;
+      }
+      return this.formatNumber(value);
+    },
+    toggleSortDirection() {
+      this.sortDirection =
+        this.sortDirection === "import" ? "export" : "import";
+      this.fetchTradeData();
+      this.$emit("direction-change", this.sortDirection);
+    },
+    changeCountry(country) {
+      this.localCountry = country;
+      this.fetchTradeData();
+      this.$emit("country-change", country);
+    },
+    async fetchTradeData() {
+      this.localIsLoading = true;
+      try {
+        const response = await getTradeRankAPI(
+          this.localCountry,
+          this.sortDirection,
+          10
+        );
+
+        if (response && response.status === "OK") {
+          this.localTradeItems = response.data.items;
+        } else {
+          this.localTradeItems = [];
+        }
+      } catch (error) {
+        console.error(
+          "무역 품목 데이터를 가져오는 중 오류가 발생했습니다:",
+          error
+        );
+        this.localTradeItems = [];
+      } finally {
+        this.localIsLoading = false;
+      }
+    },
+    goToProductDetail(hsCodeId) {
+      if (hsCodeId) {
+        this.$router.push(`/products/${hsCodeId}`);
+      }
+    },
+    truncateText(text, maxLength) {
+      if (!text) return "";
+      return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+    },
+  },
+  mounted() {
+    // props로 전달된 country 값이 있으면 로컬 값 업데이트
+    if (this.country) {
+      this.localCountry = this.country;
+    }
+    // 컴포넌트가 마운트되면 데이터 가져오기 (props로 전달되지 않았을 경우에만)
+    if (this.tradeItems.length === 0) {
+      this.fetchTradeData();
+    }
+  },
+  watch: {
+    country(newVal) {
+      if (newVal && newVal !== this.localCountry) {
+        this.localCountry = newVal;
+        this.fetchTradeData();
+      }
     },
   },
 };
@@ -86,8 +198,12 @@ export default {
   background-color: white;
   border-radius: 16px;
   overflow: hidden;
-  width: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  width: 100%; /* 부모 요소의 너비에 맞춤 */
+  max-width: 600px; /* 최대 너비 설정 - 필요에 따라 조정 */
+  min-width: 400px; /* 최소 너비 설정 - 필요에 따라 조정 */
+  box-shadow: 0px 4px 20px #cfdef1;
+  margin-top: 20px;
+  box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
 }
 
 .header-section {
@@ -102,18 +218,42 @@ export default {
 .header-section h2 {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: #000c37;
   margin: 0;
+}
+
+.country-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-button {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.tab-button.active {
+  background: #000c37;
+  color: white;
+  border-color: #000c37;
 }
 
 .sort-direction {
   display: flex;
   align-items: center;
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
+  cursor: pointer;
 }
 
-.sort-direction i {
+.sort-arrow {
+  width: 16px;
+  height: 16px;
   margin-left: 5px;
 }
 
@@ -142,35 +282,71 @@ export default {
 
 .trades-items {
   overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .trade-item {
   display: flex;
+  height: 60px;
   padding: 14px 15px;
   align-items: center;
   background-color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.trade-item:hover {
+  background-color: #f2f7ff;
 }
 
 .even-row {
   background-color: #f9fafb;
 }
 
+.even-row:hover {
+  background-color: #f2f7ff;
+}
+
 .item-name {
   flex: 1.5;
   font-size: 14px;
   color: #333;
+  overflow: hidden;
+}
+
+.item-name-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.hs-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  color: #000c37;
+}
+
+.hs-code {
+  font-size: 12px;
+  color: #888;
 }
 
 .item-values {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
 }
 
 .item-value {
   font-size: 14px;
-  color: #333;
+  color: #000c37;
   margin-bottom: 4px;
+  font-weight: 500;
 }
 
 .item-change {
@@ -199,10 +375,32 @@ export default {
   width: 30px;
   height: 30px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
+  border-top: 3px solid #2d7aff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 10px;
+}
+
+/* 빈 상태 표시 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  background-color: white;
+}
+
+.empty-state img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  font-size: 16px;
+  color: #000c37;
+  font-weight: 500;
 }
 
 @keyframes spin {
@@ -214,7 +412,25 @@ export default {
   }
 }
 
-/* 반응형 스타일 */
+/* 스크롤바 스타일링 */
+.trades-items::-webkit-scrollbar {
+  width: 8px;
+}
+
+.trades-items::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.trades-items::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.trades-items::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
 @media (max-width: 768px) {
   .item-name,
   .item-value {
@@ -223,6 +439,10 @@ export default {
 
   .item-change {
     font-size: 12px;
+  }
+
+  .country-tabs {
+    display: none;
   }
 }
 
