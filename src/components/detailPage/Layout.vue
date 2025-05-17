@@ -226,7 +226,8 @@
           >
             <span class="header">수출입량 통계</span>
             <!-- 임시 -->
-            <div style="height: 300px"></div>
+            <LineGraph />
+            <!-- <div style="height: 300px"></div> -->
           </div>
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
@@ -254,6 +255,7 @@ import SentimentBadge from "./SentimentBadge.vue";
 import CandleLine from "../candleLine/CandleLine.vue";
 import NetworkGraph from "../network/NetworkGraph.vue";
 import MarkdownIt from "markdown-it";
+import LineGraph from "../line/LineGraph.vue";
 
 // 관련 품목 숫자 아이콘
 export const icons = [
@@ -271,6 +273,7 @@ export default {
     SentimentBadge,
     CandleLine,
     NetworkGraph,
+    LineGraph,
   },
   props: {
     type: {

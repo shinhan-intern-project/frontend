@@ -20,7 +20,17 @@ export async function getRelatedStocksAPI(hscodeId) {
 
 export async function getProductNetworkAPI(productId) {
   try {
-    const response = await networkAPI.get(`/hs/${productId}?depth=3`);
+    const response = await networkAPI.get(`/hs/${productId}?depth=10`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// 무역 통계 조회
+export async function getProductTradeAPI(hscodeId) {
+  try {
+    const response = await productAPI.get(`/${hscodeId}/trade-stats`);
     return response.data;
   } catch (error) {
     console.error(error);
