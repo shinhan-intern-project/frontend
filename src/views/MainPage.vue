@@ -94,7 +94,7 @@
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
           >
-            <!-- ✨ extra 슬롯에 토글 삽입 -->
+            <!-- extra 슬롯에 토글 삽입 -->
             <template #extra>
               <ToggleSwitch
                 v-model="exportMarket"
