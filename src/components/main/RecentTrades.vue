@@ -2,19 +2,15 @@
   <div class="recent-trades">
     <div class="header-section">
       <h2>무역 품목 최근 수출입량</h2>
-      <div class="country-tabs">
-        <button
-          :class="['tab-button', localCountry === 'KR' ? 'active' : '']"
-          @click="changeCountry('KR')"
-        >
-          국내
-        </button>
-        <button
-          :class="['tab-button', localCountry === 'US' ? 'active' : '']"
-          @click="changeCountry('US')"
-        >
-          해외
-        </button>
+      <div class="toggle-container">
+        <ToggleSwitch
+          v-model="localCountry"
+          :options="[
+            { value: 'KR', label: '국내' },
+            { value: 'US', label: '미국' },
+          ]"
+          @change="handleCountryChange"
+        />
       </div>
       <div class="sort-direction" @click="toggleSortDirection">
         <span>{{ sortLabel }}</span>
@@ -28,9 +24,9 @@
 
     <div class="trades-table">
       <div class="trades-header">
-        <div class="header-item">품목</div>
-        <div class="header-item">수입</div>
-        <div class="header-item">수출</div>
+        <div class="header-item header-product">품목</div>
+        <div class="header-item header-import">수입</div>
+        <div class="header-item header-export">수출</div>
       </div>
 
       <div v-if="effectiveIsLoading" class="loading-indicator">
@@ -52,7 +48,9 @@
         >
           <div class="item-name">
             <div class="item-name-content">
-              <span class="hs-name">{{ item.hsName }}</span>
+              <span class="hs-name" :title="item.hsName">{{
+                truncateText(item.hsName, 25)
+              }}</span>
               <span class="hs-code">{{ item.hsCode }}</span>
             </div>
           </div>
@@ -70,9 +68,13 @@
 
 <script>
 import { getTradeRankAPI } from "@/apis/product";
+import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 
 export default {
   name: "RecentTrades",
+  components: {
+    ToggleSwitch,
+  },
   props: {
     tradeItems: {
       type: Array,
@@ -100,13 +102,11 @@ export default {
       return this.sortDirection === "import" ? "수입 금액순" : "수출 금액순";
     },
     effectiveTradeItems() {
-      // props로 전달된 데이터가 있으면 props 사용, 없으면 로컬 데이터 사용
       return this.tradeItems.length > 0
         ? this.tradeItems
         : this.localTradeItems;
     },
     effectiveIsLoading() {
-      // props로 전달된 로딩 상태가 있으면 props 사용, 없으면 로컬 상태 사용
       return this.isLoading !== undefined
         ? this.isLoading
         : this.localIsLoading;
@@ -133,10 +133,9 @@ export default {
       this.fetchTradeData();
       this.$emit("direction-change", this.sortDirection);
     },
-    changeCountry(country) {
-      this.localCountry = country;
+    handleCountryChange(value) {
       this.fetchTradeData();
-      this.$emit("country-change", country);
+      this.$emit("country-change", value);
     },
     async fetchTradeData() {
       this.localIsLoading = true;
@@ -173,11 +172,9 @@ export default {
     },
   },
   mounted() {
-    // props로 전달된 country 값이 있으면 로컬 값 업데이트
     if (this.country) {
       this.localCountry = this.country;
     }
-    // 컴포넌트가 마운트되면 데이터 가져오기 (props로 전달되지 않았을 경우에만)
     if (this.tradeItems.length === 0) {
       this.fetchTradeData();
     }
@@ -198,14 +195,16 @@ export default {
   background-color: white;
   border-radius: 16px;
   overflow: hidden;
-  width: 100%; /* 부모 요소의 너비에 맞춤 */
-  max-width: 600px; /* 최대 너비 설정 - 필요에 따라 조정 */
-  min-width: 400px; /* 최소 너비 설정 - 필요에 따라 조정 */
+  width: 100%;
+  max-width: 600px;
+  min-width: 400px;
   box-shadow: 0px 4px 20px #cfdef1;
   margin-top: 20px;
-  box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
+  box-sizing: border-box;
 }
-
+.toggle-container {
+  margin-left: 145px;
+}
 .header-section {
   display: flex;
   flex-direction: row;
@@ -214,33 +213,16 @@ export default {
   padding: 20px 20px 15px 20px;
   margin-bottom: 0;
 }
-
+.header-import,
+.header-export {
+  text-align: right;
+  padding-right: 30px;
+}
 .header-section h2 {
   font-size: 18px;
   font-weight: 600;
   color: #000c37;
   margin: 0;
-}
-
-.country-tabs {
-  display: flex;
-  gap: 10px;
-}
-
-.tab-button {
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s ease;
-}
-
-.tab-button.active {
-  background: #000c37;
-  color: white;
-  border-color: #000c37;
 }
 
 .sort-direction {
@@ -361,7 +343,7 @@ export default {
   color: #1971c2;
 }
 
-/* 로딩 인디케이터 */
+/* 로딩 */
 .loading-indicator {
   display: flex;
   flex-direction: column;
@@ -381,7 +363,6 @@ export default {
   margin-bottom: 10px;
 }
 
-/* 빈 상태 표시 */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -412,7 +393,6 @@ export default {
   }
 }
 
-/* 스크롤바 스타일링 */
 .trades-items::-webkit-scrollbar {
   width: 8px;
 }
@@ -439,10 +419,6 @@ export default {
 
   .item-change {
     font-size: 12px;
-  }
-
-  .country-tabs {
-    display: none;
   }
 }
 
