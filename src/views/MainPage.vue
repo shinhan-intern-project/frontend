@@ -66,38 +66,23 @@
             @market-change="handleMarketChange"
           />
         </div>
+        <!-- 오른쪽 영역: 수출입 통계와 무역 품목 최근 수출입량 -->
+        <div class="export-stats-section">
+          <!-- 수출입 통계 그래프 -->
+          <ExportImportStats
+            :stats-items="exportStats"
+            :is-loading="isExportStatsLoading"
+          />
 
-        <!-- 수출입 통계 섹션 -->
-        <div class="export-import-section">
-          <h2>수출입 통계 그래프</h2>
-
-          <div class="statistics-table">
-            <div class="stats-header">
-              <div>품목</div>
-              <div>수입</div>
-              <div>수출 금액</div>
-              <div>수출 증감</div>
-            </div>
-
-            <div
-              v-for="(stat, index) in exportStats"
-              :key="`stat-${index}`"
-              class="stat-item"
-            >
-              <div class="stat-name">{{ stat.name }}</div>
-              <div class="stat-import">{{ stat.importValue }}</div>
-              <div class="stat-export">{{ stat.exportValue }}</div>
-              <div
-                class="stat-change"
-                :class="stat.change > 0 ? 'positive-change' : 'negative-change'"
-              >
-                {{ stat.change > 0 ? "+" : "" }}{{ stat.change }}
-              </div>
-            </div>
+          <!-- 무역 품목 최근 수출입량 (바로 아래에 배치) -->
+          <div class="recent-trades-wrapper">
+            <RecentTrades
+              :trade-items="tradeItems"
+              :is-loading="isTradeItemsLoading"
+            />
           </div>
         </div>
       </div>
-
       <!-- 뉴스 섹션 -->
       <div class="content-card">
         <h2>관련 뉴스</h2>
@@ -126,8 +111,9 @@ import * as THREE from "three";
 import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
 import StockSearchAndInfo from "@/components/search/StockSearchAndInfo.vue";
-import TopVolumeRanking from "@/components/stock/TopVolumeRanking.vue";
-
+import TopVolumeRanking from "@/components/main/TopVolumeRanking.vue";
+import ExportImportStats from "@/components/main/ExportImportStats.vue";
+import RecentTrades from "@/components/main/RecentTrades.vue";
 import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 
 const countries = {
@@ -153,6 +139,8 @@ export default {
     BackgroundGlobe,
     StockSearchAndInfo,
     TopVolumeRanking,
+    ExportImportStats,
+    RecentTrades,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
@@ -309,9 +297,9 @@ export default {
       ],
       exportStats: [
         {
-          name: "한국정보통신서비스",
-          importValue: "8,327,139",
-          exportValue: "8,327,139",
+          name: "라인그래프",
+          importValue: "라인그래프",
+          exportValue: "라인그래프",
           change: 3.6,
         },
         // 더 많은 수출입 데이터...
@@ -498,9 +486,25 @@ export default {
 .volume-section,
 .export-import-section {
   flex: 1;
-  padding: 20px;
+  /* padding: 20px; */
   box-sizing: border-box;
 }
+.export-stats-section {
+  flex: 1;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.export-stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recent-trades-wrapper {
+  margin-top: 0;
+}
+
 .background-globe-container {
   position: absolute;
   top: 0%;
@@ -553,9 +557,9 @@ html body {
 }
 
 /* 종목 거래량 섹션 스타일 */
-.volume-section {
+/* .volume-section {
   margin-bottom: 40px;
-}
+} */
 
 .section-header {
   display: flex;
@@ -650,13 +654,13 @@ html body {
 }
 
 /* 수출입 통계 섹션 스타일 */
-.export-import-section {
+/* .export-import-section {
   margin-bottom: 40px;
-}
+} */
 
 .export-import-section h2 {
   font-size: 18px;
-  margin-bottom: 20px;
+  margin: 0 0 20px;
 }
 
 .statistics-table {
