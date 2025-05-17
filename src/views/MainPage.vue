@@ -15,7 +15,14 @@
       </header>
 
       <!-- 탭 영역 -->
-      <ToggleSwitch v-model="type" style="margin-bottom: 20px" />
+      <ToggleSwitch
+        v-model="type"
+        :options="[
+          { value: 'stock', label: '종목' },
+          { value: 'product', label: '품목' },
+        ]"
+        style="margin-bottom: 20px"
+      />
 
       <!-- 선택된 타입에 따라 다른 내용 표시 -->
       <div class="content">
@@ -52,42 +59,12 @@
       <div class="layout">
         <!-- 종목 거래량 섹션 -->
         <div class="volume-section">
-          <div class="section-header">
-            <h2>종목 거래량 Top 10</h2>
-          </div>
-
-          <div class="volume-table-header">
-            <div class="col-header">번호</div>
-            <div class="col-header">종목명</div>
-            <div class="col-header">현재가</div>
-            <div class="col-header">등락률</div>
-            <div class="col-header">거래량</div>
-          </div>
-
-          <div class="volume-table">
-            <div
-              v-for="(item, index) in topStocks"
-              :key="`volume-${index}`"
-              class="volume-item"
-            >
-              <div class="item-rank">{{ index + 1 }}</div>
-              <div class="item-company">
-                <div class="company-logo-small"></div>
-                <div class="company-details-small">
-                  <div class="company-name-small">{{ item.name }}</div>
-                  <div class="company-code-small">{{ item.code }}</div>
-                </div>
-              </div>
-              <div class="item-price">{{ item.price }}원</div>
-              <div
-                class="item-change"
-                :class="{ 'zero-change': item.changePercent === '0.0%' }"
-              >
-                {{ item.changePercent }}
-              </div>
-              <div class="item-volume">{{ item.volume }}주</div>
-            </div>
-          </div>
+          <!-- 새로운 컴포넌트 사용 -->
+          <TopVolumeRanking
+            :stocks="topStocks"
+            :is-loading="isTopStocksLoading"
+            @market-change="handleMarketChange"
+          />
         </div>
 
         <!-- 수출입 통계 섹션 -->
@@ -149,7 +126,9 @@ import * as THREE from "three";
 import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
 import StockSearchAndInfo from "@/components/search/StockSearchAndInfo.vue";
-import { getSearchAPI } from "@/apis/stock";
+import TopVolumeRanking from "@/components/stock/TopVolumeRanking.vue";
+
+import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 
 const countries = {
   features: [],
@@ -173,6 +152,7 @@ export default {
     ToggleSwitch,
     BackgroundGlobe,
     StockSearchAndInfo,
+    TopVolumeRanking,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
@@ -352,7 +332,50 @@ export default {
     };
   },
   methods: {
-    // 검색어 처리 핸들러
+    // 거래량 상위 Top 10 데이터 가져오기
+    async fetchTopStocks() {
+      this.isTopStocksLoading = true;
+      try {
+        const responseData = await getTopStocksAPI("KR");
+        if (responseData && responseData.status === "OK") {
+          this.topStocks = responseData.data;
+        } else {
+          console.error("API 응답 형식이 올바르지 않습니다.", responseData);
+        }
+      } catch (error) {
+        console.error(
+          "거래량 상위 Top 10 데이터를 가져오는 중 오류가 발생했습니다:",
+          error
+        );
+      } finally {
+        this.isTopStocksLoading = false;
+      }
+    },
+
+    // 가격 포맷 함수
+    formatPrice(price) {
+      return parseFloat(price).toLocaleString();
+    },
+
+    // 거래량 포맷 함수
+    formatVolume(volume) {
+      return parseInt(volume).toLocaleString();
+    },
+
+    // 등락률 포맷 함수
+    formatChangeRate(rate) {
+      const value = parseFloat(rate) * 100;
+      return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
+    },
+
+    // 등락률에 따른 클래스 반환
+    getChangeClass(rate) {
+      const value = parseFloat(rate);
+      if (value > 0) return "positive-change";
+      if (value < 0) return "negative-change";
+      return "zero-change";
+    },
+
     handleSearch(keyword) {
       this.searchKeyword = keyword;
       this.searchStocks();
@@ -412,7 +435,6 @@ export default {
       this.selectedStockIndex = -1;
     },
 
-    // 종목 선택 처리
     selectStock(stock, index) {
       this.selectedStock = stock;
       this.selectedStockIndex = index;
@@ -438,9 +460,9 @@ export default {
       }
     },
 
-    // 초기 데이터 로드 (필요 시 추가 구현)
     loadInitialData() {
-      // 초기 데이터 로드 로직
+      console.log("초기 데이터 로드 시작");
+      this.fetchTopStocks();
     },
   },
   mounted() {
@@ -518,8 +540,11 @@ header {
   margin-top: 5%;
   margin-bottom: 30px;
 }
+html body {
+  font-family: Pretendard !important;
+  height: 100vh;
+}
 
-/* 중앙 화살표 스타일 */
 .center-arrow {
   text-align: center;
   margin: 20px 0;
@@ -761,7 +786,6 @@ header {
   max-width: 70%;
 }
 
-/* 반응형 스타일 */
 @media (max-width: 992px) {
   .layout {
     flex-direction: column;
