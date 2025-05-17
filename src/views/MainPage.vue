@@ -427,11 +427,15 @@ export default {
       this.searchStocks();
     },
     // 국가 변경 핸들러
+    // handleCountryChange(value) {
+    //   this.fetchTradeData();
+    //   this.$emit("country-change", value);
+    // },
     handleCountryChange(country) {
       console.log(`국가 변경: ${country}`);
       this.selectedCountry = country;
+      // this.fetchTradeData(); // 이 줄을 제거
     },
-
     // 정렬 방향 변경 핸들러
     handleDirectionChange(direction) {
       console.log(`정렬 방향 변경: ${direction}`);
