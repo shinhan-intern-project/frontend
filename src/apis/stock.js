@@ -34,3 +34,13 @@ export async function getSearchAPI(searchKeyword) {
     console.error(error);
   }
 }
+
+export async function getTopStocksAPI(code = "KR") {
+  try {
+    const response = await stockAPI.get(`/rank?code=${code}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
