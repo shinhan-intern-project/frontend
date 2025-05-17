@@ -55,6 +55,10 @@ export default {
           node: {
             normal: {
               radius: 16,
+              // node0만 검은 테두리 적용
+              strokeColor: (node) =>
+                node.id === "node0" ? "#000000" : "transparent",
+              strokeWidth: (node) => (node.id === "node0" ? 2 : 0),
               color: (node) => {
                 const base = {
                   품목: [0, 60, 255],
