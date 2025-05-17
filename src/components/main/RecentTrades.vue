@@ -198,6 +198,7 @@ export default {
   width: 100%;
   max-width: 600px;
   min-width: 400px;
+
   box-shadow: 0px 4px 20px #cfdef1;
   margin-top: 20px;
   box-sizing: border-box;

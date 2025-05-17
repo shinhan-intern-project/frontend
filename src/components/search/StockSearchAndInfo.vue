@@ -135,14 +135,17 @@ export default {
 <style scoped>
 /* 검색창 스타일 */
 .search-container {
+  box-shadow: 0px 4px 20px #cfdef1;
+
   display: flex;
   margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   overflow: hidden;
 }
 
 .search-input {
+  box-shadow: 0px 4px 20px #cfdef1;
+
   flex: 1;
   padding: 15px;
   border: none;
@@ -176,7 +179,7 @@ export default {
   background-color: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 20px #cfdef1;
   margin-bottom: 30px;
 }
 
