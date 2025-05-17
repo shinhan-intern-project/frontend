@@ -56,12 +56,15 @@ export default {
             normal: {
               radius: 16,
               color: (node) => {
-                if (node.id === "node0") return "#F04452";
-                if (node.type === "품목") return "rgba(103, 138, 196, 0.58)";
-                if (node.type === "품목") return "rgba(103, 138, 196, 0.58)";
-                if (node.type === "국내") return "rgba(232, 83, 87, 0.53)";
-                if (node.type === "해외") return "rgba(31, 9, 140, 0.22)";
-                return "#CCCCCC";
+                const base = {
+                  품목: [0, 60, 255],
+                  국내: [255, 0, 7],
+                  해외: [88, 166, 92],
+                }[node.type] || [204, 204, 204];
+                // 깊이에 따른 알파
+                const depth = node.depth || 0;
+                const alpha = Math.max(0.2, 1 - depth * 0.2);
+                return `rgba(${base[0]}, ${base[1]}, ${base[2]}, ${alpha})`;
               },
             },
             label: {
@@ -143,6 +146,31 @@ export default {
 
         Object.assign(this.nodes, data?.nodes);
         Object.assign(this.edges, data?.edges);
+
+        // 깊이에 따른 색 표현
+        // 1) 초기화
+        const depthMap = {};
+        const queue = [{ id: "node0", depth: 0 }];
+        depthMap["node0"] = 0;
+
+        // 2) BFS 루프 - 깊이 계산
+        while (queue.length) {
+          const { id, depth } = queue.shift();
+
+          Object.values(this.edges).forEach((e) => {
+            const neighbor =
+              e.source === id ? e.target : e.target === id ? e.source : null;
+            if (neighbor && depthMap[neighbor] == null) {
+              depthMap[neighbor] = depth + 1;
+              queue.push({ id: neighbor, depth: depth + 1 });
+            }
+          });
+        }
+
+        // 3) 노드 객체에 깊이 할당
+        Object.keys(this.nodes).forEach((nid) => {
+          this.nodes[nid].depth = depthMap[nid] ?? 0;
+        });
       } catch (err) {
         console.error("Error loading graph data:", err);
       }
@@ -168,7 +196,7 @@ export default {
   <div class="tooltip-wrapper">
     <v-network-graph
       ref="graph"
-      :zoom-level="1"
+      :zoom-level="0.2"
       :nodes="nodes"
       :edges="edges"
       v-model:layouts="layouts"
