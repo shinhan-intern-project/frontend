@@ -80,11 +80,32 @@
         <!-- 오른쪽 영역: 수출입 통계와 무역 품목 최근 수출입량 -->
         <div class="export-stats-section">
           <!-- 수출입 통계 그래프 -->
-
+          <!-- <ToggleSwitch
+            v-model="exportMarket"
+            :options="[
+              { value: 'domestic', label: '국내' },
+              { value: 'overseas', label: '미국' },
+            ]"
+            @change="handleExportMarketChange"
+            style="align-self: flex-end; margin-bottom: 8px"
+          /> -->
           <ExportImportStats
+            :country="exportCountryCode"
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
-          />
+          >
+            <!-- ✨ extra 슬롯에 토글 삽입 -->
+            <template #extra>
+              <ToggleSwitch
+                v-model="exportMarket"
+                :options="[
+                  { value: 'domestic', label: '국내' },
+                  { value: 'overseas', label: '미국' },
+                ]"
+                @change="handleExportMarketChange"
+              />
+            </template>
+          </ExportImportStats>
 
           <!-- 무역 품목 최근 수출입량 (바로 아래에 배치) -->
           <div class="recent-trades-wrapper">
@@ -306,6 +327,10 @@ export default {
       productItems: [],
       selectedProductIndex: -1,
       selectedProduct: null,
+      exportMarket: "domestic",
+      exportCountryCode: "KR",
+      isExportStatsLoading: false,
+
       topStocks: [
         {
           name: "삼성전자",
@@ -316,15 +341,7 @@ export default {
         },
         // 더 많은 주식 데이터...
       ],
-      // exportStats: [
-      //   {
-      //     name: "라인그래프",
-      //     importValue: "라인그래프",
-      //     exportValue: "라인그래프",
-      //     change: 3.6,
-      //   },
-      //   // 더 많은 수출입 데이터...
-      // ],
+
       newsItems: [
         {
           id: 1,
@@ -400,6 +417,10 @@ export default {
     };
   },
   methods: {
+    handleExportMarketChange(val) {
+      this.exportCountryCode = val === "domestic" ? "KR" : "US";
+      console.log("바뀐 국가 코드 →", this.exportCountryCode);
+    },
     // 타입 변경 핸들러
     handleTypeChange(value) {
       console.log(`타입 변경: ${value}`);
@@ -614,6 +635,12 @@ export default {
 
 <style scoped>
 /* 전체 앱 스타일 */
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 20px 20px 20px; /* 기존 값 유지 */
+}
 .logo-image {
   max-width: 300px;
   height: auto;

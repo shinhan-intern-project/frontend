@@ -32,6 +32,10 @@ export default {
       default: "product",
       validator: (v) => ["product", "all"].includes(v),
     },
+    country: {
+      type: String,
+      default: "KR",
+    },
   },
 
   data() {
@@ -74,6 +78,16 @@ export default {
       },
     };
   },
+
+  watch: {
+    country: {
+      immediate: true,
+      handler() {
+        this.getChartData();
+      },
+    },
+  },
+
   methods: {
     async getChartData() {
       try {
@@ -81,17 +95,17 @@ export default {
         let res;
 
         if (this.apiMode === "all") {
-          res = await getTradeStatsGraph(); // 메인용
+          res = await getTradeStatsGraph({ country: this.country }); // 메인용
         } else {
           res = await getProductTradeAPI(productId); // 개별품목
         }
 
         // 3) 값 저장
         const prod = res.data || [];
-
+        const countryKey = this.country.toLowerCase();
         // 4) 수출입량 라인 그래프
         // 수출 데이터
-        if (prod.kr) {
+        if (prod[countryKey]) {
           this.series[0].data = prod.kr.map((item) => ({
             x: new Date(
               +item.date.slice(0, 4),
@@ -101,7 +115,7 @@ export default {
           }));
 
           // 수입 데이터
-          this.series[1].data = prod.kr.map((item) => ({
+          this.series[1].data = prod[countryKey].map((item) => ({
             x: new Date(
               +item.date.slice(0, 4),
               +item.date.slice(4, 6) - 1
