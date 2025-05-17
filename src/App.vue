@@ -22,7 +22,9 @@ export default {
   src: url("@/assets/fonts/Pretendard-Bold.otf") format("opentype");
   font-weight: 700;
 }
-
+* {
+  font-family: "Pretendard" !important;
+}
 html,
 body,
 div,

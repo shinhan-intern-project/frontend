@@ -1,40 +1,44 @@
-<!-- SegmentedControl.vue -->
 <template>
   <div class="segmented-control">
     <button
+      v-for="option in options"
+      :key="option.value"
       class="segment-button"
-      :class="{ active: modelValue === 'stock' }"
-      @click="switchSegment('stock')"
+      :class="{ active: modelValue === option.value }"
+      @click="switchSegment(option.value)"
       type="button"
     >
-      종목
-    </button>
-    <button
-      class="segment-button"
-      :class="{ active: modelValue === 'product' }"
-      @click="switchSegment('product')"
-      type="button"
-    >
-      품목
+      {{ option.label }}
     </button>
   </div>
 </template>
 
-<script setup>
-import { defineProps, defineEmits } from "vue";
-
-defineProps({
-  modelValue: {
-    type: String,
-    default: "stock",
-    validator: (value) => ["stock", "product"].includes(value),
+<script>
+export default {
+  name: "ToggleSwitch",
+  props: {
+    modelValue: {
+      type: String,
+      required: true,
+    },
+    options: {
+      type: Array,
+      required: true,
+      validator: (options) => {
+        return options.every(
+          (option) =>
+            typeof option === "object" && "value" in option && "label" in option
+        );
+      },
+    },
   },
-});
-const emit = defineEmits(["update:modelValue", "change"]);
-
-const switchSegment = (value) => {
-  emit("update:modelValue", value);
-  emit("change", value);
+  emits: ["update:modelValue", "change"],
+  methods: {
+    switchSegment(value) {
+      this.$emit("update:modelValue", value);
+      this.$emit("change", value);
+    },
+  },
 };
 </script>
 
@@ -55,21 +59,22 @@ const switchSegment = (value) => {
   flex: 1;
   background: none;
   border: none;
-  padding: 4px 8px; /* 패딩 더 줄임 */
+  padding: 4px 8px;
   font-size: 13px;
-  font-weight: 500; /* 폰트 두께 조정 */
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 18px;
-  color: #999999; /* 비활성화 색상 조정 */
+  color: #999999;
   outline: none;
   position: relative;
   overflow: hidden;
   text-align: center;
-  letter-spacing: -0.2px; /* 한글 자간 조정 */
+  letter-spacing: -0.2px;
 }
+
 .segment-button.active {
-  background-color: #000c37; /* 짙은 남색 배경 */
+  background-color: #000c37;
   color: white;
   font-weight: 600;
 }
