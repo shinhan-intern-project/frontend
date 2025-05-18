@@ -30,10 +30,10 @@ export default {
   computed: {
     // 호재, 악재, 중립 판단 함수
     topSentiment() {
-      const entries = Object.entries(this.sentiment);
-      if (!entries.length) return "";
-      entries.sort(([, a], [, b]) => b - a);
-      return entries[0][0];
+      const { 호재 = 0, 악재 = 0 } = this.sentiment || {};
+      if (호재 > 악재) return "호재";
+      if (악재 > 호재) return "악재";
+      return "중립";
     },
   },
 };

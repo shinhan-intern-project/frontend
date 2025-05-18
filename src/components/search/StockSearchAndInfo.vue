@@ -39,17 +39,32 @@
             :key="`top-${index}`"
             class="stock-item"
             :class="{ active: selectedStockIndex === index }"
-            @click="handleStockSelect(item, index)"
+            @click="goToStockPage(item)"
           >
             <div class="company-info">
-              <div class="company-logo">
-                <span>{{ item.name.charAt(0) }}</span>
-              </div>
+              <img
+                class="company-logo"
+                :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.code}.png`"
+                alt="종목 아이콘"
+                @error="
+                  (e) =>
+                    (e.target.src =
+                      'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                "
+              />
+
               <div class="company-details">
                 <div class="company-name">{{ item.name }}</div>
                 <div class="company-code">{{ item.code }}</div>
               </div>
             </div>
+            <!-- 관련 품목 보기 버튼 추가 -->
+            <button
+              class="related-items-btn"
+              @click.stop="handleStockSelect(item, index)"
+            >
+              관련 품목 보기
+            </button>
             <div class="price-info">
               <div class="current-price">{{ item.price }}</div>
               <div
@@ -78,6 +93,11 @@
             class="related-item"
           >
             <div class="related-item-name">{{ item.name }}</div>
+            <!-- <img
+              class="company-logo"
+              :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.ticker}.png`"
+              alt="종목 아이콘"
+              @error="e => e.target.src = 'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png'" /> -->
             <div class="related-item-code">{{ item.stockName }}</div>
           </div>
         </div>
@@ -119,6 +139,7 @@ export default {
   watch: {
     searchKeyword(newVal) {
       this.searchInput = newVal;
+      this.relatedItemsForStock = null;
     },
   },
   methods: {
@@ -128,11 +149,35 @@ export default {
     handleStockSelect(stock, index) {
       this.$emit("select-stock", stock, index);
     },
+    goToStockPage(item) {
+      // 라우터 네임은 'stock', 파라미터는 stockId
+      this.$router.push({ name: "stock", params: { stockId: item.stockId } });
+    },
   },
 };
 </script>
 
 <style scoped>
+.related-items-btn {
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px 0 rgba(49, 130, 246, 0.08);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-left: 12px;
+}
+
+.related-items-btn:hover,
+.related-items-btn:focus {
+  background: #1563c7;
+  box-shadow: 0 4px 16px 0 rgba(49, 130, 246, 0.16);
+}
+
 /* 검색창 스타일 */
 .search-container {
   box-shadow: 0px 4px 20px #cfdef1;
