@@ -286,7 +286,7 @@ export default {
 /* Canvas 그래프 */
 .graph-container {
   width: 100%;
-  height: 600px;
+  height: 500px;
   cursor: grab;
 }
 .graph-container:active {
