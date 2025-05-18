@@ -17,7 +17,10 @@
           >
             <div class="info">
               <div class="info-left">
-                <img src="@/assets/images/stocks/samsung.png" />
+                <img
+                  :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stockInfo?.ticker}.png`"
+                  alt="종목 아이콘"
+                />
                 <div class="info-left-summary">
                   <div class="sector">{{ stockInfo?.sector }}</div>
                   <span class="title">{{ stockInfo?.companyName }}</span>
@@ -97,7 +100,7 @@
                   <div class="product-hscode-wrapper">HS코드</div>
                   <span>{{ productInfo?.hsCode }}</span>
                 </div>
-                
+
                 <SentimentBadge :sentiment="sentiment" />
               </div>
               <span class="product-title">{{ productInfo?.hsName }}</span>
@@ -306,7 +309,7 @@ export default {
       //   required: true,
     },
     sentiment: {
-      type: Object
+      type: Object,
     },
   },
   data() {
@@ -569,6 +572,7 @@ export default {
   flex: 0 0 auto;
   width: 220px;
 }
+
 /* -------------------------------- */
 
 .relation-item {

@@ -1,18 +1,22 @@
 {
-    "workbench.colorTheme": "Default Dark Modern",
-    "editor.formatOnSave": true,
-    "workbench.iconTheme": "material-icon-theme",
-    "[typescriptreact]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascriptreact]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "explorer.confirmDelete": false,
-    "[vue]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+  "workbench.colorTheme": "Atom One Dark",
+  "editor.formatOnSave": true,
+  "workbench.iconTheme": "material-icon-theme",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "explorer.confirmDelete": false,
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "emmet.syntaxProfiles": {
+    "vue-html": "html",
+    "vue": "html"
   }
+}

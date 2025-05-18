@@ -39,7 +39,8 @@
             :key="`prod-${index}`"
             class="product-item"
             :class="{ active: selectedProductIndex === index }"
-            @click="handleProductSelect(item, index)"
+            @click="goToProductPage(item)"
+            style="cursor: pointer"
           >
             <div class="product-info">
               <div class="product-logo">
@@ -50,6 +51,13 @@
                 <div class="product-code">{{ item.hsCode }}</div>
               </div>
             </div>
+            <!-- 관련 종목 보기 버튼 추가 -->
+            <button
+              class="related-items-btn"
+              @click.stop="handleProductSelect(item, index)"
+            >
+              관련 종목 보기
+            </button>
             <div class="product-stats">
               <div class="product-stat">HS코드</div>
             </div>
@@ -72,7 +80,19 @@
                 :key="`stock-${itemIdx}-${stockIdx}`"
                 class="related-stock"
               >
-                <div class="related-stock-name">{{ stock.companyName }}</div>
+                <div class="related-stock-header">
+                  <img
+                    class="related-stock-logo"
+                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                    alt="종목 아이콘"
+                    @error="
+                      (e) =>
+                        (e.target.src =
+                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                    "
+                  />
+                  <div class="related-stock-name">{{ stock.companyName }}</div>
+                </div>
                 <div class="related-stock-code">
                   {{ stock.ticker }} | {{ formatPrice(stock.currentPrice) }}원 |
                   <span :class="getChangeClass(stock.changeRate)">
@@ -95,7 +115,19 @@
                 :key="idx"
                 class="related-stock"
               >
-                <div class="related-stock-name">{{ stock.companyName }}</div>
+                <div class="related-stock-header">
+                  <img
+                    class="related-stock-logo"
+                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                    alt="종목 아이콘"
+                    @error="
+                      (e) =>
+                        (e.target.src =
+                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                    "
+                  />
+                  <div class="related-stock-name">{{ stock.companyName }}</div>
+                </div>
                 <div class="related-stock-code">
                   {{ stock.ticker }} | {{ formatPrice(stock.currentPrice) }}원 |
                   <span :class="getChangeClass(stock.changeRate)">
@@ -174,6 +206,12 @@ export default {
       const numRate = parseFloat(rate);
       return numRate > 0 ? `+${numRate.toFixed(2)}%` : `${numRate.toFixed(2)}%`;
     },
+    goToProductPage(product) {
+      this.$router.push({
+        name: "product",
+        params: { productId: product.hsCodeId },
+      });
+    },
   },
   computed: {
     productItemsWithStocks() {
@@ -189,6 +227,46 @@ export default {
 </script>
 
 <style scoped>
+.related-items-btn {
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px 0 rgba(49, 130, 246, 0.08);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-left: 12px;
+}
+
+.related-items-btn:hover,
+.related-items-btn:focus {
+  background: #1563c7;
+  box-shadow: 0 4px 16px 0 rgba(49, 130, 246, 0.16);
+}
+
+.related-stock-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.related-stock-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #034ea2;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+}
+
 /* 검색창 스타일 */
 .search-container {
   box-shadow: 0px 4px 20px #cfdef1;
@@ -340,6 +418,7 @@ export default {
 
 .product-info-card {
 }
+
 .product-logo {
   width: 36px;
   height: 36px;

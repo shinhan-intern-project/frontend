@@ -46,6 +46,7 @@
             :is-loading="isProductLoading"
             :product-items="productItems"
             :selected-product-index="selectedProductIndex"
+            :selected-product="selectedProduct"
             :search-keyword="productSearchKeyword"
             @search="handleProductSearch"
             @select-product="selectProduct"
@@ -305,6 +306,7 @@ export default {
       productItems: [],
       selectedProductIndex: -1,
       selectedProduct: null,
+      relatedStocks: [],
       topStocks: [
         {
           name: "삼성전자",
@@ -446,7 +448,7 @@ export default {
     selectProduct(product, index) {
       this.selectedProduct = product;
       this.selectedProductIndex = index;
-      // 선택된 품목에 대한 추가 정보 가져오기 (필요한 경우)
+      this.relatedStocks = product.relatedStocks || [];
     },
 
     // 거래량 상위 Top 10 데이터 가져오기
@@ -618,10 +620,12 @@ export default {
   height: auto;
   width: 100%;
 }
+
 .arrow-image {
   max-width: 50px;
   height: auto;
 }
+
 .stock-app {
   max-width: 1200px;
   margin: 0 auto;
@@ -629,17 +633,20 @@ export default {
   color: #333;
   position: relative;
 }
+
 .layout {
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
+
 .volume-section,
 .export-import-section {
   flex: 1;
   /* padding: 20px; */
   box-sizing: border-box;
 }
+
 .export-stats-section {
   flex: 1;
   padding: 0;
@@ -675,6 +682,7 @@ export default {
   z-index: 3;
   max-width: 1200px;
 }
+
 .stock-app::before {
   content: "";
   position: fixed;
@@ -695,6 +703,7 @@ header {
   margin-top: 5%;
   margin-bottom: 30px;
 }
+
 html body {
   font-family: Pretendard !important;
   height: 100vh;
@@ -732,6 +741,7 @@ html body {
   border: 1px solid #eee;
   border-bottom: none;
 }
+
 .col-header {
   flex: 1;
   font-size: 14px;

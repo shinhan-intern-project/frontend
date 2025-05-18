@@ -14,7 +14,7 @@
     </div>
 
     <div class="volume-table-header">
-      <div class="col-header rank">번호</div>
+      <div class="col-header rank">순위</div>
       <div class="col-header stock-name">종목명</div>
       <div class="col-header price">현재가</div>
       <div class="col-header change-rate">등락률</div>
@@ -35,7 +35,16 @@
         <div class="item-rank">{{ index + 1 }}</div>
         <div class="item-company">
           <div class="company-logo">
-            <span>{{ getFirstChar(item.companyName) }}</span>
+            <img
+              class="company-logo"
+              :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.ticker}.png`"
+              alt="종목 아이콘"
+              @error="
+                (e) =>
+                  (e.target.src =
+                    'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+              "
+            />
           </div>
           <div class="company-details">
             <div class="company-name">{{ item.companyName }}</div>
@@ -165,9 +174,11 @@ export default {
   margin-left: 20px;
   width: 130px;
 }
+
 .header-section :deep(.segmented-control) {
   width: 130px;
 }
+
 .volume-table-header {
   display: flex;
   padding: 10px 15px;
@@ -241,6 +252,7 @@ export default {
   color: white;
   font-weight: bold;
   font-size: 13px;
+  border-style: none;
 }
 
 .company-details {
@@ -306,6 +318,7 @@ export default {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
