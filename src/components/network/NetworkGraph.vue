@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Depth 조절 슬라이더 -->
-    <div class="network-tool">
+    <div class="network-tool" :class="{ 'all-mode': isAll }">
       <div class="slider-container">
         <div v-if="type !== 'all'" class="slider-wrapper">
           <span class="slider-label">깊이</span>
@@ -36,7 +36,7 @@
 
         <!-- 메인 - Degree 조절 슬라이더 -->
         <div v-if="type == 'all'" class="slider-wrapper">
-          <span class="slider-label">차수</span>
+          <span class="slider-label" :class="{ 'all-mode': isAll }">차수</span>
           <input
             type="range"
             v-model="allDegree"
@@ -52,7 +52,7 @@
       </div>
       <!-- 왼쪽 2개 -->
       <div class="network-tool-color">
-        <div class="network-tool-color-item-col">
+        <div class="network-tool-color-item-col" :class="{ 'all-mode': isAll }">
           <div class="network-tool-color-item">
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">국내 종목</div>
@@ -64,7 +64,7 @@
           </div>
         </div>
         <!-- 오른쪽 2개 -->
-        <div class="network-tool-color-item-col">
+        <div class="network-tool-color-item-col" :class="{ 'all-mode': isAll }">
           <div class="network-tool-color-item">
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">품목</div>
@@ -362,6 +362,10 @@ export default {
   font-weight: 500;
 }
 
+.slider-label.all-mode {
+  width: fit-content;
+}
+
 .slider-range {
   width: 250px;
   height: 6px;
@@ -442,6 +446,13 @@ export default {
   margin-bottom: 20px;
 }
 
+.network-tool.all-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
 .network-tool-color {
   display: flex;
   gap: 20px;
@@ -452,6 +463,10 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.network-tool-color-item-col.all-mode {
+  gap: 12px;
 }
 
 .network-tool-color-item {
