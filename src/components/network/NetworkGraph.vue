@@ -19,7 +19,7 @@
         </div>
 
         <!-- Degree 조절 슬라이더 -->
-        <div class="slider-wrapper">
+        <div v-if="type !== 'all'" class="slider-wrapper">
           <span class="slider-label">차수</span>
           <input
             type="range"
@@ -32,6 +32,22 @@
             :style="{ '--percent': ((degree - 1) / (353 - 1)) * 100 + '%' }"
           />
           <span class="slider-value">{{ degree }}</span>
+        </div>
+
+        <!-- 메인 - Degree 조절 슬라이더 -->
+        <div v-if="type == 'all'" class="slider-wrapper">
+          <span class="slider-label">차수</span>
+          <input
+            type="range"
+            v-model="allDegree"
+            :min="1"
+            :max="353"
+            :step="1"
+            class="slider-range"
+            @change="fetchData"
+            :style="{ '--percent': ((allDegree - 1) / (353 - 1)) * 100 + '%' }"
+          />
+          <span class="slider-value">{{ allDegree }}</span>
         </div>
       </div>
       <!-- 왼쪽 2개 -->
@@ -95,6 +111,7 @@ export default {
   setup(props) {
     const depth = ref(5); // 1 ~ 22
     const degree = ref(25); // 1 ~ 353
+    const allDegree = ref(3); // 1 ~ 353
     const rawNodes = reactive({});
     const rawEdges = reactive({});
     const graphContainer = ref(null);
@@ -112,7 +129,7 @@ export default {
       // API 호출
       let res;
       if (props.type === "all") {
-        res = await getAllNetworkAPI();
+        res = await getAllNetworkAPI(allDegree.value);
       } else if (props.type === "stock") {
         res = await getStockNetworkAPI(
           props.stockId,
@@ -175,6 +192,8 @@ export default {
       loading.value = false;
     };
     onMounted(() => {
+      const isAll = props.type === "all";
+
       fgInstance = ForceGraph2D()(graphContainer.value)
         .width(graphContainer.value.offsetWidth)
         .height(graphContainer.value.offsetHeight) // 링크와 충돌 힘 재설정하여 간격 조절
@@ -201,8 +220,7 @@ export default {
           const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
           // depth 작을수록 진한 표현 (alpha)
           const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
-          ctx.globalAlpha = alpha;
-
+          ctx.globalAlpha = isAll ? 1 : alpha;
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
           ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
@@ -253,6 +271,7 @@ export default {
         props.productId,
         depth.value,
         degree.value,
+        allDegree.value,
       ],
       () => {
         if (
@@ -271,6 +290,7 @@ export default {
     return {
       depth,
       degree,
+      allDegree,
       graphContainer,
       loading,
       fetchData,

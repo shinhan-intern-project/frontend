@@ -44,9 +44,9 @@ export async function getStockNetworkAPI(stockId, depth, degree) {
   }
 }
 
-export async function getAllNetworkAPI() {
+export async function getAllNetworkAPI(allDegree) {
   try {
-    const response = await networkAPI.get(`/all?maxDegree=3`);
+    const response = await networkAPI.get(`/all?maxDegree=${allDegree}`);
     return response.data;
   } catch (error) {
     console.error(error);
