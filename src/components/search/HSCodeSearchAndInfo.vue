@@ -50,9 +50,6 @@
                 <div class="hscode-code">{{ item.hsCode }}</div>
               </div>
             </div>
-            <!-- <div class="hscode-stats">
-              <div class="hscode-stat">국제통일상품분류</div>
-            </div> -->
           </div>
         </div>
       </div>

@@ -17,11 +17,18 @@ export async function getStockChartAPI(stockId, type) {
     console.error(error);
   }
 }
-export async function getStockNetworkAPI(stockId, depth, degree) {
+export async function getStockNetworkAPI(stockId) {
   try {
-    const response = await networkAPI.get(
-      `/stock/${stockId}?depth=${depth}&maxDegree=${degree}`
-    );
+    const response = await networkAPI.get(`/stock/${stockId}?depth=10`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getAllNetworkAPI() {
+  try {
+    const response = await networkAPI.get(`/all?maxDegree=3`);
     return response.data;
   } catch (error) {
     console.error(error);

@@ -24,6 +24,7 @@
         @change="handleTypeChange"
         style="margin-bottom: 20px"
       />
+      <!-- (2) 네트워크 그래프 -->
 
       <!-- 선택된 타입에 따라 다른 내용 표시 -->
       <div class="content">
@@ -38,6 +39,7 @@
             @search="handleSearch"
             @select-stock="selectStock"
           />
+          <!-- (2) 네트워크 그래프 -->
         </div>
 
         <div v-else-if="type === 'product'">

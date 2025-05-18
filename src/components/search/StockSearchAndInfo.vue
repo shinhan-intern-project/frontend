@@ -1,6 +1,7 @@
 <template>
   <div class="stock-search-and-info">
     <!-- 검색창 영역 -->
+
     <div class="search-container">
       <input
         type="text"
@@ -9,6 +10,7 @@
         class="search-input"
         @keyup.enter="handleSearch"
       />
+
       <button class="search-button">
         <img
           src="@/assets/images/SearchButton.svg"
@@ -17,6 +19,7 @@
         />
       </button>
     </div>
+    <NetworkGraphCanvas :type="'all'" />
 
     <!-- 로딩 표시 -->
     <div v-if="isLoading" class="loading-indicator">
@@ -118,8 +121,13 @@
 </template>
 
 <script>
+import NetworkGraphCanvas from "@/components/network/NetworkGraph.vue";
+
 export default {
   name: "StockSearchAndInfo",
+  components: {
+    NetworkGraphCanvas,
+  },
   props: {
     isLoading: {
       type: Boolean,

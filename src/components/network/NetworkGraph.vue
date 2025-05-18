@@ -3,7 +3,7 @@
     <!-- Depth 조절 슬라이더 -->
     <div class="network-tool">
       <div class="slider-container">
-        <div class="slider-wrapper">
+        <div v-if="type !== 'all'" class="slider-wrapper">
           <span class="slider-label">깊이</span>
           <input
             type="range"
@@ -77,7 +77,7 @@
 <script>
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from "vue";
 import ForceGraph2D from "force-graph";
-import { getStockNetworkAPI } from "@/apis/stock";
+import { getStockNetworkAPI, getAllNetworkAPI } from "@/apis/stock.js";
 import { getProductNetworkAPI } from "@/apis/product";
 import { forceLink, forceManyBody } from "d3-force";
 
@@ -88,7 +88,7 @@ export default {
     productId: { type: String, default: "" },
     type: {
       type: String,
-      validator: (v) => ["stock", "product"].includes(v),
+      validator: (v) => ["stock", "product", "all"].includes(v),
       required: true,
     },
   },
@@ -111,7 +111,9 @@ export default {
 
       // API 호출
       let res;
-      if (props.type === "stock") {
+      if (props.type === "all") {
+        res = await getAllNetworkAPI();
+      } else if (props.type === "stock") {
         res = await getStockNetworkAPI(
           props.stockId,
           depth.value,
@@ -124,13 +126,17 @@ export default {
           degree.value
         );
       }
+
       const data = res.data || {};
       Object.assign(rawNodes, data.nodes || {});
       Object.assign(rawEdges, data.edges || {});
 
       // BFS로 depthMap 계산
-      const depthMap = { node0: 0 };
-      const queue = [{ id: "node0", depth: 0 }];
+      const rootId =
+        props.type === "all" ? Object.keys(rawNodes)[0] || "node0" : "node0";
+      const depthMap = { [rootId]: 0 };
+      const queue = [{ id: rootId, depth: 0 }];
+
       while (queue.length) {
         const { id, depth: d } = queue.shift();
         Object.values(rawEdges).forEach((e) => {
@@ -154,6 +160,8 @@ export default {
         id,
         depth: depthMap[id] || 0,
       }));
+      console.table(nodesArray.slice(0, 5)); // 최소 1개 있나?
+
       const linksArray = Object.values(rawEdges)
         .filter((e) => allowed.includes(e.source) && allowed.includes(e.target))
         .map((e) => ({
@@ -192,8 +200,8 @@ export default {
           };
           const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
           // depth 작을수록 진한 표현 (alpha)
-          const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
-          ctx.globalAlpha = alpha;
+          // const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
+          // ctx.globalAlpha = alpha;
 
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
@@ -239,7 +247,13 @@ export default {
       fetchData();
     });
     watch(
-      () => [props.stockId, props.productId, depth.value, degree.value],
+      () => [
+        props.type,
+        props.stockId,
+        props.productId,
+        depth.value,
+        degree.value,
+      ],
       () => {
         if (
           (props.type === "stock" && !props.stockId) ||
