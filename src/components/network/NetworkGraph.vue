@@ -1,37 +1,65 @@
 <template>
   <div>
     <!-- Depth 조절 슬라이더 -->
-    <div class="slider-wrapper">
-      <span class="slider-label">깊이</span>
-      <input
-        type="range"
-        v-model="depth"
-        :min="1"
-        :max="22"
-        :step="1"
-        class="slider-range"
-        @change="fetchData"
-        :style="{ '--percent': ((depth - 1) / (22 - 1)) * 100 + '%' }"
-      />
-      <span class="slider-value">{{ depth }}</span>
-    </div>
+    <div class="network-tool">
+      <div class="slider-container">
+        <div class="slider-wrapper">
+          <span class="slider-label">깊이</span>
+          <input
+            type="range"
+            v-model="depth"
+            :min="1"
+            :max="22"
+            :step="1"
+            class="slider-range"
+            @change="fetchData"
+            :style="{ '--percent': ((depth - 1) / (22 - 1)) * 100 + '%' }"
+          />
+          <span class="slider-value">{{ depth }}</span>
+        </div>
 
-    <!-- Degree 조절 슬라이더 -->
-    <div class="slider-wrapper">
-      <span class="slider-label">차수</span>
-      <input
-        type="range"
-        v-model="degree"
-        :min="1"
-        :max="353"
-        :step="1"
-        class="slider-range"
-        @change="fetchData"
-        :style="{ '--percent': ((degree - 1) / (353 - 1)) * 100 + '%' }"
-      />
-      <span class="slider-value">{{ degree }}</span>
-    </div>
+        <!-- Degree 조절 슬라이더 -->
+        <div class="slider-wrapper">
+          <span class="slider-label">차수</span>
+          <input
+            type="range"
+            v-model="degree"
+            :min="1"
+            :max="353"
+            :step="1"
+            class="slider-range"
+            @change="fetchData"
+            :style="{ '--percent': ((degree - 1) / (353 - 1)) * 100 + '%' }"
+          />
+          <span class="slider-value">{{ degree }}</span>
+        </div>
+      </div>
+      <!-- 왼쪽 2개 -->
+      <div class="network-tool-color">
+        <div class="network-tool-color-item-col">
+          <div class="network-tool-color-item">
+            <div class="network-tool-color-circle"></div>
+            <div class="network-tool-color-text">국내 종목</div>
+          </div>
 
+          <div class="network-tool-color-item">
+            <div class="network-tool-color-circle"></div>
+            <div class="network-tool-color-text">해외 종목</div>
+          </div>
+        </div>
+        <!-- 오른쪽 2개 -->
+        <div class="network-tool-color-item-col">
+          <div class="network-tool-color-item">
+            <div class="network-tool-color-circle"></div>
+            <div class="network-tool-color-text">품목</div>
+          </div>
+          <div class="network-tool-color-item">
+            <div class="network-tool-color-circle"></div>
+            <div class="network-tool-color-text">현재 노드</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- 그래프 + 스피너 래퍼 -->
     <div class="graph-wrapper">
       <!-- 로딩 중일 때 보여줄 스피너 -->
@@ -239,11 +267,16 @@ export default {
 
 <style scoped>
 /* 슬라이더 */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .slider-wrapper {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 /* 슬라이더 라벨 */
@@ -319,5 +352,67 @@ export default {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* 네트워크 툴 */
+.network-tool {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.network-tool-color {
+  display: flex;
+  gap: 20px;
+  margin-right: 20px;
+}
+
+.network-tool-color-item-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.network-tool-color-item {
+  display: flex;
+  gap: 4px;
+}
+
+.network-tool-color-circle {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* 왼쪽 첫 번째 컬럼, 첫 번째 아이템(국내 종목) */
+.network-tool-color-item-col:first-child
+  .network-tool-color-item:nth-child(1)
+  .network-tool-color-circle {
+  background-color: #ff3b30;
+}
+
+/* 왼쪽 첫 번째 컬럼, 두 번째 아이템(해외 종목) */
+.network-tool-color-item-col:first-child
+  .network-tool-color-item:nth-child(2)
+  .network-tool-color-circle {
+  background-color: #58a65c;
+}
+
+/* 오른쪽 컬럼, 첫 번째 아이템(품목) */
+.network-tool-color-item-col:last-child
+  .network-tool-color-item:nth-child(1)
+  .network-tool-color-circle {
+  background-color: #007aff;
+}
+
+/* 오른쪽 컬럼, 두 번째 아이템(현재 노드) */
+.network-tool-color-item-col:last-child
+  .network-tool-color-item:nth-child(2)
+  .network-tool-color-circle {
+  background-color: transparent;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #000;
 }
 </style>
