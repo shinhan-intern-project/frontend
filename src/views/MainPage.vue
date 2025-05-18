@@ -150,6 +150,7 @@ import ExportImportStats from "@/components/main/ExportImportStats.vue";
 import RecentTrades from "@/components/main/RecentTrades.vue";
 import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 import NewsItem from "@/components/news/NewsItem.vue";
+import { getLatestNewsAPI } from "@/apis/news";
 import ProductSearchAndInfo from "@/components/search/ProductSearchAndInfo.vue";
 import { getSearchProductAPI, getSearchHsCodeAPI } from "@/apis/product";
 // import HsToggle from "@/components/toggle/HsToggle.vue";
@@ -345,81 +346,46 @@ export default {
       selectedHSCode: null,
       topStocks: [],
 
-      newsItems: [
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 2,
-          tag: "악재",
-          tagColor: "#2D7AFF",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "경제 일보",
-          date: "5일 전",
-        },
-        {
-          id: 3,
-          tag: "중립",
-          tagColor: "#6B6F76",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "한국 경제",
-          date: "1주일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-      ],
+      newsItems: [],
     };
   },
   methods: {
+    getTagColor(sentiment) {
+      switch (sentiment) {
+        case "호재": return "#E5484D";
+        case "악재": return "#3D8BFF";
+        case "중립":
+        default: return "#A5A5A5";
+      }
+    },
+    formatDate(datetime) {
+      if (!datetime || datetime.length < 8) return datetime;
+
+      const year = datetime.slice(0, 4);
+      const month = datetime.slice(4, 6);
+      const day = datetime.slice(6, 8);
+
+      return `${year}-${month}-${day}`;
+    },
+    async fetchLatestNews() {
+      try {
+        const res = await getLatestNewsAPI();
+        const newsList = res.data;
+        this.newsItems  = newsList.map(news => ({
+          id: news.newsId,
+          tag: news.sentiment,
+          tagColor: this.getTagColor(news.sentiment),
+          image: news.imageOriginLink,
+          url: news.newsOriginLink || "#",
+          title: news.title,
+          publisher: news.officeName,
+          date: this.formatDate(news.datetime),
+        }));
+      } catch (e) {
+        console.error("뉴스 가져오기 실패:", e);
+      }
+    },
+
     handleExportMarketChange(val) {
       this.exportCountryCode = val === "domestic" ? "KR" : "US";
       console.log("바뀐 국가 코드 →", this.exportCountryCode);
@@ -655,6 +621,7 @@ export default {
   mounted() {
     // 초기 데이터 로드
     this.loadInitialData();
+    this.fetchLatestNews();
   },
 };
 </script>

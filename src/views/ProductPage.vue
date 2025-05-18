@@ -82,7 +82,7 @@ export default {
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
           image: news.imageOriginLink,
-          url: "#",
+          url: news.newsOriginLink || "#",
           title: news.title,
           publisher: news.officeName,
           date: this.formatDate(news.datetime),

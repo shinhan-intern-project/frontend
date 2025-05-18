@@ -62,7 +62,7 @@ export default {
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
           image: news.imageOriginLink || "", // 비어 있는 경우는 NewsItem.vue에서 처리됨
-          url: news.url || "#",
+          url: news.newsOriginLink || "#",
           title: news.title,
           publisher: news.officeName,
           date: this.formatDate(news.datetime),
