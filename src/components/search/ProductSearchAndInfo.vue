@@ -55,9 +55,6 @@
             >
               관련 종목 보기
             </button>
-            <div class="product-stats">
-              <div class="product-stat">HS코드</div>
-            </div>
           </div>
         </div>
 
