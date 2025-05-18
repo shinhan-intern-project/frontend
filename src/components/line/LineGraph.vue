@@ -104,9 +104,15 @@ export default {
         const prod = res.data || [];
         const countryKey = this.country.toLowerCase();
         // 4) 수출입량 라인 그래프
-        // 수출 데이터
-        if (prod[countryKey]) {
-          this.series[0].data = prod.kr.map((item) => ({
+        // 4) 수출입량 라인 그래프
+        if (prod[countryKey] && prod[countryKey].length > 0) {
+          // 값이 0인 데이터 필터링하기 (exportValue와 importValue 모두 0인 경우 제외)
+          const filteredData = prod[countryKey].filter(
+            (item) => item.exportValue !== 0 || item.importValue !== 0
+          );
+
+          // 수출 데이터
+          this.series[0].data = filteredData.map((item) => ({
             x: new Date(
               +item.date.slice(0, 4),
               +item.date.slice(4, 6) - 1
@@ -115,16 +121,22 @@ export default {
           }));
 
           // 수입 데이터
-          this.series[1].data = prod[countryKey].map((item) => ({
+          this.series[1].data = filteredData.map((item) => ({
             x: new Date(
               +item.date.slice(0, 4),
               +item.date.slice(4, 6) - 1
             ).getTime(),
             y: item.importValue,
           }));
+        } else {
+          // 데이터가 없을 경우 빈 배열로 초기화
+          this.series[0].data = [];
+          this.series[1].data = [];
         }
       } catch (e) {
         console.error(e);
+        this.series[0].data = [];
+        this.series[1].data = [];
       }
     },
     onChangeType(type) {
