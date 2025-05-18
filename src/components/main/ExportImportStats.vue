@@ -1,14 +1,19 @@
 <template>
   <div class="export-import-stats">
-    <div class="header-section">
-      <div class="header-section-inside">
-        <h2>수출입 통계 그래프</h2>
+    <!-- <div class="header-section"> -->
+    <div class="header-section-inside">
+      <h2>수출입 통계 그래프</h2>
 
-        <slot name="extra"></slot>
-      </div>
-      <div class="graph-section">
-        <LineGraph :country="country" :apiMode="'all'" />
-      </div>
+      <!-- <slot name="extra"></slot> -->
+
+      <!-- <div class="graph-section"> -->
+      <LineGraph
+        :country="country"
+        @update:country="updateCountry"
+        :apiMode="'all'"
+      />
+      <!-- </div> -->
+      <!-- </div> -->
     </div>
 
     <div class="stats-table">
@@ -94,17 +99,24 @@ export default {
   padding: 30px 20px 20px 20px;
   margin-bottom: 0;
 }
+
 .header-section-inside {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
+  padding: 20px 20px 15px 20px;
+  align-items: center;
+  /* margin-top: 20px;
+  margin-left: 15px;
+  margin-right: 15px; */
+  margin-bottom: 20px;
 }
-.header-section h2 {
+.header-section-inside h2 {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: #000c37;
   margin: 0;
-  padding-bottom: 4px;
 }
 
 .stats-table {
