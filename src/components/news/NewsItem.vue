@@ -1,6 +1,7 @@
+
 <template>
   <div class="news-item" @click="clickNews">
-    <img :src="news.image || require('@/assets/images/news.png')" alt="뉴스 이미지" />
+    <img :src="imageSrc" @error="onImageError" alt="뉴스 이미지" />
 
     <div class="badge" v-if="isBadge" :class="badgeColor">
       <span>{{ news.tag }}</span>
@@ -15,6 +16,8 @@
 </template>
 
 <script>
+import defaultNewsImage from "@/assets/images/defaultNews.svg";
+
 export default {
   name: "NewsItem",
   props: {
@@ -26,10 +29,20 @@ export default {
       type: Boolean,
     },
   },
+  data() {
+    return {
+      hasImageError: false,
+    };
+  },
   computed: {
+    imageSrc() {
+      return this.hasImageError || !this.news.image
+        ? defaultNewsImage
+        : this.news.image;
+    },
     badgeColor() {
       switch (this.news.tag) {
-        case "호재":
+        case "호제":
           return "badge-positive";
         case "악재":
           return "badge-negative";
@@ -44,6 +57,9 @@ export default {
     clickNews() {
       window.open(this.news.url, "_blank");
     },
+    onImageError() {
+      this.hasImageError = true;
+    },
   },
 };
 </script>
@@ -55,19 +71,21 @@ export default {
   position: relative;
   gap: 6px;
   cursor: pointer;
+
+  /* ✅ 아래 속성 추가 */
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .news-item .badge {
   position: absolute;
   top: 8px;
   left: 8px;
-
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 20px;
   padding: 4px 10px;
-
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -77,11 +95,9 @@ export default {
 .badge-positive {
   background-color: #e5484d;
 }
-
 .badge-negative {
   background-color: #3182f6;
 }
-
 .badge-neutral {
   background-color: #9f9f9f;
 }
@@ -90,6 +106,8 @@ export default {
   width: 180px;
   height: 120px;
   border-radius: 8px;
+  object-fit: cover;     /* ✅ 이미지 비율 유지하며 꽉 채우기 */
+  display: block; 
 }
 
 .news-item-title {
@@ -97,7 +115,6 @@ export default {
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
