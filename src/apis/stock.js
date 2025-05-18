@@ -17,10 +17,11 @@ export async function getStockChartAPI(stockId, type) {
     console.error(error);
   }
 }
-export async function getStockNetworkAPI(stockId, depth) {
+export async function getStockNetworkAPI(stockId, depth, degree) {
   try {
-    const response = await networkAPI.get(`/stock/${stockId}?depth=${depth}`);
-
+    const response = await networkAPI.get(
+      `/stock/${stockId}?depth=${depth}&maxDegree=${degree}`
+    );
     return response.data;
   } catch (error) {
     console.error(error);
