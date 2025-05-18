@@ -16,7 +16,7 @@
       ref="chart"
       :options="chartOptions"
       :series="series"
-      type="candlestick"
+      type="line"
     />
   </div>
 </template>
@@ -72,7 +72,16 @@ export default {
           },
         ],
         tooltip: {
+          enabled: true,
+          followCursor: true,
           shared: true,
+          intersect: false,
+          x: {
+            format: "yyyy년 MM월",
+          },
+          y: {
+            formatter: (val) => Number(val).toLocaleString("ko-KR") + " 달러",
+          },
         },
         legend: { position: "bottom" },
       },
@@ -95,22 +104,27 @@ export default {
         let res;
 
         if (this.apiMode === "all") {
-          res = await getTradeStatsGraph({ country: this.country }); // 메인용
+          res = await getTradeStatsGraph({ country: this.country }); // 메인페이지
         } else {
-          res = await getProductTradeAPI(productId); // 개별품목
+          res = await getProductTradeAPI(productId); // 개별품목페이지
         }
 
-        // 3) 값 저장
         const prod = res.data || [];
         const countryKey = this.country.toLowerCase();
-        // 4) 수출입량 라인 그래프
-        // 4) 수출입량 라인 그래프
-        if (prod[countryKey] && prod[countryKey].length > 0) {
-          // 값이 0인 데이터 필터링하기 (exportValue와 importValue 모두 0인 경우 제외)
-          const filteredData = prod[countryKey].filter(
-            (item) => item.exportValue !== 0 || item.importValue !== 0
-          );
 
+        // 값이 0인 데이터 필터링하기 (exportValue와 importValue 모두 0인 경우 제외)
+        if (prod[countryKey] && prod[countryKey].length > 0) {
+          const skipByCountry = {
+            kr: ["202504"],
+          };
+          const skipList = skipByCountry[countryKey] || [];
+
+          // 값이 0이 아니면서, 제외 목록에 없는 데이터만 남기기
+          const filteredData = prod[countryKey].filter(
+            (item) =>
+              (item.exportValue !== 0 || item.importValue !== 0) &&
+              !skipList.includes(item.date)
+          );
           // 수출 데이터
           this.series[0].data = filteredData.map((item) => ({
             x: new Date(
