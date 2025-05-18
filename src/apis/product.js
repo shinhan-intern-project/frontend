@@ -74,3 +74,13 @@ export async function getTradeStatsGraph() {
     console.error(error);
   }
 }
+export async function getSearchHsCodeAPI(searchKeyword) {
+  try {
+    const response = await productAPI.get(
+      `/hs-suggestions?keyword=${searchKeyword}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
