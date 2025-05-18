@@ -1,7 +1,7 @@
 <template>
   <div class="volume-ranking">
     <div class="header-section">
-      <h2>종목 거래량 Top 10</h2>
+      <h2>종목 등락률 Top 10</h2>
 
       <ToggleSwitch
         v-model="marketType"
@@ -228,12 +228,18 @@ export default {
   padding: 14px 15px;
   align-items: center;
   background-color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
-
+.volume-item:hover {
+  background-color: #f2f7ff;
+}
 .even-row {
   background-color: #f9fafb;
 }
-
+.even-row:hover {
+  background-color: #f2f7ff;
+}
 .item-rank {
   flex: 0.8;
   font-weight: bold;
