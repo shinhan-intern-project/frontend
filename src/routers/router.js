@@ -25,7 +25,7 @@ const routes = [
     component: ProductPage,
   },
   {
-    path: "/:catchAll(.*)", // ✅ 404 처리용 catch-all route
+    path: "/not-found", // 👈 명시적인 경로
     name: "NotFound",
     component: ErrorPage,
     props: {
@@ -34,6 +34,10 @@ const routes = [
       message2: "입력하신 페이지 주소가 정확한지 다시 한번 확인해주시기 바랍니다.",
     },
   },
+  {
+    path: "/:catchAll(.*)",
+    redirect: "/not-found",
+  }
 ];
 
 // 라우터 인스턴스 생성

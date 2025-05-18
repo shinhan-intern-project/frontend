@@ -1,5 +1,6 @@
 <template>
   <DetailLayout
+    v-if="stockInfo"
     :relatedNews="relatedNews"
     :stockInfo="stockInfo"
     type="stock"
@@ -13,7 +14,7 @@ import DetailLayout from "@/components/detailPage/Layout.vue";
 import { getStockAPI } from "@/apis/stock.js";
 import {
   getStockRelatedNewsAPI,
-  getStockSentimentAPI
+  getStockSentimentAPI,
 } from "@/apis/news.js";
 
 export default {
@@ -39,9 +40,14 @@ export default {
       this.isStockInfoLoading = true;
       try {
         const res = await getStockAPI(id);
+        if (!res?.data || !res.data.companyName) {
+          this.$router.push({ name: "NotFound" });
+          return;
+        }
         this.stockInfo = res.data;
       } catch (e) {
-        this.error = e;
+        console.error("종목 조회 실패:", e);
+        this.$router.push({ name: "NotFound" });
       } finally {
         this.isStockInfoLoading = false;
       }
@@ -55,8 +61,8 @@ export default {
           id: news.newsId,
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
-          image: news.imageOriginLink,
-          url: "#",
+          image: news.imageOriginLink || "", // 비어 있는 경우는 NewsItem.vue에서 처리됨
+          url: news.url || "#",
           title: news.title,
           publisher: news.officeName,
           date: this.formatDate(news.datetime),
@@ -88,10 +94,11 @@ export default {
       }
     },
     formatDate(datetime) {
-      const date = new Date(datetime);
-      const now = new Date();
-      const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-      return diffDays === 0 ? "오늘" : `${diffDays}일 전`;
+      if (!datetime || datetime.length < 8) return datetime;
+      const year = datetime.slice(0, 4);
+      const month = datetime.slice(4, 6);
+      const day = datetime.slice(6, 8);
+      return `${year}-${month}-${day}`;
     },
   },
   mounted() {

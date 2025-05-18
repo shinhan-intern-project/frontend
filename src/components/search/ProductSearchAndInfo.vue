@@ -43,9 +43,6 @@
             style="cursor: pointer"
           >
             <div class="product-info">
-              <div class="product-logo">
-                <span>{{ item.hsName ? item.hsName.charAt(0) : "" }}</span>
-              </div>
               <div class="product-details">
                 <div class="product-name">{{ item.hsName }}</div>
                 <div class="product-code">{{ item.hsCode }}</div>
@@ -58,9 +55,6 @@
             >
               관련 종목 보기
             </button>
-            <div class="product-stats">
-              <div class="product-stat">HS코드</div>
-            </div>
           </div>
         </div>
 
@@ -337,11 +331,14 @@ export default {
 
 .header-left {
   text-align: left;
+  font-weight: 700;
+  font-family: "Pretendard Bold" !important;
 }
-
 .header-center {
+  margin-left: 120px;
   text-align: center;
-  font-weight: 500;
+  font-weight: 700;
+  font-family: "Pretendard Bold" !important;
 }
 
 .header-right {

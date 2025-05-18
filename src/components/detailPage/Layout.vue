@@ -27,11 +27,24 @@
                   "
                 />
                 <div class="info-left-summary">
-                  <div class="sector">{{ stockInfo?.sector }}</div>
+                  <div class="sector">
+                    {{
+                      stockInfo?.stockType === "IMPORT"
+                        ? "수입형"
+                        : stockInfo?.stockType === "EXPORT"
+                        ? "수출형"
+                        : stockInfo?.stockType === "COMPLEX"
+                        ? "혼합형"
+                        : stockInfo?.stockType === "DOMESTIC"
+                        ? "내수형"
+                        : stockInfo?.stockType
+                    }}
+                  </div>
                   <span class="title">{{ stockInfo?.companyName }}</span>
                   <div class="market-ticker">
                     <span>{{ stockInfo?.marketType }}</span>
                     <span>{{ stockInfo?.ticker }}</span>
+                    <span>{{ stockInfo?.sector }}</span>
                   </div>
                 </div>
               </div>
@@ -155,10 +168,14 @@
             <!-- 개별 종목 페이지 - 관련 품목 -->
             <template v-if="type === 'stock'">
               <div class="relation" v-if="stockInfo?.relatedProducts.length">
-                <div
+                <router-link
                   class="relation-item"
                   v-for="(prod, i) in stockInfo?.relatedProducts"
                   :key="prod.hscode"
+                  :to="{
+                    name: 'product',
+                    params: { productId: prod.hscodeId },
+                  }"
                 >
                   <img :src="icons[i]" alt="icon" />
                   <router-link
@@ -169,15 +186,12 @@
                     }"
                   >
                     {{ prod.hscodeName }}
-                  </router-link>
+                  </span>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
-                    {{ prod?.hscodeDescription }}
-                    왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
-                    종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
-                    관련이 있냐면... GPT가 설명해줄거야</span
-                  >
-                </div>
+                    {{ extractDescription(prod?.hscodeDescription) }}
+                  </span>
+                </router-link>
               </div>
               <!-- 관련 품목이 없거나 빈 배열일 때 -->
               <div class="no-relation" v-else>
@@ -194,10 +208,14 @@
               >
                 <div class="relation-stocks-title">국내</div>
                 <div class="relation-stocks">
-                  <div
+                  <router-link
                     class="relation-item"
                     v-for="stock in relatedStocks?.kr"
                     :key="stock.stockId"
+                    :to="{
+                      name: 'stock',
+                      params: { stockId: stock?.stockId },
+                    }"
                   >
                     <img
                       class="relation-icon"
@@ -223,7 +241,7 @@
                     <span class="relation-content">{{
                       stock?.companyOverview
                     }}</span>
-                  </div>
+                  </router-link>
                 </div>
               </div>
 
@@ -233,10 +251,14 @@
               >
                 <div class="relation-stocks-title">미국</div>
                 <div class="relation-stocks">
-                  <div
+                  <router-link
                     class="relation-item"
                     v-for="stock in relatedStocks?.us"
                     :key="stock.stockId"
+                    :to="{
+                      name: 'stock',
+                      params: { stockId: stock?.stockId },
+                    }"
                   >
                     <img
                       class="relation-icon"
@@ -263,7 +285,7 @@
                     <span class="relation-content">{{
                       stock?.companyOverview
                     }}</span>
-                  </div>
+                  </router-link>
                 </div>
               </div>
 
@@ -298,22 +320,30 @@
             ref="section3"
           >
             <span class="header">수출입량 통계</span>
-            <!-- 임시 -->
             <LineGraph api-mode="product" />
-            <!-- <div style="height: 300px"></div> -->
           </div>
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
             <span class="header">관련 뉴스</span>
-            <div class="news-container">
-              <NewsItem
-                :isBadge="true"
-                v-for="news in relatedNews"
-                :key="news.id"
-                :news="news"
-              />
+
+            <template v-if="relatedNews?.length">
+              <div class="news-container">
+                <NewsItem
+                  :isBadge="true"
+                  v-for="news in relatedNews"
+                  :key="news.id"
+                  :news="news"
+                />
+              </div>
+            </template>
+
+            <!-- 🔔 관련 뉴스가 없을 경우 -->
+            <div class="no-relation" v-else>
+              <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+              <p>관련된 뉴스가 없습니다.</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -392,7 +422,6 @@ export default {
       }),
     };
   },
-
   methods: {
     scrollToSection(idx) {
       const el = this.$refs[`section${idx}`];
@@ -457,6 +486,23 @@ export default {
       entries.sort(([, a], [, b]) => b - a);
       return entries[0][0];
     },
+
+    // 관련 품목 내용 정리
+    extractDescription(desc) {
+      const marker = "### 🍽️ 대표 품목별 용도";
+      let summary = desc.split(marker)[0] || desc;
+
+      // 1) 불필요한 # 제거
+      summary = summary.replace(/#/g, "");
+      // 2) --- (연속된 대시) 제거
+      summary = summary.replace(/-{3,}/g, "");
+      // 3) 실제 줄바꿈 제거 (한 줄로 합치기)
+      summary = summary.replace(/\r?\n/g, " ");
+      // 4) 다중 공백 하나로 축소
+      summary = summary.replace(/\s{2,}/g, " ");
+      // 5) 양쪽 공백 정리
+      return summary.trim();
+    },
   },
   mounted() {
     window.addEventListener("scroll", this.onScroll, { passive: true });
@@ -484,7 +530,7 @@ export default {
 }
 
 .detail-layout-container {
-  padding: 100px 0px;
+  padding: 60px 0px 100px 0px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -497,7 +543,7 @@ export default {
 .detail-layout-content {
   display: flex;
   justify-content: space-between;
-  margin-top: 100px;
+  margin-top: 32px;
 }
 
 .detail-layout-content-items {
@@ -630,8 +676,8 @@ export default {
 /* 관련 품목 및 종목 */
 .relation {
   display: flex;
-  gap: 60px;
-  justify-content: space-around;
+  gap: 46px;
+  justify-content: flex-start;
   margin-top: 40px;
 }
 
@@ -657,7 +703,7 @@ export default {
 .relation-stocks {
   display: flex;
   justify-content: flex-start;
-  gap: 40px;
+  gap: 46px;
   flex-wrap: nowrap;
   overflow-x: auto;
   width: 100%;
@@ -680,6 +726,15 @@ export default {
   align-items: center;
   gap: 8px;
   width: 220px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 24px 12px;
+  border-radius: 12px;
+}
+/* Hover 상태 */
+.relation-item:hover {
+  background-color: #f3f4f5;
 }
 
 .relation-item img {

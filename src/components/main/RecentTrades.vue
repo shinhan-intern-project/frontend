@@ -279,7 +279,7 @@ export default {
 
 .trades-header {
   display: flex;
-  padding: 10px 15px;
+  padding: 10px 20px;
   background-color: white;
   font-weight: 400;
   color: #888;
@@ -304,7 +304,7 @@ export default {
 
 .trade-item {
   display: flex;
-  height: 60px;
+  height: 40px;
   padding: 14px 15px;
   align-items: center;
   background-color: white;
