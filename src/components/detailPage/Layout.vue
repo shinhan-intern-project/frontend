@@ -319,9 +319,13 @@
             class="detail-layout-content-item"
             ref="section3"
           >
-            <span class="header">수출입량 통계</span>
-            <LineGraph api-mode="product" />
+            <div class="line-graph-header">
+              <span class="header">수출입량 통계</span>
+
+              <LineGraph api-mode="product" />
+            </div>
           </div>
+
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
             <span class="header">관련 뉴스</span>
@@ -534,6 +538,15 @@ export default {
 </script>
 
 <style scoped>
+.line-graph-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 @import "github-markdown-css/github-markdown.css";
 
 .relation-icon {
