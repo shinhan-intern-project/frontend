@@ -186,7 +186,7 @@
                     }"
                   >
                     {{ prod.hscodeName }}
-                  </span>
+                  </router-link>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
                     {{ extractDescription(prod?.hscodeDescription) }}
@@ -343,7 +343,6 @@
               <p>관련된 뉴스가 없습니다.</p>
             </div>
           </div>
-
         </div>
       </div>
     </div>
