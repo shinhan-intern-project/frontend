@@ -54,8 +54,8 @@
               />
 
               <div class="company-details">
-                <div class="company-name">{{ item.name }}</div>
-                <div class="company-code">{{ item.code }}</div>
+                <span class="company-name">{{ item.name }}</span>
+                <span class="company-code">{{ item.code }}</span>
               </div>
             </div>
             <!-- 관련 품목 보기 버튼 추가 -->
@@ -93,12 +93,8 @@
             class="related-item"
           >
             <div class="related-item-name">{{ item.name }}</div>
-            <!-- <img
-              class="company-logo"
-              :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.ticker}.png`"
-              alt="종목 아이콘"
-              @error="e => e.target.src = 'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png'" /> -->
             <div class="related-item-code">{{ item.stockName }}</div>
+            <div class="related-item-code">{{ item.code }}</div>
           </div>
         </div>
       </div>
@@ -150,7 +146,6 @@ export default {
       this.$emit("select-stock", stock, index);
     },
     goToStockPage(item) {
-      // 라우터 네임은 'stock', 파라미터는 stockId
       this.$router.push({ name: "stock", params: { stockId: item.stockId } });
     },
   },
@@ -238,11 +233,15 @@ export default {
 
 .header-left {
   text-align: left;
+  font-weight: 700;
+  font-family: "Pretendard Bold" !important;
 }
 
 .header-center {
+  margin-left: 120px;
   text-align: center;
-  font-weight: 500;
+  font-weight: 700;
+  font-family: "Pretendard Bold" !important;
 }
 
 .header-right {
@@ -252,14 +251,18 @@ export default {
 .stock-info-content {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
 }
 
 /* 종목 리스트 스타일 */
-.stock-list,
-.related-items-list {
+.stock-list {
   flex: 1;
   max-height: 400px;
+  overflow-y: auto;
+  border-right: 1px solid #eee;
+}
+.related-items-list {
+  height: 400px;
+  flex: 1;
   overflow-y: auto;
   border-right: 1px solid #eee;
   scrollbar-width: thin;
@@ -300,6 +303,7 @@ export default {
 
 /* 종목 항목 스타일 */
 .stock-item {
+  height: 40px;
   display: flex;
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
@@ -309,6 +313,12 @@ export default {
   transition: background-color 0.2s;
 }
 
+.related-item:hover {
+  background-color: #f8f9fa;
+}
+.related-item.active {
+  background-color: #e9f2ff;
+}
 .stock-item:hover {
   background-color: #f8f9fa;
 }
@@ -341,6 +351,7 @@ export default {
 .company-details {
   flex: 1;
   overflow: hidden;
+  gap: 6px;
 }
 
 .company-name {
@@ -383,42 +394,29 @@ export default {
 
 /* 관련 품목 스타일 */
 .related-item {
+  height: 46px;
   display: flex;
-  flex-direction: column;
-  padding: 15px 20px;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 20px;
   border-bottom: 1px solid #eee;
 }
 
 .related-item-name {
-  font-weight: 500;
-  margin-bottom: 8px;
-  width: 100%;
-  white-space: normal;
-  line-height: 1.4;
-  max-height: 4.2em;
+  flex: 1 1 auto;
+  white-space: nowrap;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
   text-overflow: ellipsis;
+  color: #374151;
 }
 
 .related-item-code {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-}
-
-.related-item-code::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #034ea2;
-  margin-right: 6px;
+  gap: 6px;
+  font-size: 14px;
+  color: #6b7280;
 }
 
 @media (max-width: 992px) {
