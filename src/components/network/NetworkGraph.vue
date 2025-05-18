@@ -269,6 +269,21 @@ export default {
               해외: [88, 166, 92],
             };
             const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
+            // 가운데에만 네온 효과
+            const t = Date.now() * 0.005;
+            const pulse = 1 + 0.1 * Math.sin(t + (node.depth || 0));
+            const baseR = node.id === "node0" ? 32 : 16;
+            const R = baseR * pulse;
+            // 라디얼 그라디언트
+            const grad = ctx.createRadialGradient(
+              node.x,
+              node.y,
+              R * 0.2,
+              node.x,
+              node.y,
+              R
+            );
+
             const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
             ctx.globalAlpha = alpha;
             ctx.beginPath();
@@ -277,9 +292,35 @@ export default {
             ctx.fill();
             ctx.globalAlpha = 1;
             if (isRoot) {
-              ctx.lineWidth = 2;
-              ctx.strokeStyle = "#000";
-              ctx.stroke();
+              // ctx.lineWidth = 2;
+              // ctx.strokeStyle = "#FFC107";
+              // ctx.stroke();
+
+              // ctx.strokeStyle = "#FBFF43";
+              grad.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
+              grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+              ctx.shadowColor = `rgba(${r},${g},${b},0.7)`;
+              ctx.shadowBlur = 15;
+
+              // 글로우
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, R, 0, 2 * Math.PI);
+              ctx.fillStyle = grad;
+              ctx.fill();
+
+              // 중심 원
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, R * 0.6, 0, 2 * Math.PI);
+              ctx.fillStyle = `rgb(${r},${g},${b})`;
+              ctx.fill();
+
+              // 루트 노드만 흰 테두리
+              if (isRoot) {
+                ctx.shadowBlur = 0;
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#fff";
+                ctx.stroke();
+              }
             }
           }
         })
