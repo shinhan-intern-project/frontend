@@ -134,7 +134,12 @@
                   :key="prod.hscode"
                 >
                   <img :src="icons[i]" alt="icon" />
-                  <span class="relation-title">{{ prod?.hscodeName }}</span>
+                  <router-link
+                    class="relation-title"
+                    :to="{ name: 'product', params: { productId: prod.hscodeId } }"
+                  >
+                    {{ prod.hscodeName }}
+                  </router-link>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
                     {{ prod?.hscodeDescription }}
@@ -165,7 +170,14 @@
                     :key="stock.stockId"
                   >
                     <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <span class="relation-title">{{ stock?.name }}</span>
+                    <!-- <img :src="icons[i]" alt="icon" /> -->
+                    <router-link
+                      class="relation-title"
+                      :to="{ name: 'stock', params: { stockId: stock?.stockId } }"
+                    >
+                    {{ stock?.name }}
+                    </router-link>
+
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
@@ -186,7 +198,13 @@
                     :key="stock.stockId"
                   >
                     <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <span class="relation-title">{{ stock?.name }}</span>
+                    <router-link
+                      class="relation-title"
+                      :to="{ name: 'stock', params: { stockId: stock?.stockId } }"
+                    >
+                    {{ stock?.name }}
+                    </router-link>
+                    
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
