@@ -576,8 +576,8 @@ export default {
 /* 관련 품목 및 종목 */
 .relation {
   display: flex;
-  /* gap: 60px; */
-  justify-content: space-around;
+  gap: 46px;
+  justify-content: flex-start;
   margin-top: 40px;
 }
 
@@ -603,7 +603,7 @@ export default {
 .relation-stocks {
   display: flex;
   justify-content: flex-start;
-  gap: 44px;
+  gap: 46px;
   flex-wrap: nowrap;
   overflow-x: auto;
   width: 100%;
@@ -629,7 +629,7 @@ export default {
   cursor: pointer;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease;
-  padding: 12px;
+  padding: 24px 12px;
   border-radius: 12px;
 }
 /* Hover 상태 */
