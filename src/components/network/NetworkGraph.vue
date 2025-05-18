@@ -206,7 +206,8 @@ export default {
             .strength(1)
         )
         .d3Force("charge", forceManyBody().strength(-100))
-
+        // .d3AlphaDecay(0.01) // 기본 0.0228 → 0.02 정도로 조금 더 느리게
+        // .d3VelocityDecay(0.1)
         .nodeRelSize(8)
         .nodeCanvasObject((node, ctx) => {
           if (isAll) {
