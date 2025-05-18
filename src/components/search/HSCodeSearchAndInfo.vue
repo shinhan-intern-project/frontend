@@ -1,11 +1,11 @@
 <template>
-  <div class="stock-search-and-info">
+  <div class="hscode-search-and-info">
     <!-- 검색창 영역 -->
     <div class="search-container">
       <input
         type="text"
         v-model="searchInput"
-        placeholder="검색어를 입력해주세요"
+        placeholder="HS 코드 또는 품명을 입력해주세요"
         class="search-input"
         @keyup.enter="handleSearch"
       />
@@ -19,66 +19,40 @@
       <span>검색 중...</span>
     </div>
 
-    <!-- 종목 정보 영역 -->
-    <div v-else class="stock-info-card">
-      <div class="stock-info-header">
-        <div class="header-left">종목</div>
-        <div class="header-center">종목과 관련된 품목</div>
+    <!-- HS코드 정보 영역 -->
+    <div v-else class="hscode-info-card">
+      <div class="hscode-info-header">
+        <div class="header-left">HS 코드</div>
+        <!-- <div class="header-center">HS 코드와 관련된 종목</div> -->
         <div class="header-right"></div>
       </div>
 
-      <div class="stock-info-content">
-        <!-- 왼쪽: 종목 리스트 -->
-        <div class="stock-list">
-          <div v-if="stockItems.length === 0" class="no-results">
+      <div class="hscode-info-content">
+        <!-- 왼쪽: HS코드 리스트 -->
+        <div class="hscode-list">
+          <div v-if="hscodeItems.length === 0" class="no-results">
             <span>검색 결과가 없습니다</span>
           </div>
           <div
             v-else
-            v-for="(item, index) in stockItems"
-            :key="`top-${index}`"
-            class="stock-item"
-            :class="{ active: selectedStockIndex === index }"
-            @click="handleStockSelect(item, index)"
+            v-for="(item, index) in hscodeItems"
+            :key="`hscode-${index}`"
+            class="hscode-item"
+            :class="{ active: selectedHscodeIndex === index }"
+            @click="handleHscodeSelect(item, index)"
           >
-            <div class="company-info">
-              <div class="company-logo">
-                <span>{{ item.name.charAt(0) }}</span>
+            <div class="hscode-info">
+              <div class="hscode-logo">
+                <span>{{ item.hsName ? item.hsName.charAt(0) : "" }}</span>
               </div>
-              <div class="company-details">
-                <div class="company-name">{{ item.name }}</div>
-                <div class="company-code">{{ item.code }}</div>
+              <div class="hscode-details">
+                <div class="hscode-name">{{ item.description }}</div>
+                <div class="hscode-code">{{ item.hsCode }}</div>
               </div>
             </div>
-            <div class="price-info">
-              <div class="current-price">{{ item.price }}</div>
-              <div
-                class="price-change"
-                :class="{
-                  'zero-change': item.changePercent === '0.0%',
-                  'positive-change': parseFloat(item.changePercent) > 0,
-                  'negative-change': parseFloat(item.changePercent) < 0,
-                }"
-              >
-                {{ item.changePercent }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 오른쪽: 관련 품목 -->
-        <div class="related-items-list">
-          <div v-if="relatedItems.length === 0" class="no-related-items">
-            <span>관련 품목이 없습니다</span>
-          </div>
-          <div
-            v-else
-            v-for="(item, index) in relatedItems"
-            :key="`related-${index}`"
-            class="related-item"
-          >
-            <div class="related-item-name">{{ item.name }}</div>
-            <div class="related-item-code">{{ item.stockName }}</div>
+            <!-- <div class="hscode-stats">
+              <div class="hscode-stat">국제통일상품분류</div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -88,27 +62,39 @@
 
 <script>
 export default {
-  name: "StockSearchAndInfo",
+  name: "HSCodeSearchAndInfo",
   props: {
+    formatPrice: {
+      type: Function,
+      required: true,
+    },
+    formatChangeRate: {
+      type: Function,
+      required: true,
+    },
+    getChangeClass: {
+      type: Function,
+      required: true,
+    },
     isLoading: {
       type: Boolean,
       default: false,
     },
-    stockItems: {
+    hscodeItems: {
       type: Array,
       default: () => [],
     },
-    relatedItems: {
-      type: Array,
-      default: () => [],
-    },
-    selectedStockIndex: {
+    selectedHscodeIndex: {
       type: Number,
       default: -1,
     },
     searchKeyword: {
       type: String,
       default: "",
+    },
+    selectedHscode: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -125,8 +111,23 @@ export default {
     handleSearch() {
       this.$emit("search", this.searchInput);
     },
-    handleStockSelect(stock, index) {
-      this.$emit("select-stock", stock, index);
+    handleHscodeSelect(hscode, index) {
+      this.$emit("select-hscode", hscode, index);
+    },
+    displayChangeRate(rate) {
+      // 문자열로 변환하고 %로 표시
+      const numRate = parseFloat(rate);
+      return numRate > 0 ? `+${numRate.toFixed(2)}%` : `${numRate.toFixed(2)}%`;
+    },
+  },
+  computed: {
+    hscodeItemsWithStocks() {
+      return this.hscodeItems.filter(
+        (item) => item.relatedStocks && item.relatedStocks.length > 0
+      );
+    },
+    hasRelatedStocks() {
+      return this.hscodeItemsWithStocks.length > 0;
     },
   },
 };
@@ -136,7 +137,6 @@ export default {
 /* 검색창 스타일 */
 .search-container {
   box-shadow: 0px 4px 20px #cfdef1;
-
   display: flex;
   margin-bottom: 30px;
   border-radius: 10px;
@@ -145,7 +145,6 @@ export default {
 
 .search-input {
   box-shadow: 0px 4px 20px #cfdef1;
-
   flex: 1;
   padding: 15px;
   border: none;
@@ -154,6 +153,7 @@ export default {
 }
 
 .search-button {
+  box-shadow: 0px 4px 20px #cfdef1;
   width: 50px;
   background-color: #101c42;
   color: white;
@@ -174,16 +174,16 @@ export default {
   color: #888;
 }
 
-/* 종목 정보 카드 스타일 */
-.stock-info-card {
+/* HS코드 정보 카드 스타일 */
+.hscode-info-card {
+  box-shadow: 0px 4px 20px #cfdef1;
   background-color: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0px 4px 20px #cfdef1;
   margin-bottom: 30px;
 }
 
-.stock-info-header {
+.hscode-info-header {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   padding: 15px 20px;
@@ -204,15 +204,15 @@ export default {
   text-align: right;
 }
 
-.stock-info-content {
+.hscode-info-content {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
 }
 
-/* 종목 리스트 스타일 */
-.stock-list,
-.related-items-list {
+/* HS코드 리스트 스타일 */
+.hscode-list,
+.related-stocks-list {
   flex: 1;
   max-height: 400px;
   overflow-y: auto;
@@ -221,28 +221,28 @@ export default {
   scrollbar-color: #ccc transparent;
 }
 
-.stock-list::-webkit-scrollbar,
-.related-items-list::-webkit-scrollbar {
+.hscode-list::-webkit-scrollbar,
+.related-stocks-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.stock-list::-webkit-scrollbar-track,
-.related-items-list::-webkit-scrollbar-track {
+.hscode-list::-webkit-scrollbar-track,
+.related-stocks-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.stock-list::-webkit-scrollbar-thumb,
-.related-items-list::-webkit-scrollbar-thumb {
+.hscode-list::-webkit-scrollbar-thumb,
+.related-stocks-list::-webkit-scrollbar-thumb {
   background-color: #ccc;
   border-radius: 3px;
 }
 
-.related-items-list {
+.related-stocks-list {
   border-right: none;
 }
 
 .no-results,
-.no-related-items {
+.no-related-stocks {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -253,8 +253,8 @@ export default {
   text-align: center;
 }
 
-/* 종목 항목 스타일 */
-.stock-item {
+/* HS코드 항목 스타일 */
+.hscode-item {
   display: flex;
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
@@ -264,22 +264,22 @@ export default {
   transition: background-color 0.2s;
 }
 
-.stock-item:hover {
+.hscode-item:hover {
   background-color: #f8f9fa;
 }
 
-.stock-item.active {
+.hscode-item.active {
   background-color: #e9f2ff;
 }
 
-.company-info {
+.hscode-info {
   display: flex;
   align-items: center;
   flex: 2;
   min-width: 0;
 }
 
-.company-logo {
+.hscode-logo {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -293,12 +293,12 @@ export default {
   font-size: 12px;
 }
 
-.company-details {
+.hscode-details {
   flex: 1;
   overflow: hidden;
 }
 
-.company-name {
+.hscode-name {
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -306,22 +306,59 @@ export default {
   margin-bottom: 4px;
 }
 
-.company-code {
+.hscode-code {
   color: #888;
   font-size: 14px;
 }
 
-.price-info {
+.hscode-stats {
   text-align: right;
   min-width: 100px;
 }
 
-.current-price {
-  font-weight: 500;
+.hscode-stat {
+  font-size: 14px;
+  color: #888;
 }
 
-.price-change {
+/* 관련 종목 스타일 */
+.related-stock {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.related-stock-name {
+  font-weight: 500;
+  margin-bottom: 8px;
+  width: 100%;
+  white-space: normal;
+  line-height: 1.4;
+  max-height: 4.2em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+.related-stock-code {
+  color: #666;
   font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.related-stock-code::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #034ea2;
+  margin-right: 6px;
 }
 
 .positive-change {
@@ -336,53 +373,13 @@ export default {
   color: #333;
 }
 
-/* 관련 품목 스타일 */
-.related-item {
-  display: flex;
-  flex-direction: column;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.related-item-name {
-  font-weight: 500;
-  margin-bottom: 8px;
-  width: 100%;
-  white-space: normal;
-  line-height: 1.4;
-  max-height: 4.2em;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
-}
-
-.related-item-code {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-}
-
-.related-item-code::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #034ea2;
-  margin-right: 6px;
-}
-
 @media (max-width: 992px) {
-  .stock-info-content {
+  .hscode-info-content {
     flex-direction: column;
   }
 
-  .stock-list,
-  .related-items-list {
+  .hscode-list,
+  .related-stocks-list {
     border-right: none;
     border-bottom: 1px solid #eee;
     max-height: 300px;
@@ -390,17 +387,17 @@ export default {
 }
 
 @media (max-width: 576px) {
-  .stock-item {
+  .hscode-item {
     padding: 12px 15px;
   }
 
-  .company-logo {
+  .hscode-logo {
     width: 30px;
     height: 30px;
     font-size: 10px;
   }
 
-  .price-info {
+  .hscode-stats {
     min-width: 80px;
   }
 }

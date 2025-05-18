@@ -18,9 +18,9 @@ export async function getRelatedStocksAPI(hscodeId) {
   }
 }
 
-export async function getProductNetworkAPI(productId) {
+export async function getProductNetworkAPI(productId, depth) {
   try {
-    const response = await networkAPI.get(`/hs/${productId}?depth=10`);
+    const response = await networkAPI.get(`/hs/${productId}?depth=${depth}`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -60,6 +60,25 @@ export async function getTradeRankAPI(
 export async function getSearchProductAPI(searchKeyword) {
   try {
     const response = await productAPI.get(`/search?keyword=${searchKeyword}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getTradeStatsGraph() {
+  try {
+    const response = await productAPI.get(`/trade-stats/graph`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+export async function getSearchHsCodeAPI(searchKeyword) {
+  try {
+    const response = await productAPI.get(
+      `/hs-suggestions?keyword=${searchKeyword}`
+    );
     return response.data;
   } catch (error) {
     console.error(error);

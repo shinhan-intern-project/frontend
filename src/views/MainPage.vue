@@ -15,11 +15,12 @@
       </header>
 
       <!-- 탭 영역 -->
-      <ToggleSwitch
+      <HsToggle
         v-model="type"
         :options="[
           { value: 'stock', label: '종목' },
           { value: 'product', label: '품목' },
+          { value: 'hscode', label: 'HS 코드' },
         ]"
         @change="handleTypeChange"
         style="margin-bottom: 20px"
@@ -28,7 +29,7 @@
       <!-- 선택된 타입에 따라 다른 내용 표시 -->
       <div class="content">
         <div v-if="type === 'stock'">
-          <!-- 통합된 종목 검색 및 정보 컴포넌트 -->
+          <!-- 종목 검색 -->
           <StockSearchAndInfo
             :is-loading="isLoading"
             :stock-items="stockItems"
@@ -40,8 +41,8 @@
           />
         </div>
 
-        <div v-else>
-          <!-- 품목 검색 및 정보 컴포넌트 -->
+        <div v-else-if="type === 'product'">
+          <!-- 품목 검색 -->
           <ProductSearchAndInfo
             :is-loading="isProductLoading"
             :product-items="productItems"
@@ -54,9 +55,19 @@
             :get-change-class="getChangeClass"
           />
         </div>
+        <div v-else>
+          <!-- HS 코드 검색-->
+          <HSCodeSearchAndInfo
+            :is-loading="isHSCodeLoading"
+            :hscode-items="hscodeItems"
+            :selected-hscode-index="selectedHSCodeIndex"
+            :search-keyword="hscodeSearchKeyword"
+            @search="handleHSCodeSearch"
+            @select-hscode="selectHSCode"
+          />
+        </div>
       </div>
 
-      <!-- 중앙 화살표 -->
       <div class="center-arrow">
         <img
           src="@/assets/images/icons/arrow.png"
@@ -68,9 +79,7 @@
 
       <!-- 종목 거래량 / 수출입 통계 그래프  -->
       <div class="layout">
-        <!-- 종목 거래량 섹션 -->
         <div class="volume-section">
-          <!-- 새로운 컴포넌트 사용 -->
           <TopVolumeRanking
             :stocks="topStocks"
             :is-loading="isTopStocksLoading"
@@ -80,12 +89,26 @@
         <!-- 오른쪽 영역: 수출입 통계와 무역 품목 최근 수출입량 -->
         <div class="export-stats-section">
           <!-- 수출입 통계 그래프 -->
+
           <ExportImportStats
+            :country="exportCountryCode"
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
-          />
+          >
+            <!-- extra 슬롯에 토글 삽입 -->
+            <template #extra>
+              <ToggleSwitch
+                v-model="exportMarket"
+                :options="[
+                  { value: 'domestic', label: '국내' },
+                  { value: 'overseas', label: '미국' },
+                ]"
+                @change="handleExportMarketChange"
+              />
+            </template>
+          </ExportImportStats>
 
-          <!-- 무역 품목 최근 수출입량 (바로 아래에 배치) -->
+          <!-- 무역 품목 최근 수출입량 -->
           <div class="recent-trades-wrapper">
             <RecentTrades
               :is-loading="isTradeItemsLoading"
@@ -96,8 +119,8 @@
           </div>
         </div>
       </div>
-      <!-- 뉴스 섹션 -->
 
+      <!-- 뉴스 섹션 -->
       <div class="detail-layout-content-item" ref="section4">
         <span class="header">무역 관련 뉴스</span>
         <div class="news-container">
@@ -126,7 +149,9 @@ import RecentTrades from "@/components/main/RecentTrades.vue";
 import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 import NewsItem from "@/components/news/NewsItem.vue";
 import ProductSearchAndInfo from "@/components/search/ProductSearchAndInfo.vue";
-import { getSearchProductAPI } from "@/apis/product";
+import { getSearchProductAPI, getSearchHsCodeAPI } from "@/apis/product";
+import HsToggle from "@/components/toggle/HsToggle.vue";
+import HSCodeSearchAndInfo from "@/components/search/HSCodeSearchAndInfo.vue";
 const countries = {
   features: [],
 };
@@ -154,6 +179,8 @@ export default {
     RecentTrades,
     NewsItem,
     ProductSearchAndInfo,
+    HSCodeSearchAndInfo,
+    HsToggle,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
@@ -305,25 +332,17 @@ export default {
       productItems: [],
       selectedProductIndex: -1,
       selectedProduct: null,
-      topStocks: [
-        {
-          name: "삼성전자",
-          code: "005930",
-          price: "55,700",
-          changePercent: "0.0%",
-          volume: "93,000",
-        },
-        // 더 많은 주식 데이터...
-      ],
-      exportStats: [
-        {
-          name: "라인그래프",
-          importValue: "라인그래프",
-          exportValue: "라인그래프",
-          change: 3.6,
-        },
-        // 더 많은 수출입 데이터...
-      ],
+      exportMarket: "domestic",
+      exportCountryCode: "KR",
+      isExportStatsLoading: false,
+      // HS 코드 관련
+      hscodeSearchKeyword: "",
+      isHSCodeLoading: false,
+      hscodeItems: [],
+      selectedHSCodeIndex: -1,
+      selectedHSCode: null,
+      topStocks: [],
+
       newsItems: [
         {
           id: 1,
@@ -399,10 +418,13 @@ export default {
     };
   },
   methods: {
+    handleExportMarketChange(val) {
+      this.exportCountryCode = val === "domestic" ? "KR" : "US";
+      console.log("바뀐 국가 코드 →", this.exportCountryCode);
+    },
     // 타입 변경 핸들러
     handleTypeChange(value) {
       console.log(`타입 변경: ${value}`);
-      // 필요에 따라 추가 로직
     },
     // 품목 검색 핸들러
     handleProductSearch(keyword) {
@@ -420,11 +442,6 @@ export default {
           this.productSearchKeyword
         );
         if (responseData && responseData.status === "OK") {
-          // this.productItems = responseData.data.map((item) => ({
-          //   name: item.hscodeName || item.name,
-          //   code: item.hscode || item.code,
-          //   // 필요한 다른 데이터 필드 매핑
-          // }));
           this.productItems = responseData.data;
         } else {
           console.error(
@@ -446,7 +463,6 @@ export default {
     selectProduct(product, index) {
       this.selectedProduct = product;
       this.selectedProductIndex = index;
-      // 선택된 품목에 대한 추가 정보 가져오기 (필요한 경우)
     },
 
     // 거래량 상위 Top 10 데이터 가져오기
@@ -500,17 +516,11 @@ export default {
       this.searchKeyword = keyword;
       this.searchStocks();
     },
-    // 국가 변경 핸들러
-    // handleCountryChange(value) {
-    //   this.fetchTradeData();
-    //   this.$emit("country-change", value);
-    // },
+
     handleCountryChange(country) {
       console.log(`국가 변경: ${country}`);
       this.selectedCountry = country;
-      // this.fetchTradeData(); // 이 줄을 제거
     },
-    // 정렬 방향 변경 핸들러
     handleDirectionChange(direction) {
       console.log(`정렬 방향 변경: ${direction}`);
       this.sortDirection = direction;
@@ -598,11 +608,42 @@ export default {
         this.relatedItems = [];
       }
     },
+    // HS 코드 검색 핸들러
+    handleHSCodeSearch(keyword) {
+      this.hscodeSearchKeyword = keyword;
+      this.searchHSCodes();
+    },
 
-    // loadInitialData() {
-    //   console.log("초기 데이터 로드 시작");
-    //   this.fetchTopStocks();
-    // },
+    // HS 코드 검색 API 호출
+    async searchHSCodes() {
+      if (!this.hscodeSearchKeyword) return;
+
+      this.isHSCodeLoading = true;
+      try {
+        const responseData = await getSearchHsCodeAPI(this.hscodeSearchKeyword);
+        if (responseData && responseData.status === "OK") {
+          this.hscodeItems = responseData.data;
+        } else {
+          console.error(
+            "HS 코드 API 응답 형식이 올바르지 않습니다.",
+            responseData
+          );
+          this.hscodeItems = [];
+        }
+      } catch (error) {
+        console.error("HS 코드 검색 오류:", error);
+        this.hscodeItems = [];
+        this.selectedHSCode = null;
+      } finally {
+        this.isHSCodeLoading = false;
+      }
+    },
+
+    // HS 코드 선택 핸들러
+    selectHSCode(hsCode, index) {
+      this.selectedHSCode = hsCode;
+      this.selectedHSCodeIndex = index;
+    },
   },
   mounted() {
     // 초기 데이터 로드
@@ -613,6 +654,12 @@ export default {
 
 <style scoped>
 /* 전체 앱 스타일 */
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 20px 20px 20px; /* 기존 값 유지 */
+}
 .logo-image {
   max-width: 300px;
   height: auto;

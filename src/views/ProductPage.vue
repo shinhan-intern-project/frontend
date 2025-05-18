@@ -5,13 +5,20 @@
     type="product"
     :relatedStocks="relatedStocks"
     :productId="productId"
+    :sentiment="sentiment"
   />
 </template>
 
 <script>
 import DetailLayout from "@/components/detailPage/Layout.vue";
-import { getProductAPI, getRelatedStocksAPI } from "@/apis/product.js";
-import { getProductRelatedNewsAPI } from "@/apis/news.js"; // ✅ 품목 뉴스 API
+import {
+  getProductAPI,
+  getRelatedStocksAPI
+} from "@/apis/product.js";
+import {
+  getProductRelatedNewsAPI,
+  getProductSentimentAPI
+} from "@/apis/news.js";
 
 export default {
   name: "ProductPage",
@@ -23,6 +30,7 @@ export default {
       productInfo: null,
       relatedStocks: null,
       relatedNews: [],
+      sentiment: { 호재: 0, 악재: 0, 중립: 0 },
       isProductInfoLoading: false,
       isRelatedStocksLoading: false,
     };
@@ -65,13 +73,24 @@ export default {
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
           image: news.imageOriginLink,
-          url: "#", // 실제 URL로 대체 가능
+          url: "#", // 실제 URL 있으면 대체
           title: news.title,
           publisher: news.officeName,
           date: this.formatDate(news.datetime),
         }));
       } catch (e) {
         console.error("품목 관련 뉴스 호출 실패:", e);
+      }
+    },
+    async getSentiment(id) {
+      try {
+        const res = await getProductSentimentAPI(id);
+        if (res.data && res.status === "OK") {
+          this.sentiment = res.data;
+        }
+      } catch (e) {
+        console.error("감정 지표 호출 실패:", e);
+        this.sentiment = { 호재: 0, 악재: 0, 중립: 0 };
       }
     },
     getTagColor(sentiment) {
@@ -94,12 +113,14 @@ export default {
     this.getProductInfo(id);
     this.getRelatedStocks(id);
     this.getRelatedNews(id);
+    this.getSentiment(id);
   },
   watch: {
     productId(newId) {
       this.getProductInfo(newId);
       this.getRelatedStocks(newId);
       this.getRelatedNews(newId);
+      this.getSentiment(newId);
     },
   },
 };

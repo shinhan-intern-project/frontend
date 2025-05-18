@@ -22,10 +22,22 @@
 </template>
 
 <script>
-import { getProductTradeAPI } from "@/apis/product.js";
+import { getProductTradeAPI, getTradeStatsGraph } from "@/apis/product.js";
 
 export default {
   name: "LineGraph",
+  props: {
+    apiMode: {
+      type: String,
+      default: "product",
+      validator: (v) => ["product", "all"].includes(v),
+    },
+    country: {
+      type: String,
+      default: "KR",
+    },
+  },
+
   data() {
     return {
       chartType: "month",
@@ -66,24 +78,34 @@ export default {
       },
     };
   },
+
+  watch: {
+    country: {
+      immediate: true,
+      handler() {
+        this.getChartData();
+      },
+    },
+  },
+
   methods: {
     async getChartData() {
       try {
-        // 초기화
-        this.series[0].data = [];
-        this.series[1].data = [];
-
-        // 1) 경로에서 stockId 꺼내기
         const productId = this.$route.params.productId;
-        // 2) API 호출
-        const res = await getProductTradeAPI(productId);
+        let res;
+
+        if (this.apiMode === "all") {
+          res = await getTradeStatsGraph({ country: this.country }); // 메인용
+        } else {
+          res = await getProductTradeAPI(productId); // 개별품목
+        }
 
         // 3) 값 저장
         const prod = res.data || [];
-
+        const countryKey = this.country.toLowerCase();
         // 4) 수출입량 라인 그래프
         // 수출 데이터
-        if (prod.kr) {
+        if (prod[countryKey]) {
           this.series[0].data = prod.kr.map((item) => ({
             x: new Date(
               +item.date.slice(0, 4),
@@ -93,7 +115,7 @@ export default {
           }));
 
           // 수입 데이터
-          this.series[1].data = prod.kr.map((item) => ({
+          this.series[1].data = prod[countryKey].map((item) => ({
             x: new Date(
               +item.date.slice(0, 4),
               +item.date.slice(4, 6) - 1

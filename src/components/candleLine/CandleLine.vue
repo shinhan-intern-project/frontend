@@ -9,8 +9,17 @@
     >
       {{ opt.label }}
     </button>
-  </div>
 
+    <!-- 국가 토글 - ToggleSwitch 컴포넌트 사용 -->
+    <div class="country-selector">
+      <span class="selector-label"></span>
+      <ToggleSwitch
+        v-model="selectedCountry"
+        :options="countryOptions"
+        @change="onChangeCountry"
+      />
+    </div>
+  </div>
   <div id="chart">
     <apexchart
       ref="chart"
@@ -23,18 +32,27 @@
 
 <script>
 import { getStockChartAPI } from "@/apis/stock.js";
-
+import ToggleSwitch from "../toggle/ToggleSwitch.vue";
 export default {
   name: "CandleLine",
+  components: {
+    ToggleSwitch,
+  },
   data() {
     return {
       chartType: "month",
+      selectedCountry: "kr", // 기본값은 한국
+
       periodOptions: [
         { label: "일", value: "day" },
         { label: "주", value: "week" },
         { label: "월", value: "month" },
         { label: "분기", value: "quarter" },
         { label: "년", value: "year" },
+      ],
+      countryOptions: [
+        { label: "한국", value: "kr" },
+        { label: "미국", value: "us" },
       ],
       series: [
         {
@@ -126,7 +144,11 @@ export default {
         // 1) 경로에서 stockId 꺼내기
         const stockId = this.$route.params.stockId;
         // 2) API 호출
-        const res = await getStockChartAPI(stockId, this.chartType);
+        const res = await getStockChartAPI(
+          stockId,
+          this.chartType,
+          this.selectedCountry
+        );
         // 3) 값 저장
         const stock = res.data.data[0].stock;
         const relatedProducts = res.data.data[0].relatedProducts || [];
@@ -143,11 +165,13 @@ export default {
 
         // 5) 수출입량 라인 그래프
         relatedProducts.forEach((prod) => {
+          // 선택된 국가의 데이터 사용
+          const countryData = prod[this.selectedCountry] || [];
           // 5-1) 수출 라인
           this.series.push({
             name: `수출: ${prod.hscodeId}`,
             type: "line",
-            data: prod.kr.map((item) => ({
+            data: countryData.map((item) => ({
               x: new Date(
                 +item.date.slice(0, 4),
                 +item.date.slice(4, 6) - 1
@@ -160,7 +184,7 @@ export default {
           this.series.push({
             name: ` 수입: ${prod.hscodeId}`,
             type: "line",
-            data: prod.kr.map((item) => ({
+            data: countryData.map((item) => ({
               x: new Date(
                 +item.date.slice(0, 4),
                 +item.date.slice(4, 6) - 1
@@ -179,6 +203,10 @@ export default {
       this.chartType = type;
       this.getChartData();
     },
+    // 국가 변경 메서드
+    onChangeCountry() {
+      this.getChartData();
+    },
   },
   async mounted() {
     await this.getChartData();
@@ -194,6 +222,8 @@ export default {
 
 .chart-controls {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
   margin: 12px 0;
 }
@@ -204,6 +234,11 @@ export default {
   background: #eee;
   cursor: pointer;
   border-radius: 4px;
+}
+.country-selector {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* 오른쪽으로 밀기 */
 }
 
 .chart-controls button.active {

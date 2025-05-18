@@ -4,13 +4,17 @@
     :stockInfo="stockInfo"
     type="stock"
     :stockId="stockId"
+    :sentiment="sentiment"
   />
 </template>
 
 <script>
 import DetailLayout from "@/components/detailPage/Layout.vue";
 import { getStockAPI } from "@/apis/stock.js";
-import { getStockRelatedNewsAPI } from "@/apis/news.js";
+import {
+  getStockRelatedNewsAPI,
+  getStockSentimentAPI
+} from "@/apis/news.js";
 
 export default {
   name: "StockPage",
@@ -21,6 +25,7 @@ export default {
     return {
       relatedNews: [],
       stockInfo: null,
+      sentiment: { 호재: 0, 악재: 0, 중립: 0 },
       isStockInfoLoading: false,
     };
   },
@@ -44,20 +49,31 @@ export default {
     async getRelatedNews(id) {
       try {
         const res = await getStockRelatedNewsAPI(id);
-        const newsList = res.data; // ✅ 실제 뉴스 배열은 res.data.data 에 있음
+        const newsList = res.data;
 
-        this.relatedNews = newsList.map(news => ({
+        this.relatedNews = newsList.map((news) => ({
           id: news.newsId,
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
           image: news.imageOriginLink,
-          url: "#", // 실제 뉴스 URL이 없는 경우 대체
+          url: "#",
           title: news.title,
           publisher: news.officeName,
           date: this.formatDate(news.datetime),
         }));
       } catch (e) {
         console.error("관련 뉴스 호출 실패:", e);
+      }
+    },
+    async getSentiment(id) {
+      try {
+        const res = await getStockSentimentAPI(id);
+        if (res.data && res.status === "OK") {
+          this.sentiment = res.data;
+        }
+      } catch (e) {
+        console.error("감정 지표 호출 실패:", e);
+        this.sentiment = { 호재: 0, 악재: 0, 중립: 0 };
       }
     },
     getTagColor(sentiment) {
@@ -82,11 +98,13 @@ export default {
     const id = this.stockId;
     this.getStockInfo(id);
     this.getRelatedNews(id);
+    this.getSentiment(id);
   },
   watch: {
     stockId(newId) {
       this.getStockInfo(newId);
       this.getRelatedNews(newId);
+      this.getSentiment(newId);
     },
   },
 };

@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="info-right">
-                <SentimentBadge :sentiment="stockInfo?.sentiment" />
+                <SentimentBadge :sentiment="sentiment" />
                 <div class="price-container">
                   <div>
                     <div class="sub-title">현재가</div>
@@ -97,7 +97,8 @@
                   <div class="product-hscode-wrapper">HS코드</div>
                   <span>{{ productInfo?.hsCode }}</span>
                 </div>
-                <SentimentBadge :sentiment="productInfo?.sentiment" />
+                
+                <SentimentBadge :sentiment="sentiment" />
               </div>
               <span class="product-title">{{ productInfo?.hsName }}</span>
               <div
@@ -226,7 +227,7 @@
           >
             <span class="header">수출입량 통계</span>
             <!-- 임시 -->
-            <LineGraph />
+            <LineGraph api-mode="product" />
             <!-- <div style="height: 300px"></div> -->
           </div>
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
@@ -303,6 +304,9 @@ export default {
     productId: {
       type: String,
       //   required: true,
+    },
+    sentiment: {
+      type: Object
     },
   },
   data() {
