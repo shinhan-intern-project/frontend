@@ -384,9 +384,9 @@ export default {
 }
 
 .company-details {
-  flex: 1;
-  overflow: hidden;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;   
+  justify-content: center; 
 }
 
 .company-name {
@@ -399,6 +399,7 @@ export default {
 
 .company-code {
   color: #888;
+  display: block;
   font-size: 14px;
 }
 
