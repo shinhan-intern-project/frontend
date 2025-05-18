@@ -10,7 +10,11 @@
         @keyup.enter="handleSearch"
       />
       <button class="search-button" @click="handleSearch">
-        <img src="@/assets/images/SearchButton.svg" alt="검색" @click="handleSearch"/>
+        <img
+          src="@/assets/images/SearchButton.svg"
+          alt="검색"
+          @click="handleSearch"
+        />
       </button>
     </div>
 
@@ -92,8 +96,8 @@
                   {{
                     (console.log(stock),
                     stock.marketType == "NASDAQ"
-                      ? stock.currentPrice
-                      : Math.floor(stock.currentPrice))
+                      ? stock.currentPrice.toLocaleString()
+                      : Math.floor(stock.currentPrice).toLocaleString())
                   }}
                   {{ stock.marketType === "NASDAQ" ? "USD" : "원" }} |
                   <span :class="getChangeClass(stock.changeRate)">
@@ -130,7 +134,13 @@
                   <div class="related-stock-name">{{ stock.companyName }}</div>
                 </div>
                 <div class="related-stock-code">
-                  {{ stock.ticker }} | {{ formatPrice(stock.currentPrice) }}원 |
+                  {{ stock.ticker }} |
+                  {{
+                    stock.marketType === "NASDAQ"
+                      ? Number(stock.currentPrice).toLocaleString()
+                      : Math.floor(stock.currentPrice).toLocaleString()
+                  }}
+                  {{ stock.marketType === "NASDAQ" ? "USD" : "원" }} |
                   <span :class="getChangeClass(stock.changeRate)">
                     {{ displayChangeRate(stock.changeRate) }}
                   </span>
@@ -279,14 +289,14 @@ export default {
 }
 
 .search-input::placeholder {
-  color: #B8B8B8; /* 원하는 색상으로 변경 */
+  color: #b8b8b8; /* 원하는 색상으로 변경 */
   font-size: 14px;
 }
 
 .search-input {
   box-shadow: 0px 4px 20px #cfdef1;
   flex: 1;
-  padding:  16px 25px;
+  padding: 16px 25px;
   border: none;
   outline: none;
   font-size: 16px;
@@ -298,7 +308,7 @@ export default {
   border: none;
   cursor: pointer;
 }
-.search-button img{
+.search-button img {
   height: 35px;
   margin-top: 3px;
 }

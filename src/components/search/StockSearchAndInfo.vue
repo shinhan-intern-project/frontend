@@ -10,8 +10,7 @@
         class="search-input"
         @keyup.enter="handleSearch"
       />
-
-      <button class="search-button">
+      <button class="search-button" @click="handleSearch">
         <img
           src="@/assets/images/SearchButton.svg"
           alt="검색"
@@ -70,9 +69,9 @@
             <div class="price-info">
               <div class="current-price">
                 {{
-                  item.marketType == "NASDAQ"
-                    ? item.price
-                    : Math.floor(item.price)
+                  item.marketType === "NASDAQ"
+                    ? Number(item.price).toLocaleString()
+                    : Math.floor(item.price).toLocaleString()
                 }}
                 {{ item.marketType === "NASDAQ" ? "USD" : "원" }}
               </div>
