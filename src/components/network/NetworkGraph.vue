@@ -69,7 +69,7 @@
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">품목</div>
           </div>
-          <div class="network-tool-color-item">
+          <div class="network-tool-color-item" :class="{ 'all-mode': isAll }">
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">현재 노드</div>
           </div>
@@ -518,6 +518,7 @@ export default {
 
 .network-tool-color-item-col.all-mode {
   gap: 12px;
+  flex-direction: row;
 }
 
 .network-tool-color-item {
@@ -561,5 +562,11 @@ export default {
   width: 12px;
   height: 12px;
   border: 2px solid #000;
+}
+
+.network-tool.all-mode
+  .network-tool-color-item-col:last-child
+  .network-tool-color-item:nth-child(2) {
+  display: none;
 }
 </style>
