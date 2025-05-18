@@ -52,7 +52,14 @@
             <div class="company-code">{{ item.ticker }}</div>
           </div>
         </div>
-        <div class="item-price">{{ formatPrice(item.currentPrice) }}원</div>
+        <div class="item-price">
+          {{
+            marketType === "overseas"
+              ? formatPrice(item.currentPrice)
+              : formatPrice(item.currentPrice)
+          }}
+          {{ marketType === "overseas" ? "USD" : "원" }}
+        </div>
         <div
           class="item-change"
           :class="{

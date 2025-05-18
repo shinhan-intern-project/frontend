@@ -44,12 +44,12 @@
             <div class="company-info">
               <img
                 class="company-logo"
-                :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.code}.png`"
+                :src="`https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.code}.png`"
                 alt="종목 아이콘"
                 @error="
                   (e) =>
                     (e.target.src =
-                      'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                      'https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
                 "
               />
 
@@ -58,15 +58,15 @@
                 <div class="company-code">{{ item.code }}</div>
               </div>
             </div>
-            <!-- 관련 품목 보기 버튼 추가 -->
-            <button
-              class="related-items-btn"
-              @click.stop="handleStockSelect(item, index)"
-            >
-              관련 품목 보기
-            </button>
             <div class="price-info">
-              <div class="current-price">{{ item.price }}</div>
+              <div class="current-price">
+                {{
+                  item.marketType == "NASDAQ"
+                    ? item.price
+                    : Math.floor(item.price)
+                }}
+                {{ item.marketType === "NASDAQ" ? "USD" : "원" }}
+              </div>
               <div
                 class="price-change"
                 :class="{
