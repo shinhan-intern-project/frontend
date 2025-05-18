@@ -22,11 +22,24 @@
                   alt="종목 아이콘"
                 />
                 <div class="info-left-summary">
-                  <div class="sector">{{ stockInfo?.sector }}</div>
+                  <div class="sector">
+                    {{
+                      stockInfo?.stockType === "IMPORT"
+                        ? "수입형"
+                        : stockInfo?.stockType === "EXPORT"
+                        ? "수출형"
+                        : stockInfo?.stockType === "COMPLEX"
+                        ? "혼합형"
+                        : stockInfo?.stockType === "DOMESTIC"
+                        ? "내수형"
+                        : stockInfo?.stockType
+                    }}
+                  </div>
                   <span class="title">{{ stockInfo?.companyName }}</span>
                   <div class="market-ticker">
                     <span>{{ stockInfo?.marketType }}</span>
                     <span>{{ stockInfo?.ticker }}</span>
+                    <span>{{ stockInfo?.sector }}</span>
                   </div>
                 </div>
               </div>
@@ -350,7 +363,6 @@ export default {
       }),
     };
   },
-
   methods: {
     scrollToSection(idx) {
       const el = this.$refs[`section${idx}`];
