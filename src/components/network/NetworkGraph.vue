@@ -2,6 +2,7 @@
   <div>
     <!-- Depth 조절 슬라이더 -->
     <div class="slider-wrapper">
+      <span class="slider-label">깊이</span>
       <input
         type="range"
         v-model="depth"
@@ -10,12 +11,14 @@
         :step="1"
         class="slider-range"
         @change="fetchData"
+        :style="{ '--percent': ((depth - 1) / (22 - 1)) * 100 + '%' }"
       />
       <span class="slider-value">{{ depth }}</span>
     </div>
 
     <!-- Degree 조절 슬라이더 -->
     <div class="slider-wrapper">
+      <span class="slider-label">차수</span>
       <input
         type="range"
         v-model="degree"
@@ -24,6 +27,7 @@
         :step="1"
         class="slider-range"
         @change="fetchData"
+        :style="{ '--percent': ((degree - 1) / (353 - 1)) * 100 + '%' }"
       />
       <span class="slider-value">{{ degree }}</span>
     </div>
@@ -33,6 +37,7 @@
       <!-- 로딩 중일 때 보여줄 스피너 -->
       <div v-if="loading" class="spinner-overlay">
         <div class="spinner"></div>
+        <!-- <span>그래프를 그리고 있습니다</span> -->
       </div>
 
       <!-- Canvas 그래프 컨테이너 -->
@@ -147,7 +152,7 @@ export default {
         .nodeRelSize(8)
         .nodeCanvasObject((node, ctx) => {
           const isRoot = node.id === "node0";
-          const radius = isRoot ? 12 : 8;
+          const radius = isRoot ? 24 : 8;
           // 노드 원 그리기
           // 색상 RGB 매핑
           const rgbMap = {
@@ -200,7 +205,6 @@ export default {
             window.location.href = `/product/${link}`;
           }
         });
-
       fetchData();
     });
     watch(
@@ -238,10 +242,35 @@ export default {
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
+
+/* 슬라이더 라벨 */
+.slider-label {
+  width: 3rem;
+  text-align: right;
+  font-weight: 500;
+}
+
 .slider-range {
   width: 250px;
   height: 6px;
 }
+
+.slider-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 300px;
+  height: 8px;
+  border-radius: 6px;
+  background: linear-gradient(
+    to right,
+    #0088ff 0%,
+    #0088ff var(--percent),
+    #d7e1fb var(--percent),
+    #d7e1fb 100%
+  );
+  outline: none;
+}
+
 .slider-value {
   width: 2rem;
   text-align: center;
