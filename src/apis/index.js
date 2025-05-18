@@ -26,7 +26,6 @@ export const productAPI = axios.create({
   },
 });
 
-
 // 뉴스 API
 export const newsAPI = axios.create({
   baseURL: `${baseURL}/api/news`,
