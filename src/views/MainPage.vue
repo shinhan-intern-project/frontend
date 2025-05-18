@@ -97,17 +97,6 @@
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
           >
-            <!-- extra 슬롯에 토글 삽입 -->
-            <template #extra>
-              <ToggleSwitch
-                v-model="exportMarket"
-                :options="[
-                  { value: 'domestic', label: '국내' },
-                  { value: 'overseas', label: '미국' },
-                ]"
-                @change="handleExportMarketChange"
-              />
-            </template>
           </ExportImportStats>
 
           <!-- 무역 품목 최근 수출입량 -->
