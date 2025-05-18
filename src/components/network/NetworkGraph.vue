@@ -116,11 +116,22 @@ export default {
           const isRoot = node.id === "node0";
           const radius = isRoot ? 12 : 8;
           // 노드 원 그리기
+          // 색상 RGB 매핑
+          const rgbMap = {
+            품목: [0, 60, 255],
+            국내: [255, 0, 7],
+            해외: [88, 166, 92],
+          };
+          const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
+          // depth 작을수록 진한 표현 (alpha)
+          const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
+          ctx.globalAlpha = alpha;
+
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-          const colMap = { 품목: "#3C8", 국내: "#F22", 해외: "#28A" };
-          ctx.fillStyle = colMap[node.type] || "#888";
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
           ctx.fill();
+          ctx.globalAlpha = 1;
           if (isRoot) {
             ctx.lineWidth = 2;
             ctx.strokeStyle = "#000";
@@ -133,8 +144,21 @@ export default {
             ctx.fillText(node.name, node.x, node.y - radius - 4);
           }
         })
-        .linkWidth(1)
-        .linkColor("#B8C8FC")
+        // 점선 엣지 렌더링
+        .linkCanvasObject((link, ctx) => {
+          const sx = link.source.x;
+          const sy = link.source.y;
+          const tx = link.target.x;
+          const ty = link.target.y;
+          ctx.beginPath();
+          ctx.setLineDash([4, 6]);
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(tx, ty);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = "#B8C8FC";
+          ctx.stroke();
+          ctx.setLineDash([]);
+        })
         .onNodeClick((node) => {
           const link = node.link_id;
           if (node.type === "국내" || node.type === "해외") {
