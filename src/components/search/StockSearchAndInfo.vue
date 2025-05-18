@@ -322,13 +322,13 @@ export default {
 }
 
 .related-item:hover {
-  background-color: #f8f9fa;
+  background-color: #f2f7ff;
 }
 .related-item.active {
   background-color: #e9f2ff;
 }
 .stock-item:hover {
-  background-color: #f8f9fa;
+  background-color: #f2f7ff;
 }
 
 .stock-item.active {
