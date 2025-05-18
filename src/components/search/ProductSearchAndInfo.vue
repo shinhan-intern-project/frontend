@@ -43,9 +43,6 @@
             style="cursor: pointer"
           >
             <div class="product-info">
-              <div class="product-logo">
-                <span>{{ item.hsName ? item.hsName.charAt(0) : "" }}</span>
-              </div>
               <div class="product-details">
                 <div class="product-name">{{ item.hsName }}</div>
                 <div class="product-code">{{ item.hsCode }}</div>
