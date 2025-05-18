@@ -88,7 +88,14 @@
                   <div class="related-stock-name">{{ stock.companyName }}</div>
                 </div>
                 <div class="related-stock-code">
-                  {{ stock.ticker }} | {{ formatPrice(stock.currentPrice) }}원 |
+                  {{ stock.ticker }} |
+                  {{
+                    (console.log(stock),
+                    stock.marketType == "NASDAQ"
+                      ? stock.currentPrice
+                      : Math.floor(stock.currentPrice))
+                  }}
+                  {{ stock.marketType === "NASDAQ" ? "USD" : "원" }} |
                   <span :class="getChangeClass(stock.changeRate)">
                     {{ displayChangeRate(stock.changeRate) }}
                   </span>

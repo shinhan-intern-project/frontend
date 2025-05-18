@@ -542,10 +542,14 @@ export default {
           this.stockItems = responseData.data.map((item) => ({
             name: item.companyName,
             code: item.ticker,
-            price: `${parseInt(item.currentPrice).toLocaleString()}원`,
+            price:
+              item.marketType === "NASDAQ"
+                ? parseFloat(item.currentPrice)
+                : parseInt(item.currentPrice, 10),
             changePercent: `${(parseFloat(item.changeRate) * 100).toFixed(1)}%`,
             stockId: item.stockId,
             relatedProducts: item.relatedProducts || [],
+            marketType: item.marketType,
           }));
 
           this.showAllRelatedProducts();
