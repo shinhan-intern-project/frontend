@@ -177,11 +177,11 @@ export default {
             ctx.strokeStyle = "#000";
             ctx.stroke();
             // node0 라벨 텍스트
-            ctx.font = "12px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            ctx.fillStyle = "#000";
-            ctx.fillText(node.name, node.x, node.y - radius - 4);
+            // ctx.font = "12px sans-serif";
+            // ctx.textAlign = "center";
+            // ctx.textBaseline = "bottom";
+            // ctx.fillStyle = "#000";
+            // ctx.fillText(node.name, node.x, node.y - radius - 4);
           }
         })
         // 점선 엣지 렌더링
