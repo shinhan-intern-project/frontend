@@ -139,7 +139,10 @@
                   <img :src="icons[i]" alt="icon" />
                   <router-link
                     class="relation-title"
-                    :to="{ name: 'product', params: { productId: prod.hscodeId } }"
+                    :to="{
+                      name: 'product',
+                      params: { productId: prod.hscodeId },
+                    }"
                   >
                     {{ prod.hscodeName }}
                   </router-link>
@@ -176,9 +179,12 @@
                     <!-- <img :src="icons[i]" alt="icon" /> -->
                     <router-link
                       class="relation-title"
-                      :to="{ name: 'stock', params: { stockId: stock?.stockId } }"
+                      :to="{
+                        name: 'stock',
+                        params: { stockId: stock?.stockId },
+                      }"
                     >
-                    {{ stock?.name }}
+                      {{ stock?.name }}
                     </router-link>
 
                     <span class="relation-code">{{ stock?.ticker }}</span>
@@ -203,11 +209,14 @@
                     <!-- <img :src="icons[i]" alt="icon" /> -->
                     <router-link
                       class="relation-title"
-                      :to="{ name: 'stock', params: { stockId: stock?.stockId } }"
+                      :to="{
+                        name: 'stock',
+                        params: { stockId: stock?.stockId },
+                      }"
                     >
-                    {{ stock?.name }}
+                      {{ stock?.name }}
                     </router-link>
-                    
+
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
@@ -403,7 +412,7 @@ export default {
 @import "github-markdown-css/github-markdown.css";
 
 .detail-layout-container {
-  padding: 100px 0px;
+  padding: 60px 0px 100px 0px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -416,7 +425,7 @@ export default {
 .detail-layout-content {
   display: flex;
   justify-content: space-between;
-  margin-top: 100px;
+  margin-top: 32px;
 }
 
 .detail-layout-content-items {
