@@ -159,11 +159,8 @@
                   </span>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
-                    {{ prod?.hscodeDescription }}
-                    왜 이 종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이
-                    종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
-                    관련이 있냐면... GPT가 설명해줄거야</span
-                  >
+                    {{ extractDescription(prod?.hscodeDescription) }}
+                  </span>
                 </router-link>
               </div>
               <!-- 관련 품목이 없거나 빈 배열일 때 -->
@@ -263,9 +260,7 @@
             ref="section3"
           >
             <span class="header">수출입량 통계</span>
-            <!-- 임시 -->
             <LineGraph api-mode="product" />
-            <!-- <div style="height: 300px"></div> -->
           </div>
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
@@ -401,6 +396,23 @@ export default {
       const entries = Object.entries(s);
       entries.sort(([, a], [, b]) => b - a);
       return entries[0][0];
+    },
+
+    // 관련 품목 내용 정리
+    extractDescription(desc) {
+      const marker = "### 🍽️ 대표 품목별 용도";
+      let summary = desc.split(marker)[0] || desc;
+
+      // 1) 불필요한 # 제거
+      summary = summary.replace(/#/g, "");
+      // 2) --- (연속된 대시) 제거
+      summary = summary.replace(/-{3,}/g, "");
+      // 3) 실제 줄바꿈 제거 (한 줄로 합치기)
+      summary = summary.replace(/\r?\n/g, " ");
+      // 4) 다중 공백 하나로 축소
+      summary = summary.replace(/\s{2,}/g, " ");
+      // 5) 양쪽 공백 정리
+      return summary.trim();
     },
   },
   mounted() {
