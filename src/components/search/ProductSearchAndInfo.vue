@@ -10,7 +10,7 @@
         @keyup.enter="handleSearch"
       />
       <button class="search-button" @click="handleSearch">
-        <i class="fas fa-search"></i>
+        <img src="@/assets/images/SearchButton.svg" alt="검색" @click="handleSearch"/>
       </button>
     </div>
 
@@ -278,24 +278,29 @@ export default {
   overflow: hidden;
 }
 
+.search-input::placeholder {
+  color: #B8B8B8; /* 원하는 색상으로 변경 */
+  font-size: 14px;
+}
+
 .search-input {
   box-shadow: 0px 4px 20px #cfdef1;
-
   flex: 1;
-  padding: 15px;
+  padding:  16px 25px;
   border: none;
   outline: none;
   font-size: 16px;
 }
 
 .search-button {
-  box-shadow: 0px 4px 20px #cfdef1;
-
   width: 50px;
-  background-color: #101c42;
-  color: white;
+  background-color: white;
   border: none;
   cursor: pointer;
+}
+.search-button img{
+  height: 35px;
+  margin-top: 3px;
 }
 
 /* 로딩 인디케이터 */

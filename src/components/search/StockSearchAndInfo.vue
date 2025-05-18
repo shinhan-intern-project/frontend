@@ -10,7 +10,6 @@
         @keyup.enter="handleSearch"
       />
       <button class="search-button">
-        <!-- <i class="fas fa-search"></i> -->
         <img
           src="@/assets/images/SearchButton.svg"
           alt="검색"
@@ -104,6 +103,9 @@
             v-for="(item, index) in relatedItems"
             :key="`related-${index}`"
             class="related-item"
+            :class="{ active: selectedProductIndex === index }"
+            @click="goToProductPage(item)"
+            style="cursor: pointer"
           >
             <div class="related-item-name">{{ item.name }}</div>
             <div class="related-item-code">{{ item.stockName }}</div>
@@ -160,6 +162,12 @@ export default {
     },
     goToStockPage(item) {
       this.$router.push({ name: "stock", params: { stockId: item.stockId } });
+    },
+    goToProductPage(stock) {
+      this.$router.push({
+        name: "product",
+        params: { productId: stock.hscodeId },
+      });
     },
   },
 };
