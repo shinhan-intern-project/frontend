@@ -327,11 +327,14 @@ export default {
 
 .header-left {
   text-align: left;
+  font-weight: 500;
+  font-family: "Pretendard Bold" !important;
 }
-
 .header-center {
+  margin-left: 120px;
   text-align: center;
   font-weight: 500;
+  font-family: "Pretendard Bold" !important;
 }
 
 .header-right {
