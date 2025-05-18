@@ -1,6 +1,6 @@
 <template>
   <div class="news-item" @click="clickNews">
-    <img src="@/assets/images/news.png" />
+    <img :src="news.image || require('@/assets/images/news.png')" alt="뉴스 이미지" />
 
     <div class="badge" v-if="isBadge" :class="badgeColor">
       <span>{{ news.tag }}</span>
