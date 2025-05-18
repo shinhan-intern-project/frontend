@@ -85,7 +85,11 @@
       </div>
 
       <!-- Canvas 그래프 컨테이너 -->
-      <div class="graph-container" ref="graphContainer"></div>
+      <div
+        class="graph-container"
+        :class="{ 'all-mode': isAll }"
+        ref="graphContainer"
+      ></div>
     </div>
   </div>
 </template>
@@ -408,6 +412,11 @@ export default {
   height: 500px;
   cursor: grab;
 }
+
+.graph-container.all-mode {
+  height: 387px;
+}
+
 .graph-container:active {
   cursor: grabbing;
 }

@@ -516,7 +516,6 @@ export default {
 
 .on-off {
   position: relative;
-  background-color: pink;
 }
 .on-off-search {
   /* display: flex; */
