@@ -69,6 +69,15 @@ export default {
           type: "candlestick",
           height: 400,
           toolbar: { show: true },
+          // zoom: { enabled: true },
+          // events: {
+          //   zoomed: (chartCtx, { xaxis }) => {
+          //     // 보이는 x축 범위를 서버로 요청
+          //     this.startDate = this.formatDate(xaxis.min);
+          //     this.endDate = this.formatDate(xaxis.max);
+          //     this.getChartData();
+          //   },
+          // },
         },
         plotOptions: {
           candlestick: {
@@ -124,10 +133,20 @@ export default {
           show: true,
           position: "bottom",
         },
+        // 서버 요청할 날짜 범위
+        // startDate: null,
+        // endDate: null,
       },
     };
   },
   methods: {
+    // formatDate(ts) {
+    //   const d = new Date(ts);
+    //   const yy = d.getFullYear();
+    //   const mm = String(d.getMonth() + 1).padStart(2, "0");
+    //   const dd = String(d.getDate()).padStart(2, "0");
+    //   return `${yy}${mm}${dd}`; // YYYYMMDD
+    // },
     async getChartData() {
       try {
         this.series = [
@@ -144,6 +163,8 @@ export default {
           stockId,
           this.chartType,
           this.selectedCountry
+          // this.startDate,
+          // this.endDate
         );
 
         const stock = res.data.data[0].stock;
@@ -237,10 +258,8 @@ export default {
   display: flex;
   align-items: center;
   margin-left: auto;
-
 }
 ::v-deep .apexcharts-legend {
-
   gap: 40px; /* 모든 그룹 사이에 간격 적용됨 */
 }
 ::v-deep .apexcharts-legend-group-1.apexcharts-legend-group-vertical {
@@ -252,5 +271,4 @@ export default {
   gap: 3px 40px;
   justify-content: start;
 }
-
 </style>
