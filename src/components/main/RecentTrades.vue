@@ -55,10 +55,14 @@
             </div>
           </div>
           <div class="item-values">
-            <div class="item-value">{{ formatCurrency(item.importValue) }}</div>
+            <div class="item-value">
+              {{ formatCurrency(item.importValue) }} USD
+            </div>
           </div>
           <div class="item-values">
-            <div class="item-value">{{ formatCurrency(item.exportValue) }}</div>
+            <div class="item-value">
+              {{ formatCurrency(item.exportValue) }} USD
+            </div>
           </div>
         </div>
       </div>
@@ -117,15 +121,44 @@ export default {
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
     formatCurrency(value) {
-      // 값이 1,000,000 이상이면 백만 단위로 표시
-      if (value >= 1000000) {
-        return `${(value / 1000000).toFixed(1)}백만`;
+      // 국내(KR)는 1000 곱하기
+      let v = value;
+      if (this.localCountry === "KR") {
+        v = value * 1000;
       }
-      // 값이 1,000 이상이면 천 단위로 표시
-      else if (value >= 1000) {
-        return `${(value / 1000).toFixed(1)}천`;
+
+      // 단위 변환
+      if (v >= 1_0000_0000_0000) {
+        // 1조 이상
+        const 조 = Math.floor(v / 1_0000_0000_0000);
+        const 억 = Math.floor((v % 1_0000_0000_0000) / 1_0000_0000);
+        return (
+          조.toLocaleString() +
+          "조" +
+          (억 > 0 ? " " + 억.toLocaleString() + "억" : "")
+        );
+      } else if (v >= 1_0000_0000) {
+        // 1억 이상
+        const 억 = Math.floor(v / 1_0000_0000);
+        const 만 = Math.floor((v % 1_0000_0000) / 1_0000);
+        return (
+          억.toLocaleString() +
+          "억" +
+          (만 > 0 ? " " + 만.toLocaleString() + "만" : "")
+        );
+      } else if (v >= 1_0000) {
+        // 1만 이상
+        const 만 = Math.floor(v / 1_0000);
+        const 나머지 = v % 1_0000;
+        return (
+          만.toLocaleString() +
+          "만" +
+          (나머지 > 0 ? " " + 나머지.toLocaleString() : "")
+        );
+      } else {
+        // 만 미만
+        return v.toLocaleString();
       }
-      return this.formatNumber(value);
     },
     toggleSortDirection() {
       this.sortDirection =

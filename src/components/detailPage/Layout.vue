@@ -18,8 +18,13 @@
             <div class="info">
               <div class="info-left">
                 <img
-                  :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stockInfo?.ticker}.png`"
+                  :src="`https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stockInfo?.ticker}.png`"
                   alt="종목 아이콘"
+                  @error="
+                    (e) =>
+                      (e.target.src =
+                        'https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                  "
                 />
                 <div class="info-left-summary">
                   <div class="sector">
@@ -49,11 +54,13 @@
                   <div>
                     <div class="sub-title">현재가</div>
                     <span class="price">
-                      <!-- {{ Math.floor(stockInfo?.currentPrice) }} -->
-                      {{ stockInfo?.currentPrice }}
-
-                      원</span
-                    >
+                      {{
+                        stockInfo?.marketType === "NASDAQ"
+                          ? stockInfo?.currentPrice
+                          : Math.floor(stockInfo?.currentPrice)
+                      }}
+                      {{ stockInfo?.marketType === "NASDAQ" ? "USD" : "원" }}
+                    </span>
                   </div>
                   <div>
                     <span class="per">
@@ -73,11 +80,23 @@
             <div class="indicator">
               <div class="indicator-item">
                 <span class="sub-title">시가총액</span>
-                <span class="value">{{ stockInfo?.marketCap }}조</span>
+                <span class="value">
+                  {{
+                    stockInfo?.marketType === "NASDAQ"
+                      ? stockInfo?.marketCap
+                      : formatMarketCap(stockInfo?.marketCap)
+                  }}
+                  {{ stockInfo?.marketType === "NASDAQ" ? "" : "" }}
+                </span>
               </div>
               <div class="indicator-item">
                 <span class="sub-title">eps</span>
-                <span class="value">{{ stockInfo?.eps }}원</span>
+                <span class="value"
+                  >{{ stockInfo?.eps
+                  }}{{
+                    stockInfo?.marketType === "NASDAQ" ? " USD" : " 원"
+                  }}</span
+                >
               </div>
               <div class="indicator-item">
                 <span class="sub-title">pbr</span>
@@ -85,7 +104,12 @@
               </div>
               <div class="indicator-item">
                 <span class="sub-title">bps</span>
-                <span class="value">{{ stockInfo?.bps }}원</span>
+                <span class="value"
+                  >{{ stockInfo?.bps
+                  }}{{
+                    stockInfo?.marketType === "NASDAQ" ? " USD" : " 원"
+                  }}</span
+                >
               </div>
               <div class="indicator-item">
                 <span class="sub-title">배당수익률</span>
@@ -154,9 +178,15 @@
                   }"
                 >
                   <img :src="icons[i]" alt="icon" />
-                  <span class="relation-title">
+                  <router-link
+                    class="relation-title"
+                    :to="{
+                      name: 'product',
+                      params: { productId: prod.hscodeId },
+                    }"
+                  >
                     {{ prod.hscodeName }}
-                  </span>
+                  </router-link>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
                     {{ extractDescription(prod?.hscodeDescription) }}
@@ -187,11 +217,25 @@
                       params: { stockId: stock?.stockId },
                     }"
                   >
-                    <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <span class="relation-title">
+                    <img
+                      class="relation-icon"
+                      :src="`https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock?.ticker}.png`"
+                      alt="종목 아이콘"
+                      @error="
+                        (e) =>
+                          (e.target.src =
+                            'https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                      "
+                    />
+                    <router-link
+                      class="relation-title"
+                      :to="{
+                        name: 'stock',
+                        params: { stockId: stock?.stockId },
+                      }"
+                    >
                       {{ stock?.name }}
-                    </span>
+                    </router-link>
 
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
@@ -216,10 +260,26 @@
                       params: { stockId: stock?.stockId },
                     }"
                   >
-                    <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <span class="relation-title">
+                    <img
+                      class="relation-icon"
+                      :src="`https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock?.ticker}.png`"
+                      alt="종목 아이콘"
+                      @error="
+                        (e) =>
+                          (e.target.src =
+                            'https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                      "
+                    />
+
+                    <router-link
+                      class="relation-title"
+                      :to="{
+                        name: 'stock',
+                        params: { stockId: stock?.stockId },
+                      }"
+                    >
                       {{ stock?.name }}
-                    </span>
+                    </router-link>
 
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
@@ -283,7 +343,6 @@
               <p>관련된 뉴스가 없습니다.</p>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -368,6 +427,25 @@ export default {
       if (!el) return;
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     },
+    formatMarketCap(value) {
+      if (!value && value !== 0) return "";
+      const num = Number(value);
+      if (num >= 1_0000) {
+        // 1조 이상
+        return (
+          Math.floor(num / 1_0000).toLocaleString() +
+          "조 " +
+          Math.floor(num % 1_0000).toLocaleString() +
+          "억 원"
+        );
+      } else if (num >= 1) {
+        // 1억 이상
+        return Math.floor(num / 1).toLocaleString() + "억";
+      } else {
+        // 억 미만
+        return num.toLocaleString() + "억 원";
+      }
+    },
     onScroll() {
       const scrollY = window.pageYOffset || document.documentElement.scrollTop;
       const visibleHeight = window.innerHeight;
@@ -438,6 +516,17 @@ export default {
 
 <style scoped>
 @import "github-markdown-css/github-markdown.css";
+
+.relation-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f5f6fa;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  display: block;
+}
 
 .detail-layout-container {
   padding: 60px 0px 100px 0px;

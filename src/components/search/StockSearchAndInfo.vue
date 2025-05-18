@@ -9,8 +9,12 @@
         class="search-input"
         @keyup.enter="handleSearch"
       />
-      <button class="search-button" >
-        <img src="@/assets/images/SearchButton.svg" alt="검색" @click="handleSearch"/>
+      <button class="search-button">
+        <img
+          src="@/assets/images/SearchButton.svg"
+          alt="검색"
+          @click="handleSearch"
+        />
       </button>
     </div>
 
@@ -44,12 +48,12 @@
             <div class="company-info">
               <img
                 class="company-logo"
-                :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.code}.png`"
+                :src="`https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${item.code}.png`"
                 alt="종목 아이콘"
                 @error="
                   (e) =>
                     (e.target.src =
-                      'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                      'https://thumb.tossinvest.com/image/resized/300x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
                 "
               />
 
@@ -61,7 +65,14 @@
             <!-- 관련 품목 보기 버튼 추가 -->
 
             <div class="price-info">
-              <div class="current-price">{{ item.price }}</div>
+              <div class="current-price">
+                {{
+                  item.marketType == "NASDAQ"
+                    ? item.price
+                    : Math.floor(item.price)
+                }}
+                {{ item.marketType === "NASDAQ" ? "USD" : "원" }}
+              </div>
               <div
                 class="price-change"
                 :class="{
@@ -193,14 +204,14 @@ export default {
   overflow: hidden;
 }
 .search-input::placeholder {
-  color: #B8B8B8; /* 원하는 색상으로 변경 */
+  color: #b8b8b8; /* 원하는 색상으로 변경 */
   font-size: 14px;
 }
 
 .search-input {
   box-shadow: 0px 4px 20px #cfdef1;
   flex: 1;
-  padding:  16px 25px;
+  padding: 16px 25px;
   border: none;
   outline: none;
   font-size: 16px;
@@ -212,7 +223,7 @@ export default {
   border: none;
   cursor: pointer;
 }
-.search-button img{
+.search-button img {
   height: 35px;
   margin-top: 3px;
 }
@@ -330,13 +341,13 @@ export default {
 }
 
 .related-item:hover {
-  background-color: #f8f9fa;
+  background-color: #f2f7ff;
 }
 .related-item.active {
   background-color: #e9f2ff;
 }
 .stock-item:hover {
-  background-color: #f8f9fa;
+  background-color: #f2f7ff;
 }
 
 .stock-item.active {
