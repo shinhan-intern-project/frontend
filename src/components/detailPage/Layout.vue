@@ -92,7 +92,7 @@
               <div class="indicator-item">
                 <span class="sub-title">eps</span>
                 <span class="value"
-                  >{{ stockInfo?.eps
+                  >{{ stockInfo?.eps.toLocaleString()
                   }}{{
                     stockInfo?.marketType === "NASDAQ" ? " USD" : " 원"
                   }}</span
@@ -105,7 +105,7 @@
               <div class="indicator-item">
                 <span class="sub-title">bps</span>
                 <span class="value"
-                  >{{ stockInfo?.bps
+                  >{{ stockInfo?.bps.toLocaleString()
                   }}{{
                     stockInfo?.marketType === "NASDAQ" ? " USD" : " 원"
                   }}</span
