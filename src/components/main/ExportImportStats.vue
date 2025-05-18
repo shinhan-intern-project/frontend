@@ -1,16 +1,23 @@
 <template>
   <div class="export-import-stats">
     <div class="header-section">
-      <h2>수출입 통계 그래프</h2>
+      <div class="header-section-inside">
+        <h2>수출입 통계 그래프</h2>
+
+        <slot name="extra"></slot>
+      </div>
+      <div class="graph-section">
+        <LineGraph :country="country" :apiMode="'all'" />
+      </div>
     </div>
 
     <div class="stats-table">
-      <div class="stats-header">
+      <!-- <div class="stats-header">
         <div class="header-item">품목</div>
         <div class="header-item">수입</div>
         <div class="header-item">수출 금액</div>
         <div class="header-item">수출 증감</div>
-      </div>
+      </div> -->
 
       <div v-if="isLoading" class="loading-indicator">
         <div class="spinner"></div>
@@ -42,9 +49,14 @@
 </template>
 
 <script>
+import LineGraph from "../line/LineGraph.vue";
 export default {
   name: "ExportImportStats",
   props: {
+    country: {
+      type: String,
+      default: "KR",
+    },
     statsItems: {
       type: Array,
       default: () => [],
@@ -59,6 +71,9 @@ export default {
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
   },
+  components: {
+    LineGraph,
+  },
 };
 </script>
 
@@ -72,14 +87,18 @@ export default {
 }
 
 .header-section {
-  display: flex;
+  /* display: flex; */
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 30px 20px 20px 20px;
   margin-bottom: 0;
 }
-
+.header-section-inside {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .header-section h2 {
   font-size: 18px;
   font-weight: 600;

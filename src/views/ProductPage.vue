@@ -11,69 +11,14 @@
 
 <script>
 import DetailLayout from "@/components/detailPage/Layout.vue";
-import { getRelatedStocksAPI } from "@/apis/product";
-import { getProductAPI } from "@/apis/product.js";
-import { getProductSentimentAPI } from "@/apis/news.js";
-
-const relatedNews = [
-  {
-    id: 1,
-    tag: "호재",
-    tagColor: "#E5484D", // 빨강
-    image: "https://via.placeholder.com/300x180?text=뉴스1",
-    url: "https://google.com",
-    title: "신한투자증권, 금융 IT 인재 키운다 ‘프로디지털아카데미’ 6기 모집",
-    publisher: "조선 미조선 미디어조선 미디선 미디어조선 미디어디어",
-    date: "3일 전",
-  },
-  {
-    id: 2,
-    tag: "악재",
-    tagColor: "#3D8BFF", // 파랑
-    image: "https://via.placeholder.com/300x180?text=뉴스2",
-    title: "신한투자증권, 금융 IT 인재 키운다 ‘프로디지털아카데미’ 6기 모집",
-    url: "https://google.com",
-    publisher: "조선 미디어",
-    date: "3일 전",
-  },
-  {
-    id: 3,
-    tag: "중립",
-    tagColor: "#A5A5A5", // 회색
-    image: "https://via.placeholder.com/300x180?text=뉴스3",
-    title:
-      "신한투자증권, 금자증권, 금융 IT 인재 키운다융 IT 인재 키운다 ‘프로디지털아카데미’ 6기 모집",
-    publisher: "조선 미디어",
-    date: "3일 전",
-  },
-  {
-    id: 4,
-    tag: "호재",
-    tagColor: "#E5484D",
-    image: "https://via.placeholder.com/300x180?text=뉴스4",
-    title: "신한투자증권, 금융 IT 인재 키운다 ‘프로디지털아카데미’ 6기 모집",
-    publisher: "조선 미디어",
-    date: "3일 전",
-  },
-  {
-    id: 5,
-    tag: "호재",
-    tagColor: "#E5484D",
-    image: "https://via.placeholder.com/300x180?text=뉴스4",
-    title: "신한투자증권, 금융 IT 인재 키운다 ‘프로디지털아카데미’ 6기 모집",
-    publisher: "조선 미디어",
-    date: "3일 전",
-  },
-  {
-    id: 6,
-    tag: "호재",
-    tagColor: "#E5484D",
-    image: "https://via.placeholder.com/300x180?text=뉴스4",
-    title: "신한투자증권, 금융 IT 인재 키운다 ‘프로디지털아카데미’ 6기 모집",
-    publisher: "조선 미디어",
-    date: "3일 전",
-  },
-];
+import {
+  getProductAPI,
+  getRelatedStocksAPI
+} from "@/apis/product.js";
+import {
+  getProductRelatedNewsAPI,
+  getProductSentimentAPI
+} from "@/apis/news.js";
 
 export default {
   name: "ProductPage",
@@ -83,10 +28,11 @@ export default {
   data() {
     return {
       productInfo: null,
-      relatedNews,
+      relatedStocks: null,
+      relatedNews: [],
+      sentiment: { 호재: 0, 악재: 0, 중립: 0 },
       isProductInfoLoading: false,
       isRelatedStocksLoading: false,
-      relatedStocks: null,
     };
   },
   computed: {
@@ -96,8 +42,6 @@ export default {
   },
   methods: {
     async getProductInfo(id) {
-      console.log("id", id);
-
       this.isProductInfoLoading = true;
       try {
         const res = await getProductAPI(id);
@@ -119,6 +63,25 @@ export default {
         this.isRelatedStocksLoading = false;
       }
     },
+    async getRelatedNews(id) {
+      try {
+        const res = await getProductRelatedNewsAPI(id);
+        const newsList = res.data;
+
+        this.relatedNews = newsList.map(news => ({
+          id: news.newsId,
+          tag: news.sentiment,
+          tagColor: this.getTagColor(news.sentiment),
+          image: news.imageOriginLink,
+          url: "#", // 실제 URL 있으면 대체
+          title: news.title,
+          publisher: news.officeName,
+          date: this.formatDate(news.datetime),
+        }));
+      } catch (e) {
+        console.error("품목 관련 뉴스 호출 실패:", e);
+      }
+    },
     async getSentiment(id) {
       try {
         const res = await getProductSentimentAPI(id);
@@ -126,18 +89,37 @@ export default {
           this.sentiment = res.data;
         }
       } catch (e) {
+        console.error("감정 지표 호출 실패:", e);
         this.sentiment = { 호재: 0, 악재: 0, 중립: 0 };
       }
     },
+    getTagColor(sentiment) {
+      switch (sentiment) {
+        case "호재": return "#E5484D";
+        case "악재": return "#3D8BFF";
+        case "중립":
+        default: return "#A5A5A5";
+      }
+    },
+    formatDate(datetime) {
+      const date = new Date(datetime);
+      const now = new Date();
+      const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+      return diffDays === 0 ? "오늘" : `${diffDays}일 전`;
+    },
   },
   mounted() {
-    this.getRelatedStocks(this.$route.params.productId);
-    this.getProductInfo(this.$route.params.productId);
-    this.getSentiment(this.$route.params.productId);
+    const id = this.productId;
+    this.getProductInfo(id);
+    this.getRelatedStocks(id);
+    this.getRelatedNews(id);
+    this.getSentiment(id);
   },
   watch: {
     productId(newId) {
+      this.getProductInfo(newId);
       this.getRelatedStocks(newId);
+      this.getRelatedNews(newId);
       this.getSentiment(newId);
     },
   },

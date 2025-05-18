@@ -163,7 +163,7 @@ export default {
     },
     goToProductDetail(hsCodeId) {
       if (hsCodeId) {
-        this.$router.push(`/products/${hsCodeId}`);
+        this.$router.push(`/product/${hsCodeId}`);
       }
     },
     truncateText(text, maxLength) {

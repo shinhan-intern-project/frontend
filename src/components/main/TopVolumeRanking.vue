@@ -31,6 +31,7 @@
         v-for="(item, index) in stocks"
         :key="`volume-${index}`"
         :class="['volume-item', index % 2 === 0 ? 'even-row' : '']"
+        @click="goToStockDetail(item.stockId)"
       >
         <div class="item-rank">{{ index + 1 }}</div>
         <div class="item-company">
@@ -138,6 +139,12 @@ export default {
       const formattedValue = Math.abs(value) < 1 ? value * 100 : value;
 
       return `${value > 0 ? "+" : ""}${formattedValue.toFixed(1)}%`;
+    },
+
+    goToStockDetail(stockId) {
+      if (stockId) {
+        this.$router.push(`/stock/${stockId}`);
+      }
     },
   },
 };

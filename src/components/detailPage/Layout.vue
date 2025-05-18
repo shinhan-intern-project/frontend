@@ -137,7 +137,12 @@
                   :key="prod.hscode"
                 >
                   <img :src="icons[i]" alt="icon" />
-                  <span class="relation-title">{{ prod?.hscodeName }}</span>
+                  <router-link
+                    class="relation-title"
+                    :to="{ name: 'product', params: { productId: prod.hscodeId } }"
+                  >
+                    {{ prod.hscodeName }}
+                  </router-link>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
                     {{ prod?.hscodeDescription }}
@@ -168,7 +173,14 @@
                     :key="stock.stockId"
                   >
                     <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <span class="relation-title">{{ stock?.name }}</span>
+                    <!-- <img :src="icons[i]" alt="icon" /> -->
+                    <router-link
+                      class="relation-title"
+                      :to="{ name: 'stock', params: { stockId: stock?.stockId } }"
+                    >
+                    {{ stock?.name }}
+                    </router-link>
+
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
@@ -189,7 +201,13 @@
                     :key="stock.stockId"
                   >
                     <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <span class="relation-title">{{ stock?.name }}</span>
+                    <router-link
+                      class="relation-title"
+                      :to="{ name: 'stock', params: { stockId: stock?.stockId } }"
+                    >
+                    {{ stock?.name }}
+                    </router-link>
+                    
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
@@ -230,7 +248,7 @@
           >
             <span class="header">수출입량 통계</span>
             <!-- 임시 -->
-            <LineGraph />
+            <LineGraph api-mode="product" />
             <!-- <div style="height: 300px"></div> -->
           </div>
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
