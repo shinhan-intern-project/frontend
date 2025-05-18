@@ -6,12 +6,26 @@
         type="range"
         v-model="depth"
         :min="1"
-        :max="10"
+        :max="22"
         :step="1"
         class="slider-range"
         @change="fetchData"
       />
       <span class="slider-value">{{ depth }}</span>
+    </div>
+
+    <!-- Degree 조절 슬라이더 -->
+    <div class="slider-wrapper">
+      <input
+        type="range"
+        v-model="degree"
+        :min="1"
+        :max="353"
+        :step="1"
+        class="slider-range"
+        @change="fetchData"
+      />
+      <span class="slider-value">{{ degree }}</span>
     </div>
 
     <!-- 그래프 + 스피너 래퍼 -->
@@ -46,7 +60,8 @@ export default {
     },
   },
   setup(props) {
-    const depth = ref(2);
+    const depth = ref(2); // 1 ~ 22
+    const degree = ref(2); // 1 ~ 353
     const rawNodes = reactive({});
     const rawEdges = reactive({});
     const graphContainer = ref(null);
@@ -62,9 +77,17 @@ export default {
       // API 호출
       let res;
       if (props.type === "stock") {
-        res = await getStockNetworkAPI(props.stockId, depth.value);
+        res = await getStockNetworkAPI(
+          props.stockId,
+          depth.value,
+          degree.value
+        );
       } else {
-        res = await getProductNetworkAPI(props.productId, depth.value);
+        res = await getProductNetworkAPI(
+          props.productId,
+          depth.value,
+          degree.value
+        );
       }
       const data = res.data || {};
       Object.assign(rawNodes, data.nodes || {});
@@ -181,7 +204,7 @@ export default {
       fetchData();
     });
     watch(
-      () => [props.stockId, props.productId, depth.value],
+      () => [props.stockId, props.productId, depth.value, degree.value],
       () => {
         if (
           (props.type === "stock" && !props.stockId) ||
@@ -198,6 +221,7 @@ export default {
 
     return {
       depth,
+      degree,
       graphContainer,
       loading,
       fetchData,
