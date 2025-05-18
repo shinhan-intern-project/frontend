@@ -681,7 +681,7 @@ export default {
 .stock-app {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 20px 60px;
   color: #333;
   position: relative;
 }
@@ -927,6 +927,7 @@ html body {
   padding: 48px;
   box-sizing: border-box;
   margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .detail-layout-content-item .header {
