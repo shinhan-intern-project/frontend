@@ -77,7 +77,7 @@
       </div>
     </div>
     <!-- 그래프 + 스피너 래퍼 -->
-    <div class="graph-wrapper">
+    <div class="graph-wrapper" :class="{ 'all-mode': isAll }">
       <!-- 로딩 중일 때 보여줄 스피너 -->
       <div v-if="loading" class="spinner-overlay">
         <div class="spinner"></div>
@@ -117,6 +117,7 @@ export default {
     const graphContainer = ref(null);
     const loading = ref(false);
     let fgInstance = null;
+    const isAll = props.type === "all";
 
     const fetchData = async () => {
       // 이전 호출 중이면 새 호출 무시
@@ -192,7 +193,7 @@ export default {
       loading.value = false;
     };
     onMounted(() => {
-      const isAll = props.type === "all";
+      // const isAll = props.type === "all";
 
       fgInstance = ForceGraph2D()(graphContainer.value)
         .width(graphContainer.value.offsetWidth)
@@ -208,36 +209,76 @@ export default {
 
         .nodeRelSize(8)
         .nodeCanvasObject((node, ctx) => {
-          const isRoot = node.id === "node0";
-          const radius = isRoot ? 24 : 8;
-          // 노드 원 그리기
-          // 색상 RGB 매핑
-          const rgbMap = {
-            품목: [0, 60, 255],
-            국내: [255, 0, 7],
-            해외: [88, 166, 92],
-          };
-          const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
-          // depth 작을수록 진한 표현 (alpha)
-          const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
-          ctx.globalAlpha = isAll ? 1 : alpha;
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-          ctx.fill();
-          ctx.globalAlpha = 1;
-          if (isRoot) {
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "#000";
-            ctx.stroke();
-            // node0 라벨 텍스트
-            // ctx.font = "12px sans-serif";
-            // ctx.textAlign = "center";
-            // ctx.textBaseline = "bottom";
-            // ctx.fillStyle = "#000";
-            // ctx.fillText(node.name, node.x, node.y - radius - 4);
+          if (isAll) {
+            // === 화려한 네온 글로우 ===
+            const rgbMap = {
+              품목: [0, 60, 255],
+              국내: [255, 0, 7],
+              해외: [88, 166, 92],
+            };
+            const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
+            const t = Date.now() * 0.005;
+            const pulse = 1 + 0.1 * Math.sin(t + (node.depth || 0));
+            const baseR = node.id === "node0" ? 32 : 16;
+            const R = baseR * pulse;
+
+            // 라디얼 그라디언트
+            const grad = ctx.createRadialGradient(
+              node.x,
+              node.y,
+              R * 0.2,
+              node.x,
+              node.y,
+              R
+            );
+            grad.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
+            grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+            ctx.shadowColor = `rgba(${r},${g},${b},0.7)`;
+            ctx.shadowBlur = 15;
+
+            // 글로우
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, R, 0, 2 * Math.PI);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // 중심 원
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, R * 0.6, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            if (node.id === "node0") {
+              ctx.lineWidth = 3;
+              ctx.strokeStyle = "#fff";
+              ctx.stroke();
+            }
+          } else {
+            // === 기존 단순 원 스타일 ===
+            const isRoot = node.id === "node0";
+            const radius = isRoot ? 24 : 8;
+            const rgbMap = {
+              품목: [0, 60, 255],
+              국내: [255, 0, 7],
+              해외: [88, 166, 92],
+            };
+            const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
+            const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            if (isRoot) {
+              ctx.lineWidth = 2;
+              ctx.strokeStyle = "#000";
+              ctx.stroke();
+            }
           }
         })
+
         // 점선 엣지 렌더링
         .linkCanvasObject((link, ctx) => {
           const sx = link.source.x;
@@ -294,6 +335,7 @@ export default {
       graphContainer,
       loading,
       fetchData,
+      isAll,
     };
   },
 };
@@ -348,6 +390,11 @@ export default {
 
 .graph-wrapper {
   position: relative;
+}
+
+.graph-wrapper.all-mode {
+  /* background: radial-gradient(circle, #1a1a2e, #0d0d1f);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); */
 }
 
 /* Canvas 그래프 */
