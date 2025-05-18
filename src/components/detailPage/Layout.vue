@@ -254,15 +254,25 @@
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
             <span class="header">관련 뉴스</span>
-            <div class="news-container">
-              <NewsItem
-                :isBadge="true"
-                v-for="news in relatedNews"
-                :key="news.id"
-                :news="news"
-              />
+
+            <template v-if="relatedNews?.length">
+              <div class="news-container">
+                <NewsItem
+                  :isBadge="true"
+                  v-for="news in relatedNews"
+                  :key="news.id"
+                  :news="news"
+                />
+              </div>
+            </template>
+
+            <!-- 🔔 관련 뉴스가 없을 경우 -->
+            <div class="no-relation" v-else>
+              <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+              <p>관련된 뉴스가 없습니다.</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>

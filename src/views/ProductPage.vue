@@ -1,5 +1,6 @@
 <template>
   <DetailLayout
+    v-if="productInfo" 
     :relatedNews="relatedNews"
     :productInfo="productInfo"
     type="product"
@@ -13,11 +14,11 @@
 import DetailLayout from "@/components/detailPage/Layout.vue";
 import {
   getProductAPI,
-  getRelatedStocksAPI
+  getRelatedStocksAPI,
 } from "@/apis/product.js";
 import {
   getProductRelatedNewsAPI,
-  getProductSentimentAPI
+  getProductSentimentAPI,
 } from "@/apis/news.js";
 
 export default {
@@ -45,9 +46,17 @@ export default {
       this.isProductInfoLoading = true;
       try {
         const res = await getProductAPI(id);
+
+        // ✅ 유효성 검사 (예: name이나 hsCode 존재 여부)
+        if (!res?.data || !res.data.hsCode) {
+          this.$router.replace({ name: "NotFound" });
+          return;
+        }
+
         this.productInfo = res.data;
       } catch (e) {
-        this.error = e;
+        console.error("품목 조회 실패:", e);
+        this.$router.replace({ name: "NotFound" });
       } finally {
         this.isProductInfoLoading = false;
       }
@@ -73,7 +82,7 @@ export default {
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
           image: news.imageOriginLink,
-          url: "#", // 실제 URL 있으면 대체
+          url: "#",
           title: news.title,
           publisher: news.officeName,
           date: this.formatDate(news.datetime),
@@ -102,11 +111,14 @@ export default {
       }
     },
     formatDate(datetime) {
-      const date = new Date(datetime);
-      const now = new Date();
-      const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-      return diffDays === 0 ? "오늘" : `${diffDays}일 전`;
-    },
+      if (!datetime || datetime.length < 8) return datetime;
+
+      const year = datetime.slice(0, 4);
+      const month = datetime.slice(4, 6);
+      const day = datetime.slice(6, 8);
+
+      return `${year}-${month}-${day}`;
+    }
   },
   mounted() {
     const id = this.productId;
