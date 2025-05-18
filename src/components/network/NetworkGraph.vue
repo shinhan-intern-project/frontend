@@ -93,8 +93,8 @@ export default {
     },
   },
   setup(props) {
-    const depth = ref(2); // 1 ~ 22
-    const degree = ref(2); // 1 ~ 353
+    const depth = ref(5); // 1 ~ 22
+    const degree = ref(25); // 1 ~ 353
     const rawNodes = reactive({});
     const rawEdges = reactive({});
     const graphContainer = ref(null);
@@ -200,8 +200,8 @@ export default {
           };
           const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
           // depth 작을수록 진한 표현 (alpha)
-          // const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
-          // ctx.globalAlpha = alpha;
+          const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
+          ctx.globalAlpha = alpha;
 
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);

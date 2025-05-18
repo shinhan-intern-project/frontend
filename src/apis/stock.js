@@ -33,9 +33,11 @@ export async function getStockChartAPI(
     console.error(error);
   }
 }
-export async function getStockNetworkAPI(stockId) {
+export async function getStockNetworkAPI(stockId, depth, degree) {
   try {
-    const response = await networkAPI.get(`/stock/${stockId}?depth=10`);
+    const response = await networkAPI.get(
+      `/stock/${stockId}?depth=${depth}&maxDegree=${degree}`
+    );
     return response.data;
   } catch (error) {
     console.error(error);
