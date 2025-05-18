@@ -74,6 +74,8 @@ export default {
     let fgInstance = null;
 
     const fetchData = async () => {
+      // 이전 호출 중이면 새 호출 무시
+      if (loading.value) return;
       loading.value = true;
       // 초기화
       Object.keys(rawNodes).forEach((k) => delete rawNodes[k]);
@@ -205,6 +207,7 @@ export default {
             window.location.href = `/product/${link}`;
           }
         });
+
       fetchData();
     });
     watch(
