@@ -15,12 +15,11 @@
       </header>
 
       <!-- 탭 영역 -->
-      <HsToggle
+      <ToggleSwitch
         v-model="type"
         :options="[
           { value: 'stock', label: '종목' },
           { value: 'product', label: '품목' },
-          { value: 'hscode', label: 'HS 코드' },
         ]"
         @change="handleTypeChange"
         style="margin-bottom: 20px"
@@ -151,7 +150,7 @@ import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 import NewsItem from "@/components/news/NewsItem.vue";
 import ProductSearchAndInfo from "@/components/search/ProductSearchAndInfo.vue";
 import { getSearchProductAPI, getSearchHsCodeAPI } from "@/apis/product";
-import HsToggle from "@/components/toggle/HsToggle.vue";
+// import HsToggle from "@/components/toggle/HsToggle.vue";
 import HSCodeSearchAndInfo from "@/components/search/HSCodeSearchAndInfo.vue";
 const countries = {
   features: [],
@@ -181,7 +180,6 @@ export default {
     NewsItem,
     ProductSearchAndInfo,
     HSCodeSearchAndInfo,
-    HsToggle,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
