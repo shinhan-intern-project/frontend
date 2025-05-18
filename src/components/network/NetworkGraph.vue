@@ -32,6 +32,7 @@ import { ref, reactive, watch, onMounted, onBeforeUnmount } from "vue";
 import ForceGraph2D from "force-graph";
 import { getStockNetworkAPI } from "@/apis/stock";
 import { getProductNetworkAPI } from "@/apis/product";
+import { forceLink, forceManyBody } from "d3-force";
 
 export default {
   name: "NetworkGraphCanvas",
@@ -110,7 +111,16 @@ export default {
     onMounted(() => {
       fgInstance = ForceGraph2D()(graphContainer.value)
         .width(graphContainer.value.offsetWidth)
-        .height(graphContainer.value.offsetHeight)
+        .height(graphContainer.value.offsetHeight) // 링크와 충돌 힘 재설정하여 간격 조절
+        .d3Force(
+          "link",
+          forceLink()
+            .id((d) => d.id)
+            .distance(40)
+            .strength(1)
+        )
+        .d3Force("charge", forceManyBody().strength(-100))
+
         .nodeRelSize(8)
         .nodeCanvasObject((node, ctx) => {
           const isRoot = node.id === "node0";
