@@ -144,21 +144,19 @@
             <!-- 개별 종목 페이지 - 관련 품목 -->
             <template v-if="type === 'stock'">
               <div class="relation" v-if="stockInfo?.relatedProducts.length">
-                <div
+                <router-link
                   class="relation-item"
                   v-for="(prod, i) in stockInfo?.relatedProducts"
                   :key="prod.hscode"
+                  :to="{
+                    name: 'product',
+                    params: { productId: prod.hscodeId },
+                  }"
                 >
                   <img :src="icons[i]" alt="icon" />
-                  <router-link
-                    class="relation-title"
-                    :to="{
-                      name: 'product',
-                      params: { productId: prod.hscodeId },
-                    }"
-                  >
+                  <span class="relation-title">
                     {{ prod.hscodeName }}
-                  </router-link>
+                  </span>
                   <span class="relation-code">{{ prod?.hscode }}</span>
                   <span class="relation-content">
                     {{ prod?.hscodeDescription }}
@@ -166,7 +164,7 @@
                     종목이랑 관련이 있냐면... GPT가 설명해줄거야 왜 이 종목이랑
                     관련이 있냐면... GPT가 설명해줄거야</span
                   >
-                </div>
+                </router-link>
               </div>
               <!-- 관련 품목이 없거나 빈 배열일 때 -->
               <div class="no-relation" v-else>
@@ -183,28 +181,26 @@
               >
                 <div class="relation-stocks-title">국내</div>
                 <div class="relation-stocks">
-                  <div
+                  <router-link
                     class="relation-item"
                     v-for="stock in relatedStocks?.kr"
                     :key="stock.stockId"
+                    :to="{
+                      name: 'stock',
+                      params: { stockId: stock?.stockId },
+                    }"
                   >
                     <!-- <img :src="icons[i]" alt="icon" /> -->
                     <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <router-link
-                      class="relation-title"
-                      :to="{
-                        name: 'stock',
-                        params: { stockId: stock?.stockId },
-                      }"
-                    >
+                    <span class="relation-title">
                       {{ stock?.name }}
-                    </router-link>
+                    </span>
 
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
                     }}</span>
-                  </div>
+                  </router-link>
                 </div>
               </div>
 
@@ -214,27 +210,25 @@
               >
                 <div class="relation-stocks-title">미국</div>
                 <div class="relation-stocks">
-                  <div
+                  <router-link
                     class="relation-item"
                     v-for="stock in relatedStocks?.us"
                     :key="stock.stockId"
+                    :to="{
+                      name: 'stock',
+                      params: { stockId: stock?.stockId },
+                    }"
                   >
                     <!-- <img :src="icons[i]" alt="icon" /> -->
-                    <router-link
-                      class="relation-title"
-                      :to="{
-                        name: 'stock',
-                        params: { stockId: stock?.stockId },
-                      }"
-                    >
+                    <span class="relation-title">
                       {{ stock?.name }}
-                    </router-link>
+                    </span>
 
                     <span class="relation-code">{{ stock?.ticker }}</span>
                     <span class="relation-content">{{
                       stock?.companyOverview
                     }}</span>
-                  </div>
+                  </router-link>
                 </div>
               </div>
 
@@ -570,7 +564,7 @@ export default {
 /* 관련 품목 및 종목 */
 .relation {
   display: flex;
-  gap: 60px;
+  /* gap: 60px; */
   justify-content: space-around;
   margin-top: 40px;
 }
@@ -597,7 +591,7 @@ export default {
 .relation-stocks {
   display: flex;
   justify-content: flex-start;
-  gap: 40px;
+  gap: 44px;
   flex-wrap: nowrap;
   overflow-x: auto;
   width: 100%;
@@ -620,6 +614,15 @@ export default {
   align-items: center;
   gap: 8px;
   width: 220px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 12px;
+  border-radius: 12px;
+}
+/* Hover 상태 */
+.relation-item:hover {
+  background-color: #f3f4f5;
 }
 
 .relation-item img {
@@ -637,7 +640,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-decoration: none;
 }
 
 .relation-code {
