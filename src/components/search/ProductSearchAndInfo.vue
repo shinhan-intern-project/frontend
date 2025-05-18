@@ -1,7 +1,7 @@
 <template>
   <div class="product-search-and-info">
     <!-- 검색창 영역 -->
-    <div class="search-container">
+    <div class="search-container" ref="searchContainer">
       <input
         type="text"
         v-model="searchInput"
@@ -10,136 +10,158 @@
         @keyup.enter="handleSearch"
       />
       <button class="search-button" @click="handleSearch">
-        <img src="@/assets/images/SearchButton.svg" alt="검색" @click="handleSearch"/>
+        <img
+          src="@/assets/images/SearchButton.svg"
+          alt="검색"
+          @click="handleSearch"
+        />
       </button>
     </div>
 
-    <!-- 로딩 표시 -->
-    <div v-if="isLoading" class="loading-indicator">
-      <span>검색 중...</span>
-    </div>
-
-    <!-- 품목 정보 영역 -->
-    <div v-else class="product-info-card">
-      <div class="product-info-header">
-        <div class="header-left">품목</div>
-        <div class="header-center">품목과 관련된 종목</div>
-        <div class="header-right"></div>
-      </div>
-
-      <div class="product-info-content">
-        <!-- 왼쪽: 품목 리스트 -->
-        <div class="product-list">
-          <div v-if="productItems.length === 0" class="no-results">
-            <span>검색 결과가 없습니다</span>
+    <div class="on-off">
+      <NetworkGraphCanvas :type="'all'" />
+      <div class="on-off-search" v-if="hasSearched" ref="panel" @click.stop>
+        <!-- 품목 정보 영역 -->
+        <div class="product-info-card">
+          <!-- 로딩 표시 -->
+          <div v-if="isLoading" class="loading-indicator">
+            <span>검색 중...</span>
           </div>
-          <div
-            v-else
-            v-for="(item, index) in productItems"
-            :key="`prod-${index}`"
-            class="product-item"
-            :class="{ active: selectedProductIndex === index }"
-            @click="goToProductPage(item)"
-            style="cursor: pointer"
-          >
-            <div class="product-info">
-              <div class="product-details">
-                <div class="product-name">{{ item.hsName }}</div>
-                <div class="product-code">{{ item.hsCode }}</div>
-              </div>
+          <div v-else>
+            <div class="product-info-header">
+              <div class="header-left">품목</div>
+              <div class="header-center">품목과 관련된 종목</div>
+              <div class="header-right"></div>
             </div>
-            <!-- 관련 종목 보기 버튼 추가 -->
-            <button
-              class="related-items-btn"
-              @click.stop="handleProductSelect(item, index)"
-            >
-              관련 종목 보기
-            </button>
-          </div>
-        </div>
 
-        <!-- 오른쪽: 관련 종목 -->
-        <div class="related-stocks-list">
-          <div v-if="!hasRelatedStocks && !isLoading" class="no-related-stocks">
-            <span>관련 종목이 없습니다</span>
-          </div>
-          <div v-else-if="selectedProductIndex === -1 && hasRelatedStocks">
-            <div
-              v-for="(item, itemIdx) in productItemsWithStocks"
-              :key="`item-${itemIdx}`"
-              class="related-stock-group"
-            >
-              <div
-                v-for="(stock, stockIdx) in item.relatedStocks"
-                :key="`stock-${itemIdx}-${stockIdx}`"
-                class="related-stock"
-              >
-                <div class="related-stock-header">
-                  <img
-                    class="related-stock-logo"
-                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
-                    alt="종목 아이콘"
-                    @error="
-                      (e) =>
-                        (e.target.src =
-                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+            <div class="product-info-content">
+              <!-- 왼쪽: 품목 리스트 -->
+              <div class="product-list">
+                <div v-if="productItems.length === 0" class="no-results">
+                  <span>검색 결과가 없습니다</span>
+                </div>
+                <div
+                  v-else
+                  v-for="(item, index) in productItems"
+                  :key="`prod-${index}`"
+                  class="product-item"
+                  :class="{ active: selectedProductIndex === index }"
+                  @click="goToProductPage(item)"
+                  style="cursor: pointer"
+                >
+                  <div class="product-info">
+                    <div class="product-details">
+                      <div class="product-name">{{ item.hsName }}</div>
+                      <div class="product-code">{{ item.hsCode }}</div>
+                    </div>
+                  </div>
+                  <!-- 관련 종목 보기 버튼 추가 -->
+                  <button
+                    class="related-items-btn"
+                    @click.stop="handleProductSelect(item, index)"
+                  >
+                    관련 종목 보기
+                  </button>
+                </div>
+              </div>
+
+              <!-- 오른쪽: 관련 종목 -->
+              <div class="related-stocks-list">
+                <div
+                  v-if="!hasRelatedStocks && !isLoading"
+                  class="no-related-stocks"
+                >
+                  <span>관련 종목이 없습니다</span>
+                </div>
+                <div
+                  v-else-if="selectedProductIndex === -1 && hasRelatedStocks"
+                >
+                  <div
+                    v-for="(item, itemIdx) in productItemsWithStocks"
+                    :key="`item-${itemIdx}`"
+                    class="related-stock-group"
+                  >
+                    <div
+                      v-for="(stock, stockIdx) in item.relatedStocks"
+                      :key="`stock-${itemIdx}-${stockIdx}`"
+                      class="related-stock"
+                    >
+                      <div class="related-stock-header">
+                        <img
+                          class="related-stock-logo"
+                          :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                          alt="종목 아이콘"
+                          @error="
+                            (e) =>
+                              (e.target.src =
+                                'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                          "
+                        />
+                        <div class="related-stock-name">
+                          {{ stock.companyName }}
+                        </div>
+                      </div>
+                      <div class="related-stock-code">
+                        {{ stock.ticker }} |
+                        {{
+                          (console.log(stock),
+                          stock.marketType == "NASDAQ"
+                            ? stock.currentPrice
+                            : Math.floor(stock.currentPrice))
+                        }}
+                        {{ stock.marketType === "NASDAQ" ? "USD" : "원" }} |
+                        <span :class="getChangeClass(stock.changeRate)">
+                          {{ displayChangeRate(stock.changeRate) }}
+                        </span>
+                        |
+                        {{ stock.relationType === "EXPORT" ? "수출" : "수입" }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else-if="selectedProductIndex !== -1">
+                  <div
+                    v-if="
+                      selectedProduct.relatedStocks &&
+                      selectedProduct.relatedStocks.length > 0
                     "
-                  />
-                  <div class="related-stock-name">{{ stock.companyName }}</div>
-                </div>
-                <div class="related-stock-code">
-                  {{ stock.ticker }} |
-                  {{
-                    (console.log(stock),
-                    stock.marketType == "NASDAQ"
-                      ? stock.currentPrice
-                      : Math.floor(stock.currentPrice))
-                  }}
-                  {{ stock.marketType === "NASDAQ" ? "USD" : "원" }} |
-                  <span :class="getChangeClass(stock.changeRate)">
-                    {{ displayChangeRate(stock.changeRate) }}
-                  </span>
-                  | {{ stock.relationType === "EXPORT" ? "수출" : "수입" }}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-else-if="selectedProductIndex !== -1">
-            <div
-              v-if="
-                selectedProduct.relatedStocks &&
-                selectedProduct.relatedStocks.length > 0
-              "
-            >
-              <div
-                v-for="(stock, idx) in selectedProduct.relatedStocks"
-                :key="idx"
-                class="related-stock"
-              >
-                <div class="related-stock-header">
-                  <img
-                    class="related-stock-logo"
-                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
-                    alt="종목 아이콘"
-                    @error="
-                      (e) =>
-                        (e.target.src =
-                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
-                    "
-                  />
-                  <div class="related-stock-name">{{ stock.companyName }}</div>
-                </div>
-                <div class="related-stock-code">
-                  {{ stock.ticker }} | {{ formatPrice(stock.currentPrice) }}원 |
-                  <span :class="getChangeClass(stock.changeRate)">
-                    {{ displayChangeRate(stock.changeRate) }}
-                  </span>
-                  | {{ stock.relationType === "EXPORT" ? "수출" : "수입" }}
+                  >
+                    <div
+                      v-for="(stock, idx) in selectedProduct.relatedStocks"
+                      :key="idx"
+                      class="related-stock"
+                    >
+                      <div class="related-stock-header">
+                        <img
+                          class="related-stock-logo"
+                          :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                          alt="종목 아이콘"
+                          @error="
+                            (e) =>
+                              (e.target.src =
+                                'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                          "
+                        />
+                        <div class="related-stock-name">
+                          {{ stock.companyName }}
+                        </div>
+                      </div>
+                      <div class="related-stock-code">
+                        {{ stock.ticker }} |
+                        {{ formatPrice(stock.currentPrice) }}원 |
+                        <span :class="getChangeClass(stock.changeRate)">
+                          {{ displayChangeRate(stock.changeRate) }}
+                        </span>
+                        |
+                        {{ stock.relationType === "EXPORT" ? "수출" : "수입" }}
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="no-related-stocks">
+                    <span>관련 종목이 없습니다</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div v-else class="no-related-stocks">
-              <span>관련 종목이 없습니다</span>
             </div>
           </div>
         </div>
@@ -149,8 +171,13 @@
 </template>
 
 <script>
+import NetworkGraphCanvas from "@/components/network/NetworkGraph.vue";
+
 export default {
   name: "ProductSearchAndInfo",
+  components: {
+    NetworkGraphCanvas,
+  },
   props: {
     formatPrice: {
       type: Function,
@@ -188,7 +215,14 @@ export default {
   data() {
     return {
       searchInput: this.searchKeyword,
+      hasSearched: false, // 검색 시점 플래그
     };
+  },
+  mounted() {
+    document.addEventListener("click", this.onClickOutside);
+  },
+  beforeUnmount() {
+    document.removeEventListener("click", this.onClickOutside);
   },
   watch: {
     searchKeyword(newVal) {
@@ -198,6 +232,7 @@ export default {
   methods: {
     handleSearch() {
       this.$emit("search", this.searchInput);
+      this.hasSearched = true;
     },
     handleProductSelect(product, index) {
       this.$emit("select-product", product, index);
@@ -212,6 +247,20 @@ export default {
         name: "product",
         params: { productId: product.hsCodeId },
       });
+    },
+    onClickOutside(event) {
+      // 검색창 영역이나 결과 패널 내부를 클릭한 게 아니면 닫기
+      const sc = this.$refs.searchContainer;
+      const panel = this.$refs.panel;
+      if (
+        this.hasSearched &&
+        sc &&
+        panel &&
+        !sc.contains(event.target) &&
+        !panel.contains(event.target)
+      ) {
+        this.hasSearched = false;
+      }
     },
   },
   computed: {
@@ -279,14 +328,14 @@ export default {
 }
 
 .search-input::placeholder {
-  color: #B8B8B8; /* 원하는 색상으로 변경 */
+  color: #b8b8b8; /* 원하는 색상으로 변경 */
   font-size: 14px;
 }
 
 .search-input {
   box-shadow: 0px 4px 20px #cfdef1;
   flex: 1;
-  padding:  16px 25px;
+  padding: 16px 25px;
   border: none;
   outline: none;
   font-size: 16px;
@@ -298,7 +347,7 @@ export default {
   border: none;
   cursor: pointer;
 }
-.search-button img{
+.search-button img {
   height: 35px;
   margin-top: 3px;
 }
@@ -318,8 +367,8 @@ export default {
 
 /* 품목 정보 카드 스타일 */
 .product-info-card {
+  height: 447px;
   box-shadow: 0px 4px 20px #cfdef1;
-
   background-color: white;
   border-radius: 10px;
   overflow: hidden;
@@ -549,5 +598,14 @@ export default {
   .product-stats {
     min-width: 80px;
   }
+}
+.on-off {
+  position: relative;
+}
+.on-off-search {
+  /* display: flex; */
+  position: absolute;
+  top: 0px;
+  width: 1200px;
 }
 </style>

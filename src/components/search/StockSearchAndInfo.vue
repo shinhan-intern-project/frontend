@@ -23,10 +23,9 @@
     <div class="on-off">
       <NetworkGraphCanvas :type="'all'" />
       <div class="on-off-search" v-if="hasSearched" ref="panel" @click.stop>
-        <!-- 로딩 표시 -->
-
         <!-- 종목 정보 영역 -->
         <div class="stock-info-card">
+          <!-- 로딩 표시 -->
           <div v-if="isLoading" class="loading-indicator">
             <span>검색 중...</span>
           </div>
