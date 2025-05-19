@@ -58,9 +58,10 @@
                     <div class="sub-title">현재가</div>
                     <span class="price">
                       {{
-                        stockInfo?.marketType === "NASDAQ"
+                        (stockInfo?.marketType === "NASDAQ"
                           ? stockInfo?.currentPrice
                           : Math.floor(stockInfo?.currentPrice)
+                        ).toLocaleString()
                       }}
                       {{ stockInfo?.marketType === "NASDAQ" ? "USD" : "원" }}
                     </span>
@@ -95,7 +96,10 @@
               <div class="indicator-item">
                 <span class="sub-title">eps</span>
                 <span class="value"
-                  >{{ stockInfo?.eps
+                  >{{
+                    stockInfo?.eps != null
+                      ? Number(stockInfo.eps).toLocaleString()
+                      : "-"
                   }}{{
                     stockInfo?.marketType === "NASDAQ" ? " USD" : " 원"
                   }}</span
@@ -108,7 +112,10 @@
               <div class="indicator-item">
                 <span class="sub-title">bps</span>
                 <span class="value"
-                  >{{ stockInfo?.bps
+                  >{{
+                    stockInfo?.bps != null
+                      ? Number(stockInfo.bps).toLocaleString()
+                      : "-"
                   }}{{
                     stockInfo?.marketType === "NASDAQ" ? " USD" : " 원"
                   }}</span
