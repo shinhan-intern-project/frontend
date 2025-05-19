@@ -626,11 +626,6 @@ export default {
   right: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at top right,
-    rgba(36, 40, 47, 0.1),
-    transparent 70%
-  );
   z-index: -1;
 }
 

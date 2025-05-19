@@ -21,7 +21,10 @@
     </div>
 
     <div class="on-off">
-      <NetworkGraphCanvas :type="'all'" />
+      <!-- 네트워크 그래프를 조건부로 표시 -->
+      <!-- <NetworkGraphCanvas v-if="showNetworkGraph" :type="'all'" /> -->
+      <NetworkGraphCanvas v-if="!hideNetworkGraph" :type="'all'" />
+
       <div class="on-off-search" v-if="hasSearched" ref="panel" @click.stop>
         <!-- 종목 정보 영역 -->
         <div class="stock-info-card">
@@ -154,6 +157,10 @@ export default {
       type: String,
       default: "",
     },
+    hideNetworkGraph: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -174,6 +181,10 @@ export default {
     },
   },
   methods: {
+    showNetworkGraph: {
+      type: Boolean,
+      default: true,
+    },
     handleSearch() {
       this.$emit("search", this.searchInput);
       this.hasSearched = true;
@@ -209,6 +220,12 @@ export default {
 </script>
 
 <style scoped>
+.on-off-search {
+  position: absolute;
+  top: 0px;
+  width: 1200px;
+  z-index: 1000;
+}
 .related-items-btn {
   background: #3182f6;
   color: #fff;
@@ -237,6 +254,7 @@ export default {
   margin-bottom: 30px;
   border-radius: 13px;
   overflow: hidden;
+  max-width: 100%;
 }
 
 .search-input::placeholder {
@@ -414,8 +432,8 @@ export default {
 
 .company-details {
   display: flex;
-  flex-direction: column;   
-  justify-content: center; 
+  flex-direction: column;
+  justify-content: center;
 }
 
 .company-name {
@@ -522,5 +540,6 @@ export default {
   position: absolute;
   top: 0px;
   width: 1200px;
+  right: 0px;
 }
 </style>
