@@ -40,3 +40,12 @@ export async function getProductSentimentAPI(stockId) {
     console.error(error);
   }
 }
+
+export async function getLatestNewsAPI() {
+  try {
+    const response = await newsAPI.get('/latest');
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

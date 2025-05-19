@@ -1,9 +1,9 @@
 <template>
   <div>
     <!-- Depth 조절 슬라이더 -->
-    <div class="network-tool">
+    <div class="network-tool" :class="{ 'all-mode': isAll }">
       <div class="slider-container">
-        <div class="slider-wrapper">
+        <div v-if="type !== 'all'" class="slider-wrapper">
           <span class="slider-label">깊이</span>
           <input
             type="range"
@@ -19,7 +19,7 @@
         </div>
 
         <!-- Degree 조절 슬라이더 -->
-        <div class="slider-wrapper">
+        <div v-if="type !== 'all'" class="slider-wrapper">
           <span class="slider-label">차수</span>
           <input
             type="range"
@@ -33,10 +33,26 @@
           />
           <span class="slider-value">{{ degree }}</span>
         </div>
+
+        <!-- 메인 - Degree 조절 슬라이더 -->
+        <div v-if="type == 'all'" class="slider-wrapper">
+          <span class="slider-label" :class="{ 'all-mode': isAll }">차수</span>
+          <input
+            type="range"
+            v-model="allDegree"
+            :min="1"
+            :max="353"
+            :step="1"
+            class="slider-range"
+            @change="fetchData"
+            :style="{ '--percent': ((allDegree - 1) / (353 - 1)) * 100 + '%' }"
+          />
+          <span class="slider-value">{{ allDegree }}</span>
+        </div>
       </div>
       <!-- 왼쪽 2개 -->
       <div class="network-tool-color">
-        <div class="network-tool-color-item-col">
+        <div class="network-tool-color-item-col" :class="{ 'all-mode': isAll }">
           <div class="network-tool-color-item">
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">국내 종목</div>
@@ -48,12 +64,12 @@
           </div>
         </div>
         <!-- 오른쪽 2개 -->
-        <div class="network-tool-color-item-col">
+        <div class="network-tool-color-item-col" :class="{ 'all-mode': isAll }">
           <div class="network-tool-color-item">
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">품목</div>
           </div>
-          <div class="network-tool-color-item">
+          <div class="network-tool-color-item" :class="{ 'all-mode': isAll }">
             <div class="network-tool-color-circle"></div>
             <div class="network-tool-color-text">현재 노드</div>
           </div>
@@ -61,7 +77,7 @@
       </div>
     </div>
     <!-- 그래프 + 스피너 래퍼 -->
-    <div class="graph-wrapper">
+    <div class="graph-wrapper" :class="{ 'all-mode': isAll }">
       <!-- 로딩 중일 때 보여줄 스피너 -->
       <div v-if="loading" class="spinner-overlay">
         <div class="spinner"></div>
@@ -69,7 +85,11 @@
       </div>
 
       <!-- Canvas 그래프 컨테이너 -->
-      <div class="graph-container" ref="graphContainer"></div>
+      <div
+        class="graph-container"
+        :class="{ 'all-mode': isAll }"
+        ref="graphContainer"
+      ></div>
     </div>
   </div>
 </template>
@@ -77,7 +97,7 @@
 <script>
 import { ref, reactive, watch, onMounted, onBeforeUnmount } from "vue";
 import ForceGraph2D from "force-graph";
-import { getStockNetworkAPI } from "@/apis/stock";
+import { getStockNetworkAPI, getAllNetworkAPI } from "@/apis/stock.js";
 import { getProductNetworkAPI } from "@/apis/product";
 import { forceLink, forceManyBody } from "d3-force";
 
@@ -88,18 +108,20 @@ export default {
     productId: { type: String, default: "" },
     type: {
       type: String,
-      validator: (v) => ["stock", "product"].includes(v),
+      validator: (v) => ["stock", "product", "all"].includes(v),
       required: true,
     },
   },
   setup(props) {
-    const depth = ref(2); // 1 ~ 22
-    const degree = ref(2); // 1 ~ 353
+    const depth = ref(5); // 1 ~ 22
+    const degree = ref(25); // 1 ~ 353
+    const allDegree = ref(3); // 1 ~ 353
     const rawNodes = reactive({});
     const rawEdges = reactive({});
     const graphContainer = ref(null);
     const loading = ref(false);
     let fgInstance = null;
+    const isAll = props.type === "all";
 
     const fetchData = async () => {
       // 이전 호출 중이면 새 호출 무시
@@ -111,7 +133,9 @@ export default {
 
       // API 호출
       let res;
-      if (props.type === "stock") {
+      if (props.type === "all") {
+        res = await getAllNetworkAPI(allDegree.value);
+      } else if (props.type === "stock") {
         res = await getStockNetworkAPI(
           props.stockId,
           depth.value,
@@ -124,13 +148,17 @@ export default {
           degree.value
         );
       }
+
       const data = res.data || {};
       Object.assign(rawNodes, data.nodes || {});
       Object.assign(rawEdges, data.edges || {});
 
       // BFS로 depthMap 계산
-      const depthMap = { node0: 0 };
-      const queue = [{ id: "node0", depth: 0 }];
+      const rootId =
+        props.type === "all" ? Object.keys(rawNodes)[0] || "node0" : "node0";
+      const depthMap = { [rootId]: 0 };
+      const queue = [{ id: rootId, depth: 0 }];
+
       while (queue.length) {
         const { id, depth: d } = queue.shift();
         Object.values(rawEdges).forEach((e) => {
@@ -154,6 +182,8 @@ export default {
         id,
         depth: depthMap[id] || 0,
       }));
+      console.table(nodesArray.slice(0, 5)); // 최소 1개 있나?
+
       const linksArray = Object.values(rawEdges)
         .filter((e) => allowed.includes(e.source) && allowed.includes(e.target))
         .map((e) => ({
@@ -167,6 +197,8 @@ export default {
       loading.value = false;
     };
     onMounted(() => {
+      // const isAll = props.type === "all";
+
       fgInstance = ForceGraph2D()(graphContainer.value)
         .width(graphContainer.value.offsetWidth)
         .height(graphContainer.value.offsetHeight) // 링크와 충돌 힘 재설정하여 간격 조절
@@ -178,40 +210,121 @@ export default {
             .strength(1)
         )
         .d3Force("charge", forceManyBody().strength(-100))
-
+        // .d3AlphaDecay(0.01) // 기본 0.0228 → 0.02 정도로 조금 더 느리게
+        // .d3VelocityDecay(0.1)
         .nodeRelSize(8)
         .nodeCanvasObject((node, ctx) => {
-          const isRoot = node.id === "node0";
-          const radius = isRoot ? 24 : 8;
-          // 노드 원 그리기
-          // 색상 RGB 매핑
-          const rgbMap = {
-            품목: [0, 60, 255],
-            국내: [255, 0, 7],
-            해외: [88, 166, 92],
-          };
-          const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
-          // depth 작을수록 진한 표현 (alpha)
-          const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
-          ctx.globalAlpha = alpha;
+          if (isAll) {
+            // === 화려한 네온 글로우 ===
+            const rgbMap = {
+              품목: [0, 60, 255],
+              국내: [255, 0, 7],
+              해외: [88, 166, 92],
+            };
+            const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
+            const t = Date.now() * 0.005;
+            const pulse = 1 + 0.1 * Math.sin(t + (node.depth || 0));
+            const baseR = node.id === "node0" ? 32 : 16;
+            const R = baseR * pulse;
 
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-          ctx.fill();
-          ctx.globalAlpha = 1;
-          if (isRoot) {
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "#000";
-            ctx.stroke();
-            // node0 라벨 텍스트
-            // ctx.font = "12px sans-serif";
-            // ctx.textAlign = "center";
-            // ctx.textBaseline = "bottom";
-            // ctx.fillStyle = "#000";
-            // ctx.fillText(node.name, node.x, node.y - radius - 4);
+            // 라디얼 그라디언트
+            const grad = ctx.createRadialGradient(
+              node.x,
+              node.y,
+              R * 0.2,
+              node.x,
+              node.y,
+              R
+            );
+            grad.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
+            grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+            ctx.shadowColor = `rgba(${r},${g},${b},0.7)`;
+            ctx.shadowBlur = 15;
+
+            // 글로우
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, R, 0, 2 * Math.PI);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // 중심 원
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, R * 0.6, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            if (node.id === "node0") {
+              ctx.lineWidth = 3;
+              ctx.strokeStyle = "#fff";
+              ctx.stroke();
+            }
+          } else {
+            // === 기존 단순 원 스타일 ===
+            const isRoot = node.id === "node0";
+            const radius = isRoot ? 24 : 8;
+            const rgbMap = {
+              품목: [0, 60, 255],
+              국내: [255, 0, 7],
+              해외: [88, 166, 92],
+            };
+            const [r, g, b] = rgbMap[node.type] || [136, 136, 136];
+            // 가운데에만 네온 효과
+            const t = Date.now() * 0.005;
+            const pulse = 1 + 0.1 * Math.sin(t + (node.depth || 0));
+            const baseR = node.id === "node0" ? 32 : 16;
+            const R = baseR * pulse;
+            // 라디얼 그라디언트
+            const grad = ctx.createRadialGradient(
+              node.x,
+              node.y,
+              R * 0.2,
+              node.x,
+              node.y,
+              R
+            );
+
+            const alpha = Math.max(0.2, 1 - (node.depth || 0) * 0.1);
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            if (isRoot) {
+              // ctx.lineWidth = 2;
+              // ctx.strokeStyle = "#FFC107";
+              // ctx.stroke();
+
+              // ctx.strokeStyle = "#FBFF43";
+              grad.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
+              grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+              ctx.shadowColor = `rgba(${r},${g},${b},0.7)`;
+              ctx.shadowBlur = 15;
+
+              // 글로우
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, R, 0, 2 * Math.PI);
+              ctx.fillStyle = grad;
+              ctx.fill();
+
+              // 중심 원
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, R * 0.6, 0, 2 * Math.PI);
+              ctx.fillStyle = `rgb(${r},${g},${b})`;
+              ctx.fill();
+
+              // 루트 노드만 흰 테두리
+              if (isRoot) {
+                ctx.shadowBlur = 0;
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#fff";
+                ctx.stroke();
+              }
+            }
           }
         })
+
         // 점선 엣지 렌더링
         .linkCanvasObject((link, ctx) => {
           const sx = link.source.x;
@@ -239,7 +352,14 @@ export default {
       fetchData();
     });
     watch(
-      () => [props.stockId, props.productId, depth.value, degree.value],
+      () => [
+        props.type,
+        props.stockId,
+        props.productId,
+        depth.value,
+        degree.value,
+        allDegree.value,
+      ],
       () => {
         if (
           (props.type === "stock" && !props.stockId) ||
@@ -257,9 +377,11 @@ export default {
     return {
       depth,
       degree,
+      allDegree,
       graphContainer,
       loading,
       fetchData,
+      isAll,
     };
   },
 };
@@ -284,6 +406,10 @@ export default {
   width: 3rem;
   text-align: right;
   font-weight: 500;
+}
+
+.slider-label.all-mode {
+  width: fit-content;
 }
 
 .slider-range {
@@ -316,12 +442,22 @@ export default {
   position: relative;
 }
 
+.graph-wrapper.all-mode {
+  /* background: radial-gradient(circle, #1a1a2e, #0d0d1f);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); */
+}
+
 /* Canvas 그래프 */
 .graph-container {
   width: 100%;
   height: 500px;
   cursor: grab;
 }
+
+.graph-container.all-mode {
+  height: 387px;
+}
+
 .graph-container:active {
   cursor: grabbing;
 }
@@ -361,6 +497,13 @@ export default {
   margin-bottom: 20px;
 }
 
+.network-tool.all-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
 .network-tool-color {
   display: flex;
   gap: 20px;
@@ -371,6 +514,11 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.network-tool-color-item-col.all-mode {
+  gap: 12px;
+  flex-direction: row;
 }
 
 .network-tool-color-item {
@@ -414,5 +562,11 @@ export default {
   width: 12px;
   height: 12px;
   border: 2px solid #000;
+}
+
+.network-tool.all-mode
+  .network-tool-color-item-col:last-child
+  .network-tool-color-item:nth-child(2) {
+  display: none;
 }
 </style>

@@ -319,9 +319,13 @@
             class="detail-layout-content-item"
             ref="section3"
           >
-            <span class="header">수출입량 통계</span>
-            <LineGraph api-mode="product" />
+            <div class="line-graph-header">
+              <span class="header">수출입량 통계</span>
+
+              <LineGraph api-mode="product" />
+            </div>
           </div>
+
           <!-- 개별 품목 페이지 - 수출입량 통계 -->
           <div class="detail-layout-content-item" ref="section4">
             <span class="header">관련 뉴스</span>
@@ -486,21 +490,40 @@ export default {
       return entries[0][0];
     },
 
-    // 관련 품목 내용 정리
+    // 관련 품목 내용 요약 추출
     extractDescription(desc) {
-      const marker = "### 🍽️ 대표 품목별 용도";
-      let summary = desc.split(marker)[0] || desc;
+      // 이거 앞부분까지만 추출
+      const exampleMarker = "🧾 대표 품목 예시";
+      const useMarkerMd = "### 🍽️ 대표 품목별 용도";
 
-      // 1) 불필요한 # 제거
-      summary = summary.replace(/#/g, "");
-      // 2) --- (연속된 대시) 제거
-      summary = summary.replace(/-{3,}/g, "");
-      // 3) 실제 줄바꿈 제거 (한 줄로 합치기)
-      summary = summary.replace(/\r?\n/g, " ");
-      // 4) 다중 공백 하나로 축소
-      summary = summary.replace(/\s{2,}/g, " ");
-      // 5) 양쪽 공백 정리
-      return summary.trim();
+      // 1) “용도” 마커 앞까지 자르기
+      const beforeUse = desc.includes(useMarkerMd)
+        ? desc.split(useMarkerMd)[0]
+        : desc;
+
+      // 2) #, --- 제거, 나머지 줄바꿈을 스페이스로 합치기
+      let clean = beforeUse
+        .replace(/#/g, "")
+        .replace(/-{3,}/g, "")
+        .replace(/\r?\n/g, " ")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      // 3) “🧾 대표 품목 예시” 기준으로 헤더/예시 분리
+      let header = clean;
+      let examples = "";
+      if (clean.includes(exampleMarker)) {
+        [header, examples] = clean.split(exampleMarker);
+        examples = examples.trim(); // "- 폴리에스터..." 등
+      }
+
+      // 4) 예시 줄 조합
+      const exampleLine = examples
+        ? `${exampleMarker} ${examples}`
+        : exampleMarker;
+
+      // 5) 헤더와 예시만 반환 (이제 용도 마커는 제외)
+      return `${header}\n${exampleLine}`;
     },
   },
   mounted() {
@@ -515,6 +538,15 @@ export default {
 </script>
 
 <style scoped>
+.line-graph-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 @import "github-markdown-css/github-markdown.css";
 
 .relation-icon {
@@ -751,6 +783,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .relation-code {
@@ -770,6 +803,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .no-relation {

@@ -9,8 +9,24 @@ export async function getStockAPI(stockId) {
   }
 }
 
-export async function getStockChartAPI(stockId, type) {
+export async function getStockChartAPI(
+  stockId,
+  type
+  // selectedCountry
+  // startDate,
+  // endDate
+) {
   try {
+    // // 기본 URL (type 파라미터만)
+    // let url = `/charts/${stockId}?type=${type}`;
+
+    // // startDate/endDate가 둘 다 있을 때만 추가
+    // if (startDate && endDate) {
+    //   url += `&startDate=${startDate}&endDate=${endDate}`;
+    // }
+
+    // const response = await stockAPI.get(url);
+
     const response = await stockAPI.get(`/charts/${stockId}?type=${type}`);
     return response.data;
   } catch (error) {
@@ -22,6 +38,15 @@ export async function getStockNetworkAPI(stockId, depth, degree) {
     const response = await networkAPI.get(
       `/stock/${stockId}?depth=${depth}&maxDegree=${degree}`
     );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getAllNetworkAPI(allDegree) {
+  try {
+    const response = await networkAPI.get(`/all?maxDegree=${allDegree}`);
     return response.data;
   } catch (error) {
     console.error(error);
