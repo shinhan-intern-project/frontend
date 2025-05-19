@@ -453,6 +453,16 @@ export default {
     };
   },
   methods: {
+    scrollNext() {
+      const container = this.$refs.newsContainer
+      if (!container) return
+      container.scrollBy({ left: container.clientWidth, behavior: 'smooth' })
+    },
+    scrollPrev() {
+      const container = this.$refs.newsContainer
+      if (!container) return
+      container.scrollBy({ left: -container.clientWidth, behavior: 'smooth' })
+    },
     // 검색 관련 메서드 추가
     handleSearchTypeChange(value) {
       this.searchType = value;
