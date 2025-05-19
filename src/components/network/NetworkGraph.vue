@@ -533,14 +533,12 @@ export default {
   border-radius: 50%;
 }
 
-/* 왼쪽 첫 번째 컬럼, 첫 번째 아이템(국내 종목) */
 .network-tool-color-item-col:first-child
   .network-tool-color-item:nth-child(1)
   .network-tool-color-circle {
   background-color: #ff3b30;
 }
 
-/* 왼쪽 첫 번째 컬럼, 두 번째 아이템(해외 종목) */
 .network-tool-color-item-col:first-child
   .network-tool-color-item:nth-child(2)
   .network-tool-color-circle {
@@ -554,7 +552,6 @@ export default {
   background-color: #007aff;
 }
 
-/* 오른쪽 컬럼, 두 번째 아이템(현재 노드) */
 .network-tool-color-item-col:last-child
   .network-tool-color-item:nth-child(2)
   .network-tool-color-circle {
@@ -568,5 +565,15 @@ export default {
   .network-tool-color-item-col:last-child
   .network-tool-color-item:nth-child(2) {
   display: none;
+}
+@media (max-width: 576px) {
+  .slider-container {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
 }
 </style>

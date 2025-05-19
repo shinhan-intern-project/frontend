@@ -454,14 +454,14 @@ export default {
   },
   methods: {
     scrollNext() {
-      const container = this.$refs.newsContainer
-      if (!container) return
-      container.scrollBy({ left: container.clientWidth, behavior: 'smooth' })
+      const container = this.$refs.newsContainer;
+      if (!container) return;
+      container.scrollBy({ left: container.clientWidth, behavior: "smooth" });
     },
     scrollPrev() {
-      const container = this.$refs.newsContainer
-      if (!container) return
-      container.scrollBy({ left: -container.clientWidth, behavior: 'smooth' })
+      const container = this.$refs.newsContainer;
+      if (!container) return;
+      container.scrollBy({ left: -container.clientWidth, behavior: "smooth" });
     },
     // 검색 관련 메서드 추가
     handleSearchTypeChange(value) {
@@ -1128,5 +1128,131 @@ export default {
 .scroll-btn {
   opacity: 0;
   transition: opacity 0.2s;
+}
+@media (max-width: 1200px) {
+  .detail-layout-content-container {
+    padding: 0 20px;
+  }
+  .detail-layout-content-items {
+    width: 100%;
+  }
+  .relation {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .relation-stocks {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 992px) {
+  .detail-layout-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  .detail-layout-content-items {
+    width: 100%;
+  }
+  .detail-layout-content-item {
+    padding: 32px;
+  }
+  .detail-layout-content-item .info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .detail-layout-content-item .info-right {
+    align-items: flex-start;
+  }
+  .relation {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .detail-layout-content-item {
+    padding: 24px;
+  }
+  .detail-layout-content-item .info-left img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+  }
+  .detail-layout-content-item .info-left-summary .title {
+    font-size: 24px;
+  }
+  .detail-layout-content-item .info-left-summary .market-ticker {
+    font-size: 14px;
+  }
+  .detail-layout-content-item .info-right .price {
+    font-size: 20px;
+  }
+  .detail-layout-content-item .info-right .per {
+    font-size: 16px;
+  }
+  .indicator {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .relation-item {
+    width: 160px;
+    padding: 16px 8px;
+  }
+  .relation-title {
+    font-size: 14px;
+  }
+  .relation-content {
+    font-size: 13px;
+  }
+  .product-title {
+    font-size: 24px;
+    line-height: 36px;
+  }
+  .product-description {
+    font-size: 14px;
+    line-height: 24px;
+  }
+  .relation-icon {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .tab-button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  .detail-layout-content-item {
+    padding: 16px;
+  }
+  .news-container > * {
+    flex: 0 0 180px;
+    max-width: 180px;
+  }
+  .scroll-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  .relation-stocks-title {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
 }
 </style>
