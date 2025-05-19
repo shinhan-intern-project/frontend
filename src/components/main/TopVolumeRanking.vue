@@ -160,7 +160,7 @@ export default {
 <style scoped>
 .volume-ranking {
   box-shadow: 0px 4px 20px #cfdef1 !important;
-  height: 837px;
+  height: 816px;
   background-color: #f9fafb;
   border-radius: 16px;
   overflow: hidden;
