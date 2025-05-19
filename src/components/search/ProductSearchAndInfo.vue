@@ -20,7 +20,12 @@
 
     <div class="on-off">
       <NetworkGraphCanvas v-if="!hideNetworkGraph" :type="'all'" />
-      <div class="on-off-search" v-if="hasSearched" ref="panel" @click.stop>
+      <div
+        class="on-off-search"
+        v-if="hasSearched && searchInput"
+        ref="panel"
+        @click.stop
+      >
         <!-- 품목 정보 영역 -->
         <div class="product-info-card">
           <!-- 로딩 표시 -->
@@ -33,48 +38,11 @@
               <div class="header-center">품목과 관련된 종목</div>
               <div class="header-right"></div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-        <!-- 오른쪽: 관련 종목 -->
-        <div class="related-stocks-list">
-          <div v-if="!hasRelatedStocks && !isLoading" class="no-related-stocks">
-            <span>관련 종목이 없습니다</span>
-          </div>
-          <div v-else-if="selectedProductIndex === -1 && hasRelatedStocks">
-            <div
-              v-for="(item, itemIdx) in productItemsWithStocks"
-              :key="`item-${itemIdx}`"
-              class="related-stock-group"
-            >
-              <div
-                v-for="(stock, stockIdx) in item.relatedStocks"
-                :key="`stock-${itemIdx}-${stockIdx}`"
-                class="related-stock"
-                @click="goToStockPage(stock)"
-                style="cursor: pointer"
-              >
-                <div class="related-stock-header">
-                  <img
-                    class="related-stock-logo"
-                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
-                    alt="종목 아이콘"
-                    @error="
-                      (e) =>
-                        (e.target.src =
-                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
-                    "
-                  />
-                  <div class="related-stock-name">{{ stock.companyName }}</div>
-
             <div class="product-info-content">
               <!-- 왼쪽: 품목 리스트 -->
               <div class="product-list">
                 <div v-if="productItems.length === 0" class="no-results">
                   <span>검색 결과가 없습니다</span>
-
                 </div>
                 <div
                   v-else
@@ -87,20 +55,23 @@
                 >
                   <div class="product-info">
                     <div class="product-details">
-                      <div class="product-name">{{ item.hsName }}</div>
-                      <div class="product-code">{{ item.hsCode }}</div>
+                      <div class="product-name">
+                        {{ item.hsName }}
+                      </div>
+                      <div class="product-code">
+                        {{ item.hsCode }}
+                      </div>
                     </div>
+                    <!-- 관련 종목 보기 버튼 추가 -->
+                    <button
+                      class="related-items-btn"
+                      @click.stop="handleProductSelect(item, index)"
+                    >
+                      관련 종목 보기
+                    </button>
                   </div>
-                  <!-- 관련 종목 보기 버튼 추가 -->
-                  <button
-                    class="related-items-btn"
-                    @click.stop="handleProductSelect(item, index)"
-                  >
-                    관련 종목 보기
-                  </button>
                 </div>
               </div>
-
               <!-- 오른쪽: 관련 종목 -->
               <div class="related-stocks-list">
                 <div
@@ -121,6 +92,8 @@
                       v-for="(stock, stockIdx) in item.relatedStocks"
                       :key="`stock-${itemIdx}-${stockIdx}`"
                       class="related-stock"
+                      @click="goToStockPage(stock)"
+                      style="cursor: pointer"
                     >
                       <div class="related-stock-header">
                         <img
@@ -145,7 +118,8 @@
                             ? stock.currentPrice
                             : Math.floor(stock.currentPrice))
                         }}
-                        {{ stock.marketType === "NASDAQ" ? "USD" : "원" }} |
+                        {{ stock.marketType === "NASDAQ" ? "USD" : "원" }}
+                        |
                         <span :class="getChangeClass(stock.changeRate)">
                           {{ displayChangeRate(stock.changeRate) }}
                         </span>
@@ -198,12 +172,127 @@
                   </div>
                 </div>
               </div>
+              <!-- 오른쪽: 관련 종목
+                        <div class="related-stocks-list">
+                          <div
+                            v-if="!hasRelatedStocks && !isLoading"
+                            class="no-related-stocks"
+                          >
+                            <span>관련 종목이 없습니다</span>
+                          </div>
+                          <div
+                            v-else-if="
+                              selectedProductIndex === -1 && hasRelatedStocks
+                            "
+                          >
+                            <div
+                              v-for="(item, itemIdx) in productItemsWithStocks"
+                              :key="`item-${itemIdx}`"
+                              class="related-stock-group"
+                            >
+                              <div
+                                v-for="(stock, stockIdx) in item.relatedStocks"
+                                :key="`stock-${itemIdx}-${stockIdx}`"
+                                class="related-stock"
+                              >
+                                <div class="related-stock-header">
+                                  <img
+                                    class="related-stock-logo"
+                                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                                    alt="종목 아이콘"
+                                    @error="
+                                      (e) =>
+                                        (e.target.src =
+                                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                                    "
+                                  />
+                                  <div class="related-stock-name">
+                                    {{ stock.companyName }}
+                                  </div>
+                                </div>
+                                <div class="related-stock-code">
+                                  {{ stock.ticker }} |
+                                  {{
+                                    (console.log(stock),
+                                    stock.marketType == "NASDAQ"
+                                      ? stock.currentPrice
+                                      : Math.floor(stock.currentPrice))
+                                  }}
+                                  {{
+                                    stock.marketType === "NASDAQ" ? "USD" : "원"
+                                  }}
+                                  |
+                                  <span
+                                    :class="getChangeClass(stock.changeRate)"
+                                  >
+                                    {{ displayChangeRate(stock.changeRate) }}
+                                  </span>
+                                  |
+                                  {{
+                                    stock.relationType === "EXPORT"
+                                      ? "수출"
+                                      : "수입"
+                                  }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div v-else-if="selectedProductIndex !== -1">
+                            <div
+                              v-if="
+                                selectedProduct.relatedStocks &&
+                                selectedProduct.relatedStocks.length > 0
+                              "
+                            >
+                              <div
+                                v-for="(
+                                  stock, idx
+                                ) in selectedProduct.relatedStocks"
+                                :key="idx"
+                                class="related-stock"
+                              >
+                                <div class="related-stock-header">
+                                  <img
+                                    class="related-stock-logo"
+                                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                                    alt="종목 아이콘"
+                                    @error="
+                                      (e) =>
+                                        (e.target.src =
+                                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                                    "
+                                  />
+                                  <div class="related-stock-name">
+                                    {{ stock.companyName }}
+                                  </div>
+                                </div>
+                                <div class="related-stock-code">
+                                  {{ stock.ticker }} |
+                                  {{ formatPrice(stock.currentPrice) }}원 |
+                                  <span
+                                    :class="getChangeClass(stock.changeRate)"
+                                  >
+                                    {{ displayChangeRate(stock.changeRate) }}
+                                  </span>
+                                  |
+                                  {{
+                                    stock.relationType === "EXPORT"
+                                      ? "수출"
+                                      : "수입"
+                                  }}
+                                </div>
+                              </div>
+                            </div>
+                            <div v-else class="no-related-stocks">
+                              <span>관련 종목이 없습니다</span>
+                            </div>
+                          </div>
+                        </div> -->
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -326,12 +415,18 @@ export default {
 </script>
 
 <style scoped>
-.on-off-search {
+.product-search-and-info {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+/* .on-off-search {
   position: absolute;
   top: 0px;
   width: 1200px;
   z-index: 1000;
-}
+} */
 .related-items-btn {
   background: #3182f6;
   color: #fff;
@@ -429,6 +524,8 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 9999;
 }
 
 .product-info-header {
@@ -659,6 +756,7 @@ export default {
   position: relative;
 }
 .on-off-search {
+  position: relative;
   /* display: flex; */
   position: absolute;
   top: 0px;
