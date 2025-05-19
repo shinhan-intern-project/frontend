@@ -94,8 +94,10 @@ export default {
             barWidth: 150,
           },
         },
-        stroke: {
+         stroke: {
+          curve: "straight",     
           width: [1],
+          connectNulls: false,
         },
         xaxis: {
           type: "datetime",
@@ -192,8 +194,8 @@ export default {
             y: item.exportValue
           }));
           if (exportSeries.length) {
-            exportSeries.unshift({ x: exportSeries[0].x, y: null })
-            exportSeries.push({ x: exportSeries[exportSeries.length-1].x, y: null })
+            exportSeries.unshift({ x: exportSeries[0].x, y: null });
+            exportSeries.push({ x: exportSeries[exportSeries.length-1].x, y: null });
           }
 
           this.series.push({
