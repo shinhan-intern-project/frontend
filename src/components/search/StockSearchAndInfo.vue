@@ -223,7 +223,7 @@ export default {
 .on-off-search {
   position: absolute;
   top: 0px;
-  width: 1200px;
+  width: 100%;
   z-index: 1000;
 }
 .related-items-btn {
@@ -539,7 +539,65 @@ export default {
   /* display: flex; */
   position: absolute;
   top: 0px;
-  width: 1200px;
+  width: 100%;
   right: 0px;
+}
+@media (max-width: 576px) {
+  /* 검색 버튼 크기 조정 */
+  .search-button {
+    width: 40px;
+  }
+
+  .search-button img {
+    height: 25px;
+  }
+
+  /* 검색창 패딩 축소 */
+  .search-input {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+
+  /* 헤더 크기 및 패딩 축소 */
+  .stock-info-header {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  /* 항목 패딩 축소 */
+  .stock-item,
+  .related-item {
+    padding: 10px 15px;
+    height: auto;
+  }
+
+  /* 관련 아이템 버튼 크기 조정 */
+  .related-items-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+    margin-left: 5px;
+  }
+
+  /* 종목 정보 세부 조정 */
+  .company-logo {
+    width: 25px;
+    height: 25px;
+  }
+
+  .company-name {
+    font-size: 13px;
+  }
+
+  .company-code,
+  .price-change {
+    font-size: 12px;
+  }
+
+  /* 가격 정보 너비 축소 */
+  .price-info {
+    min-width: 60px;
+    font-size: 13px;
+    margin-right: 4px;
+  }
 }
 </style>

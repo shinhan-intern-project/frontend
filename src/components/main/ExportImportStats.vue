@@ -110,7 +110,7 @@ export default {
   /* margin-top: 20px;
   margin-left: 15px;
   margin-right: 15px; */
-  margin-bottom: 40px;
+  margin-bottom: 0;
 }
 .header-section-inside h2 {
   font-size: 18px;
@@ -221,6 +221,9 @@ export default {
   .stats-header,
   .stat-item {
     font-size: 12px;
+  }
+  .header-section[data-v-c0b45ac0] {
+    flex-wrap: wrap;
   }
 }
 </style>
