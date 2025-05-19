@@ -2,7 +2,11 @@
   <div class="stock-search-and-info">
     <!-- 검색창 영역 -->
 
-    <div class="search-container" ref="searchContainer">
+    <div
+      class="search-container"
+      :class="{ 'is-detail-page': isDetailPage }"
+      ref="searchContainer"
+    >
       <input
         type="text"
         v-model="searchInput"
@@ -30,7 +34,8 @@
         <div class="stock-info-card">
           <!-- 로딩 표시 -->
           <div v-if="isLoading" class="loading-indicator">
-            <span>검색 중...</span>
+            <div class="spinner"></div>
+            <span class="loading-text">검색 결과를 불러오고 있어요...</span>
           </div>
           <div v-else>
             <div class="stock-info-header">
@@ -225,6 +230,41 @@ export default {
 </script>
 
 <style scoped>
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 10px;
+  /* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); */
+  color: #333;
+  min-height: 200px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #3182f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+}
+
 .on-off-search {
   position: absolute;
   top: 0px;
@@ -259,9 +299,14 @@ export default {
   margin-bottom: 30px;
   border-radius: 13px;
   overflow: hidden;
+  /* width: 600px; */
   max-width: 100%;
 }
 
+.search-container.is-detail-page {
+  width: 600px;
+  max-width: none;
+}
 .search-input::placeholder {
   color: #b8b8b8; /* 원하는 색상으로 변경 */
   font-size: 14px;
@@ -292,10 +337,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
+
   padding: 30px;
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
   margin-bottom: 30px;
   color: #888;
 }

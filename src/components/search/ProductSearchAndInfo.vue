@@ -1,7 +1,11 @@
 <template>
   <div class="product-search-and-info">
     <!-- 검색창 영역 -->
-    <div class="search-container" ref="searchContainer">
+    <div
+      class="search-container"
+      :class="{ 'is-detail-page': isDetailPage }"
+      ref="searchContainer"
+    >
       <input
         type="text"
         v-model="searchInput"
@@ -30,8 +34,10 @@
         <div class="product-info-card">
           <!-- 로딩 표시 -->
           <div v-if="isLoading" class="loading-indicator">
-            <span>검색 중...</span>
+            <div class="spinner"></div>
+            <span class="loading-text">검색 결과를 불러오고 있어요...</span>
           </div>
+
           <div v-else>
             <div class="product-info-header">
               <div class="header-left">품목</div>
@@ -65,6 +71,7 @@
                     <!-- 관련 종목 보기 버튼 추가 -->
                     <button
                       class="related-items-btn"
+                      v-if="!isDetailPage"
                       @click.stop="handleProductSelect(item, index)"
                     >
                       관련 종목 보기
@@ -305,6 +312,10 @@ export default {
     NetworkGraphCanvas,
   },
   props: {
+    isDetailPage: {
+      type: Boolean,
+      default: false, // 기본은 메인 페이지로 간주
+    },
     formatPrice: {
       type: Function,
       required: true,
@@ -415,6 +426,41 @@ export default {
 </script>
 
 <style scoped>
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 10px;
+  /* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); */
+  color: #333;
+  min-height: 200px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #3182f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+}
+
 .product-search-and-info {
   position: relative;
   width: 100%;
@@ -475,11 +521,16 @@ export default {
   margin-bottom: 30px;
   border-radius: 10px;
   overflow: hidden;
+  /* width: 600px; */
+
   max-width: 100%;
 }
-
+.search-container.is-detail-page {
+  width: 600px;
+  max-width: none;
+}
 .search-input::placeholder {
-  color: #b8b8b8; /* 원하는 색상으로 변경 */
+  color: #b8b8b8;
   font-size: 14px;
 }
 
@@ -509,16 +560,18 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 30px;
+  flex: 1;
+
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
   margin-bottom: 30px;
   color: #888;
 }
 
 /* 품목 정보 카드 스타일 */
 .product-info-card {
-  height: 447px;
+  min-height: 447px;
   box-shadow: 0px 4px 20px #cfdef1;
   background-color: white;
   border-radius: 10px;
@@ -627,9 +680,6 @@ export default {
   min-width: 0;
 }
 
-.product-info-card {
-}
-
 .product-logo {
   width: 36px;
   height: 36px;
@@ -676,13 +726,13 @@ export default {
 .related-stock {
   display: flex;
   flex-direction: column;
-  padding: 15px 20px;
+  padding: 5px 20px;
   border-bottom: 1px solid #eee;
 }
 
 .related-stock-name {
   font-weight: 500;
-  margin-bottom: 8px;
+  /* margin-bottom: 8px; */
   width: 100%;
   white-space: normal;
   line-height: 1.4;

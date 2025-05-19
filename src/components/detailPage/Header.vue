@@ -47,6 +47,7 @@
           :get-change-class="getChangeClass"
           @search="handleProductSearch"
           @select-product="selectProduct"
+          :is-detail-page="true"
         />
       </div>
     </div>
@@ -390,12 +391,18 @@ nav {
 }
 
 .search-type-toggle {
-  flex: none;
+  /* flex: none; */
+  display: flex;
+  height: 34px;
+  margin-top: 10px;
 }
 
 .custom-search-container {
-  flex: none;
-  width: 500px;
+  /* flex: none;
+  width: 500px; */
+  display: flex;
+  gap: 20px;
+  height: 51px;
   max-width: 100%;
 }
 
