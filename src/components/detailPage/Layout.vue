@@ -831,8 +831,24 @@ export default {
   display: none;
 }
 
-/* 품목 페이지 */
-/* 품목 개요 */
+.news-container > * {
+  flex: 0 0 215px;
+  max-width: 215px;
+}
+
+.news-container > * .news-item__title,
+.news-container > * .news-item-title,
+.news-container > * .title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;       /* 최대 2줄 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  height: calc(1.4em * 2);     /* 2줄 높이 고정 */
+}
+
+/* ─── 품목 페이지 ─── */
 .product {
   display: flex;
   flex-direction: column;
