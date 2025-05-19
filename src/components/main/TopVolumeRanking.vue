@@ -1,7 +1,7 @@
 <template>
   <div class="volume-ranking">
     <div class="header-section">
-      <h2>종목 등락률 Top 20</h2>
+      <h2>종목 상승률 Top 20</h2>
 
       <ToggleSwitch
         v-model="marketType"
@@ -102,7 +102,7 @@ export default {
   methods: {
     // 시장 유형 변경 시 이벤트 처리
     onMarketTypeChange(value) {
-      console.log("시장 유형 변경:", value);
+      // console.log("시장 유형 변경:", value);
       this.$emit("market-change", value);
     },
 
@@ -160,7 +160,7 @@ export default {
 <style scoped>
 .volume-ranking {
   box-shadow: 0px 4px 20px #cfdef1 !important;
-  height: 816px;
+  height: 797px;
   background-color: #f9fafb;
   border-radius: 16px;
   overflow: hidden;

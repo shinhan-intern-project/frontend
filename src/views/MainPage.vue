@@ -114,13 +114,23 @@
       <!-- 뉴스 섹션 -->
       <div class="detail-layout-content-item" ref="section4">
         <span class="header">무역 관련 뉴스</span>
-        <div class="news-container">
-          <NewsItem
-            :isBadge="true"
-            v-for="news in newsItems"
-            :key="news.id"
-            :news="news"
-          />
+        <template v-if="newsItems.length">
+          <div class="news-wrapper">
+            <button class="scroll-btn left" @click="scrollPrev">‹</button>
+            <div class="news-container" ref="newsContainer">
+              <NewsItem
+                :isBadge="true"
+                v-for="news in newsItems"
+                :key="news.id"
+                :news="news"
+              />
+            </div>
+            <button class="scroll-btn right" @click="scrollNext">›</button>
+          </div>
+        </template>
+        <div class="no-relation" v-else>
+          <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+          <p>관련된 뉴스가 없습니다.</p>
         </div>
       </div>
     </div>
@@ -234,6 +244,17 @@ export default {
     };
   },
   methods: {
+    scrollNext() {
+      const c = this.$refs.newsContainer;
+      if (!c) return;
+      c.scrollBy({ left: c.clientWidth, behavior: "smooth" });
+    },
+    scrollPrev() {
+      const c = this.$refs.newsContainer;
+      if (!c) return;
+      c.scrollBy({ left: -c.clientWidth, behavior: "smooth" });
+    },
+
     getTagColor(sentiment) {
       switch (sentiment) {
         case "호재":
@@ -275,7 +296,7 @@ export default {
 
     handleExportMarketChange(val) {
       this.exportCountryCode = val === "domestic" ? "KR" : "US";
-      console.log("바뀐 국가 코드 →", this.exportCountryCode);
+      // console.log("바뀐 국가 코드 →", this.exportCountryCode);
     },
     // 타입 변경 핸들러
     handleTypeChange(value) {
@@ -298,7 +319,7 @@ export default {
         );
         if (responseData && responseData.status === "OK") {
           this.productItems = responseData.data;
-          console.log(this.productItems);
+          // console.log(this.productItems);
         } else {
           console.error(
             "품목 API 응답 형식이 올바르지 않습니다.",
@@ -375,16 +396,16 @@ export default {
     },
 
     handleCountryChange(country) {
-      console.log(`국가 변경: ${country}`);
+      // console.log(`국가 변경: ${country}`);
       this.selectedCountry = country;
     },
     handleDirectionChange(direction) {
-      console.log(`정렬 방향 변경: ${direction}`);
+      // console.log(`정렬 방향 변경: ${direction}`);
       this.sortDirection = direction;
     },
 
     loadInitialData() {
-      console.log("초기 데이터 로드 시작");
+      // console.log("초기 데이터 로드 시작");
       this.fetchTopStocks();
     },
     // 종목 검색 API 호출 함수
@@ -515,7 +536,6 @@ export default {
     },
   },
   mounted() {
-    // 초기 데이터 로드
     this.loadInitialData();
     this.fetchLatestNews();
   },
@@ -523,12 +543,12 @@ export default {
 </script>
 
 <style scoped>
-/* 전체 앱 스타일 */
 .header-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30px 20px 20px 20px; /* 기존 값 유지 */
+  padding: 30px 20px 20px 20px;
+  flex-direction: column;
 }
 .logo-image {
   max-width: 300px;
@@ -576,6 +596,8 @@ export default {
 
 .recent-trades-wrapper {
   margin-top: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .background-globe-container {
@@ -605,11 +627,6 @@ export default {
   right: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at top right,
-    rgba(36, 40, 47, 0.1),
-    transparent 70%
-  );
   z-index: -1;
 }
 
@@ -645,11 +662,6 @@ html body {
     transform: translate3d(0, -10px, 0);
   }
 }
-
-/* 종목 거래량 섹션 스타일 */
-/* .volume-section {
-  margin-bottom: 40px;
-} */
 
 .section-header {
   display: flex;
@@ -744,11 +756,6 @@ html body {
   text-align: right;
 }
 
-/* 수출입 통계 섹션 스타일 */
-/* .export-import-section {
-  margin-bottom: 40px;
-} */
-
 .export-import-section h2 {
   font-size: 18px;
   margin: 0 0 20px;
@@ -814,8 +821,44 @@ html body {
   font-weight: 700;
 }
 
+.news-wrapper {
+  position: relative;
+}
+
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.scroll-btn.left {
+  left: 8px;
+}
+.scroll-btn.right {
+  right: 8px;
+}
+
+.news-wrapper:hover .scroll-btn {
+  opacity: 1;
+}
+
 .news-container {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   margin-top: 24px;
   gap: 20px;
@@ -823,6 +866,11 @@ html body {
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+.news-container > * {
+  flex: 0 0 215px;
+  max-width: 215px;
 }
 
 .news-container::-webkit-scrollbar {
@@ -860,6 +908,25 @@ html body {
 }
 
 @media (max-width: 576px) {
+  .toggle-container {
+    margin-left: 10px;
+  }
+
+  .recent-trades-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .recent-trades table {
+    min-width: 100%;
+  }
+  .recent-trades td,
+  .recent-trades th {
+    padding: 6px 4px;
+    font-size: 14px;
+  }
+  .recent-trades td:first-child {
+    width: 35%;
+  }
   .company-details-small {
     display: none;
   }
@@ -870,6 +937,9 @@ html body {
 
   .statistics-table {
     font-size: 12px;
+  }
+  .export-stats-section {
+    padding: 0;
   }
 }
 </style>

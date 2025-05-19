@@ -1,7 +1,7 @@
 
 <template>
   <div class="news-item" @click="clickNews">
-    <img :src="imageSrc" @error="onImageError" alt="뉴스 이미지" />
+    <img :src="imageSrc" alt="뉴스 이미지" />
 
     <div class="badge" v-if="isBadge" :class="badgeColor">
       <span>{{ news.tag }}</span>
@@ -36,10 +36,9 @@ export default {
   },
   computed: {
     imageSrc() {
-      return this.hasImageError || !this.news.image
-        ? defaultNewsImage
-        : this.news.image;
+      return (this.news.image && this.news.image.trim() !== "") ? this.news.image : defaultNewsImage;
     },
+
     badgeColor() {
       switch (this.news.tag) {
         case "호재":

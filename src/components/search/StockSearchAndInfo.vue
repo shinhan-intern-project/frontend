@@ -2,7 +2,11 @@
   <div class="stock-search-and-info">
     <!-- 검색창 영역 -->
 
-    <div class="search-container" ref="searchContainer">
+    <div
+      class="search-container"
+      :class="{ 'is-detail-page': isDetailPage }"
+      ref="searchContainer"
+    >
       <input
         type="text"
         v-model="searchInput"
@@ -20,13 +24,17 @@
     </div>
 
     <div class="on-off">
-      <NetworkGraphCanvas :type="'all'" />
+      <!-- 네트워크 그래프를 조건부로 표시 -->
+      <!-- <NetworkGraphCanvas v-if="showNetworkGraph" :type="'all'" /> -->
+      <NetworkGraphCanvas v-if="!hideNetworkGraph" :type="'all'" />
+
       <div class="on-off-search" v-if="hasSearched" ref="panel" @click.stop>
         <!-- 종목 정보 영역 -->
         <div class="stock-info-card">
           <!-- 로딩 표시 -->
           <div v-if="isLoading" class="loading-indicator">
-            <span>검색 중...</span>
+            <div class="spinner"></div>
+            <span class="loading-text">검색 결과를 불러오고 있어요...</span>
           </div>
           <div v-else>
             <div class="stock-info-header">
@@ -90,6 +98,7 @@
                   </div>
                   <button
                     class="related-items-btn"
+                    v-if="!isDetailPage"
                     @click.stop="handleStockSelect(item, index)"
                   >
                     관련 품목 보기
@@ -133,6 +142,10 @@ export default {
     NetworkGraphCanvas,
   },
   props: {
+    isDetailPage: {
+      type: Boolean,
+      default: false, // 기본은 메인 페이지로 간주
+    },
     isLoading: {
       type: Boolean,
       default: false,
@@ -152,6 +165,10 @@ export default {
     searchKeyword: {
       type: String,
       default: "",
+    },
+    hideNetworkGraph: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -173,6 +190,10 @@ export default {
     },
   },
   methods: {
+    showNetworkGraph: {
+      type: Boolean,
+      default: true,
+    },
     handleSearch() {
       this.$emit("search", this.searchInput);
       this.hasSearched = true;
@@ -208,6 +229,47 @@ export default {
 </script>
 
 <style scoped>
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 10px;
+  /* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); */
+  color: #333;
+  min-height: 200px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #3182f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+}
+
+.on-off-search {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 1000;
+}
 .related-items-btn {
   background: #3182f6;
   color: #fff;
@@ -236,8 +298,14 @@ export default {
   margin-bottom: 30px;
   border-radius: 13px;
   overflow: hidden;
+  /* width: 600px; */
+  max-width: 100%;
 }
 
+.search-container.is-detail-page {
+  width: 600px;
+  max-width: none;
+}
 .search-input::placeholder {
   color: #b8b8b8; /* 원하는 색상으로 변경 */
   font-size: 14px;
@@ -268,10 +336,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
+
   padding: 30px;
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
   margin-bottom: 30px;
   color: #888;
 }
@@ -520,6 +590,65 @@ export default {
   /* display: flex; */
   position: absolute;
   top: 0px;
-  width: 1200px;
+  width: 100%;
+  right: 0px;
+}
+@media (max-width: 576px) {
+  /* 검색 버튼 크기 조정 */
+  .search-button {
+    width: 40px;
+  }
+
+  .search-button img {
+    height: 25px;
+  }
+
+  /* 검색창 패딩 축소 */
+  .search-input {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+
+  /* 헤더 크기 및 패딩 축소 */
+  .stock-info-header {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  /* 항목 패딩 축소 */
+  .stock-item,
+  .related-item {
+    padding: 10px 15px;
+    height: auto;
+  }
+
+  /* 관련 아이템 버튼 크기 조정 */
+  .related-items-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+    margin-left: 5px;
+  }
+
+  /* 종목 정보 세부 조정 */
+  .company-logo {
+    width: 25px;
+    height: 25px;
+  }
+
+  .company-name {
+    font-size: 13px;
+  }
+
+  .company-code,
+  .price-change {
+    font-size: 12px;
+  }
+
+  /* 가격 정보 너비 축소 */
+  .price-info {
+    min-width: 60px;
+    font-size: 13px;
+    margin-right: 4px;
+  }
 }
 </style>
