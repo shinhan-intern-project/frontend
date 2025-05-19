@@ -50,7 +50,7 @@
           <span class="slider-value">{{ allDegree }}</span>
         </div>
       </div>
-      <div class="tool-container">
+      <div class="tool-container" :class="{ 'all-mode': isAll }">
         <!-- 왼쪽 2개 -->
         <div class="network-tool-color">
           <div
@@ -82,7 +82,11 @@
             </div>
           </div>
         </div>
-        <div class="network-tool-description" :class="{ 'all-mode': isAll }">
+        <div
+          v-if="type === 'all'"
+          class="network-tool-description"
+          :class="{ 'all-mode': isAll }"
+        >
           <div class="tooltip-wrapper">
             <img src="@/assets/images/icons/alert.png" alt="툴팁" />
 
@@ -606,6 +610,11 @@ export default {
 
 /* 네트워크 그래프 설명 */
 .tool-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.tool-container.all-mode {
   display: flex;
   align-items: center;
 }
