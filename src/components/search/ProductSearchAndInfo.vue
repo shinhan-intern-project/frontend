@@ -735,6 +735,9 @@ export default {
     border-bottom: 1px solid #eee;
     max-height: 300px;
   }
+  .header-center {
+    display: none;
+  }
 }
 
 @media (max-width: 576px) {

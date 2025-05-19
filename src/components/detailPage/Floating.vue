@@ -56,7 +56,7 @@ export default {
 
 <style scoped>
 .floating-container {
-  position: sticky;
+  position: static;
   top: 120px;
   width: 160px;
   display: flex;
