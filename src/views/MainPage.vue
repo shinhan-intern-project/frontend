@@ -300,7 +300,7 @@ export default {
     },
     // 타입 변경 핸들러
     handleTypeChange(value) {
-      // console.log(`타입 변경: ${value}`);
+      console.log(`타입 변경: ${value}`);
     },
     // 품목 검색 핸들러
     handleProductSearch(keyword) {
