@@ -114,13 +114,23 @@
       <!-- 뉴스 섹션 -->
       <div class="detail-layout-content-item" ref="section4">
         <span class="header">무역 관련 뉴스</span>
-        <div class="news-container">
-          <NewsItem
-            :isBadge="true"
-            v-for="news in newsItems"
-            :key="news.id"
-            :news="news"
-          />
+        <template v-if="newsItems.length">
+          <div class="news-wrapper">
+            <button class="scroll-btn left"  @click="scrollPrev">‹</button>
+            <div class="news-container" ref="newsContainer">
+              <NewsItem
+                :isBadge="true"
+                v-for="news in newsItems"
+                :key="news.id"
+                :news="news"
+              />
+            </div>
+            <button class="scroll-btn right" @click="scrollNext">›</button>
+        </div>
+        </template>
+        <div class="no-relation" v-else>
+          <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+          <p>관련된 뉴스가 없습니다.</p>
         </div>
       </div>
     </div>
@@ -234,6 +244,17 @@ export default {
     };
   },
   methods: {
+    scrollNext() {
+      const c = this.$refs.newsContainer;
+      if (!c) return;
+      c.scrollBy({ left: c.clientWidth, behavior: "smooth" });
+    },
+    scrollPrev() {
+      const c = this.$refs.newsContainer;
+      if (!c) return;
+    c.scrollBy({ left: -c.clientWidth, behavior: "smooth" });
+    },
+
     getTagColor(sentiment) {
       switch (sentiment) {
         case "호재":
@@ -814,8 +835,42 @@ html body {
   font-weight: 700;
 }
 
+.news-wrapper {
+  position: relative;
+}
+
+/* 2) arrows */
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255,255,255,0.8);
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.scroll-btn.left  { left: 8px;  }
+.scroll-btn.right { right: 8px; }
+
+/* show arrows on hover */
+.news-wrapper:hover .scroll-btn {
+  opacity: 1;
+}
+
 .news-container {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   margin-top: 24px;
   gap: 20px;
@@ -823,6 +878,11 @@ html body {
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+.news-container > * {
+  flex: 0 0 215px;
+  max-width: 215px;
 }
 
 .news-container::-webkit-scrollbar {
