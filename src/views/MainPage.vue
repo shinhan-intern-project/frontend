@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <div class="center-arrow">
+      <div class="center-arrow" @click="scrollToContent">
         <img
           src="@/assets/images/icons/arrow.png"
           alt="arrow"
@@ -80,7 +80,7 @@
       </div>
 
       <!-- 종목 거래량 / 수출입 통계 그래프  -->
-      <div class="layout">
+      <div class="layout" ref="statsSection">
         <div class="volume-section">
           <TopVolumeRanking
             :stocks="topStocks"
@@ -435,7 +435,7 @@ export default {
                 name: product.hscodeName,
                 code: product.hscode,
                 stockName: stock.name,
-                hscodeId: product.hscodeId
+                hscodeId: product.hscodeId,
               });
             }
           });
@@ -505,6 +505,13 @@ export default {
     selectHSCode(hsCode, index) {
       this.selectedHSCode = hsCode;
       this.selectedHSCodeIndex = index;
+    },
+
+    // 화살표 누르면 Content로 이동
+    scrollToContent() {
+      const el = this.$refs.statsSection;
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth" });
     },
   },
   mounted() {
@@ -622,6 +629,21 @@ html body {
   margin: 20px 0;
   font-size: 24px;
   color: #888;
+}
+
+.center-arrow img {
+  cursor: pointer;
+  animation: arrow-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes arrow-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
 }
 
 /* 종목 거래량 섹션 스타일 */
