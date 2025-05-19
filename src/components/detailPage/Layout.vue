@@ -404,15 +404,15 @@ export default {
     },
     stockInfo: {
       type: Object,
-      required: true,
+      required: false,
     },
     productInfo: {
       type: Object,
-      required: true,
+      required: false,
     },
     relatedStocks: {
       type: Object,
-      required: true,
+      required: false,
     },
     stockId: {
       type: String,
