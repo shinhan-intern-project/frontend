@@ -33,7 +33,10 @@
               <div class="header-center">품목과 관련된 종목</div>
               <div class="header-right"></div>
             </div>
-
+          </div>
+        </div>
+      </div>
+    </div>
 
         <!-- 오른쪽: 관련 종목 -->
         <div class="related-stocks-list">
@@ -200,6 +203,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
