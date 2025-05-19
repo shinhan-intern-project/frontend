@@ -95,7 +95,7 @@ export default {
           },
         },
          stroke: {
-          curve: "straight",     
+          curve: "smooth",     
           width: [1],
           connectNulls: false,
         },
