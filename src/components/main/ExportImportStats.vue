@@ -110,7 +110,7 @@ export default {
   /* margin-top: 20px;
   margin-left: 15px;
   margin-right: 15px; */
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 .header-section-inside h2 {
   font-size: 18px;

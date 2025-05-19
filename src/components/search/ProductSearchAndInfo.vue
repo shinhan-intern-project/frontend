@@ -9,7 +9,7 @@
         class="search-input"
         @keyup.enter="handleSearch"
       />
-      <button class="search-button" @click="handleSearch">
+      <button class="search-button">
         <img
           src="@/assets/images/SearchButton.svg"
           alt="검색"
@@ -19,7 +19,7 @@
     </div>
 
     <div class="on-off">
-      <NetworkGraphCanvas :type="'all'" />
+      <NetworkGraphCanvas v-if="!hideNetworkGraph" :type="'all'" />
       <div class="on-off-search" v-if="hasSearched" ref="panel" @click.stop>
         <!-- 품목 정보 영역 -->
         <div class="product-info-card">
@@ -248,6 +248,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    hideNetworkGraph: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -267,6 +271,10 @@ export default {
     },
   },
   methods: {
+    showNetworkGraph: {
+      type: Boolean,
+      default: true,
+    },
     handleSearch() {
       this.$emit("search", this.searchInput);
       this.hasSearched = true;
@@ -318,6 +326,12 @@ export default {
 </script>
 
 <style scoped>
+.on-off-search {
+  position: absolute;
+  top: 0px;
+  width: 1200px;
+  z-index: 1000;
+}
 .related-items-btn {
   background: #3182f6;
   color: #fff;
@@ -366,6 +380,7 @@ export default {
   margin-bottom: 30px;
   border-radius: 10px;
   overflow: hidden;
+  max-width: 100%;
 }
 
 .search-input::placeholder {
@@ -648,5 +663,7 @@ export default {
   position: absolute;
   top: 0px;
   width: 1200px;
+
+  right: 0px;
 }
 </style>
