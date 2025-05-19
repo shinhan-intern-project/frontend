@@ -50,28 +50,66 @@
           <span class="slider-value">{{ allDegree }}</span>
         </div>
       </div>
-      <!-- 왼쪽 2개 -->
-      <div class="network-tool-color">
-        <div class="network-tool-color-item-col" :class="{ 'all-mode': isAll }">
-          <div class="network-tool-color-item">
-            <div class="network-tool-color-circle"></div>
-            <div class="network-tool-color-text">국내 종목</div>
-          </div>
+      <div class="tool-container" :class="{ 'all-mode': isAll }">
+        <!-- 왼쪽 2개 -->
+        <div class="network-tool-color">
+          <div
+            class="network-tool-color-item-col"
+            :class="{ 'all-mode': isAll }"
+          >
+            <div class="network-tool-color-item">
+              <div class="network-tool-color-circle"></div>
+              <div class="network-tool-color-text">국내 종목</div>
+            </div>
 
-          <div class="network-tool-color-item">
-            <div class="network-tool-color-circle"></div>
-            <div class="network-tool-color-text">해외 종목</div>
+            <div class="network-tool-color-item">
+              <div class="network-tool-color-circle"></div>
+              <div class="network-tool-color-text">해외 종목</div>
+            </div>
+          </div>
+          <!-- 오른쪽 2개 -->
+          <div
+            class="network-tool-color-item-col"
+            :class="{ 'all-mode': isAll }"
+          >
+            <div class="network-tool-color-item">
+              <div class="network-tool-color-circle"></div>
+              <div class="network-tool-color-text">품목</div>
+            </div>
+            <div class="network-tool-color-item" :class="{ 'all-mode': isAll }">
+              <div class="network-tool-color-circle"></div>
+              <div class="network-tool-color-text">현재 노드</div>
+            </div>
           </div>
         </div>
-        <!-- 오른쪽 2개 -->
-        <div class="network-tool-color-item-col" :class="{ 'all-mode': isAll }">
-          <div class="network-tool-color-item">
-            <div class="network-tool-color-circle"></div>
-            <div class="network-tool-color-text">품목</div>
-          </div>
-          <div class="network-tool-color-item" :class="{ 'all-mode': isAll }">
-            <div class="network-tool-color-circle"></div>
-            <div class="network-tool-color-text">현재 노드</div>
+        <div
+          v-if="type === 'all'"
+          class="network-tool-description"
+          :class="{ 'all-mode': isAll }"
+        >
+          <div class="tooltip-wrapper">
+            <img src="@/assets/images/icons/alert.png" alt="툴팁" />
+
+            <div class="tooltip">
+              <span class="title">차수(Degree)</span> <br />
+              노드가 연결된 개수입니다. <br />
+              노드는 <span class="red">국내 종목(빨강)</span>,
+              <span class="green">해외 종목(초록)</span>,
+              <span class="blue">품목(파랑)</span>으로 구성돼요.
+              <br />
+              ex) 한 종목이 3개 품목과 연결되면 차수는 3입니다.
+              <br />
+              <br />
+              <span class="title">깊이(Depth)</span> <br />
+              중심 노드에서 <b>몇 단계 떨어져 있는지</b>를 나타냅니다. <br />
+              ex) 중심에서 바로 연결되면 깊이 1, 그 다음은 깊이 2입니다.
+              <br /><br />
+
+              <span class="title">노드 연결 기준</span><br />
+              ChatGPT를 활용해 종목별 수출입 관련 품목을<b> 최대 3개</b>까지
+              찾아 연결했습니다. <br />
+              ex) A기업이 B품목을 수출하면 A와 B 노드가 선으로 연결됩니다.
+            </div>
           </div>
         </div>
       </div>
@@ -566,6 +604,88 @@ export default {
   .network-tool-color-item:nth-child(2) {
   display: none;
 }
+
+/* 네트워크 그래프 설명 */
+.tool-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.tool-container.all-mode {
+  display: flex;
+  align-items: center;
+}
+
+.network-tool-description {
+  display: flex;
+  justify-content: center;
+}
+
+.network-tool-description img {
+  width: 20px;
+  height: 20px;
+}
+
+/* 툴팁 */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-wrapper img {
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  top: 32px;
+  left: 0px;
+  /* transform: translateX(-50%); */
+  background: #fff;
+
+  color: #665b5b;
+  font-size: 12px;
+  line-height: 20px;
+
+  padding: 24px 20px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: none;
+  z-index: 10;
+
+  width: 360px;
+  height: 310px;
+}
+
+.tooltip-wrapper:hover .tooltip {
+  display: block;
+}
+
+.tooltip b {
+  font-weight: 700;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.red {
+  color: #ff3b2f;
+  font-weight: 700;
+}
+
+.green {
+  color: #58a65c;
+  font-weight: 700;
+}
+
+.blue {
+  color: #007aff;
+  font-weight: 700;
+}
+
 @media (max-width: 576px) {
   .slider-container {
     width: 80%;
