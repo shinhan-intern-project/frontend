@@ -1,7 +1,10 @@
 <template>
   <div class="detail-layout-container">
     <div class="detail-layout-content-container">
-      <DetailHeader />
+      <!-- 선택된 검색 타입에 따라 검색 컴포넌트 표시 -->
+
+      <DetailHeader :stockId="stockId" :productId="productId" />
+
       <div class="detail-layout-content">
         <DetailFloating
           :active-index="activeSection"
@@ -332,7 +335,7 @@
 
             <template v-if="relatedNews?.length">
               <div class="news-wrapper">
-                <button class="scroll-btn left"  @click="scrollPrev">‹</button>
+                <button class="scroll-btn left" @click="scrollPrev">‹</button>
                 <div class="news-container" ref="newsContainer">
                   <NewsItem
                     :isBadge="true"
@@ -366,7 +369,12 @@ import CandleLine from "../candleLine/CandleLine.vue";
 import NetworkGraph from "../network/NetworkGraph.vue";
 import MarkdownIt from "markdown-it";
 import LineGraph from "../line/LineGraph.vue";
-
+// import StockSearchAndInfo from "../search/StockSearchAndInfo.vue";
+// import ToggleSwitch from "../toggle/ToggleSwitch.vue";
+import { getSearchAPI } from "@/apis/stock";
+import { getSearchProductAPI } from "@/apis/product";
+// import ProductSearchAndInfo from "../search/ProductSearchAndInfo.vue";
+// import HeaderSearch from "../search/HeaderSearch.vue";
 // 관련 품목 숫자 아이콘
 export const icons = [
   require("@/assets/images/icons/1.png"),
@@ -396,15 +404,15 @@ export default {
     },
     stockInfo: {
       type: Object,
-      required: true,
+      required: false,
     },
     productInfo: {
       type: Object,
-      required: true,
+      required: false,
     },
     relatedStocks: {
       type: Object,
-      required: true,
+      required: false,
     },
     stockId: {
       type: String,
@@ -420,6 +428,7 @@ export default {
   },
   data() {
     return {
+      isDetailPage: !!this.stockId || !!this.productId, // stockId나 productId가 있으면 상세 페이지로 간주
       activeSection: 0,
       icons,
       md: new MarkdownIt({
@@ -427,18 +436,145 @@ export default {
         linkify: true,
         typographer: true,
       }),
+      searchType: "stock",
+      // 종목 검색 관련 데이터
+      stockSearchKeyword: "",
+      isStockLoading: false,
+      stockItems: [],
+      relatedItems: [],
+      selectedStockIndex: -1,
+
+      // 품목 검색 관련 데이터
+      productSearchKeyword: "",
+      isProductLoading: false,
+      productItems: [],
+      selectedProductIndex: -1,
+      selectedProduct: null,
     };
   },
   methods: {
-    scrollNext() {
-      const container = this.$refs.newsContainer
-      if (!container) return
-      container.scrollBy({ left: container.clientWidth, behavior: 'smooth' })
+    // 검색 관련 메서드 추가
+    handleSearchTypeChange(value) {
+      this.searchType = value;
     },
-    scrollPrev() {
-      const container = this.$refs.newsContainer
-      if (!container) return
-      container.scrollBy({ left: -container.clientWidth, behavior: 'smooth' })
+
+    // 종목 검색 관련 메서드
+    async handleStockSearch(keyword) {
+      this.stockSearchKeyword = keyword;
+      this.isStockLoading = true;
+
+      try {
+        const response = await getSearchAPI(keyword);
+        if (response && response.status === "OK") {
+          this.stockItems = response.data.map((item) => ({
+            name: item.companyName,
+            code: item.ticker,
+            price:
+              item.marketType === "NASDAQ"
+                ? parseFloat(item.currentPrice)
+                : parseInt(item.currentPrice, 10),
+            changePercent: `${(parseFloat(item.changeRate) * 100).toFixed(1)}%`,
+            stockId: item.stockId,
+            relatedProducts: item.relatedProducts || [],
+            marketType: item.marketType,
+          }));
+
+          this.showAllRelatedProducts();
+        }
+      } catch (error) {
+        console.error("종목 검색 오류:", error);
+        this.stockItems = [];
+        this.relatedItems = [];
+      } finally {
+        this.isStockLoading = false;
+      }
+    },
+
+    selectStock(stock, index) {
+      this.selectedStockIndex = index;
+
+      if (stock.relatedProducts && stock.relatedProducts.length > 0) {
+        const uniqueHscodes = new Set();
+
+        this.relatedItems = stock.relatedProducts
+          .filter(
+            (product) =>
+              !uniqueHscodes.has(product.hscode) &&
+              uniqueHscodes.add(product.hscode)
+          )
+          .map((product) => ({
+            name: product.hscodeName,
+            code: product.hscode,
+            stockName: stock.name,
+            hscodeId: product.hscodeId,
+          }));
+      } else {
+        this.relatedItems = [];
+      }
+    },
+
+    showAllRelatedProducts() {
+      const allRelatedProducts = [];
+      const uniqueHscodes = new Set();
+
+      this.stockItems.forEach((stock) => {
+        if (stock.relatedProducts && stock.relatedProducts.length > 0) {
+          stock.relatedProducts.forEach((product) => {
+            if (!uniqueHscodes.has(product.hscode)) {
+              uniqueHscodes.add(product.hscode);
+              allRelatedProducts.push({
+                name: product.hscodeName,
+                code: product.hscode,
+                stockName: stock.name,
+                hscodeId: product.hscodeId,
+              });
+            }
+          });
+        }
+      });
+
+      this.relatedItems = allRelatedProducts;
+      this.selectedStockIndex = -1;
+    },
+
+    // 품목 검색 관련 메서드
+    async handleProductSearch(keyword) {
+      this.productSearchKeyword = keyword;
+      this.isProductLoading = true;
+
+      try {
+        const response = await getSearchProductAPI(keyword);
+        if (response && response.status === "OK") {
+          this.productItems = response.data;
+        }
+      } catch (error) {
+        console.error("품목 검색 오류:", error);
+        this.productItems = [];
+      } finally {
+        this.isProductLoading = false;
+      }
+    },
+
+    selectProduct(product, index) {
+      this.selectedProduct = product;
+      this.selectedProductIndex = index;
+    },
+
+    // 포맷 관련 메서드
+    formatPrice(price) {
+      return parseFloat(price).toLocaleString();
+    },
+
+    formatChangeRate(rate) {
+      const value = parseFloat(rate) * 100;
+      return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
+    },
+
+    getChangeClass(rate) {
+      const value = parseFloat(rate);
+      if (value > 0) return "positive-change";
+      if (value < 0) return "negative-change";
+      return "zero-change";
     },
 
     scrollToSection(idx) {
@@ -553,6 +689,12 @@ export default {
 </script>
 
 <style scoped>
+.search-type-toggle,
+.stock-search-and-info,
+.product-search-and-info {
+  position: relative;
+  z-index: 1000;
+}
 .line-graph-header {
   display: flex;
   flex-direction: row;
@@ -870,12 +1012,12 @@ export default {
 .news-container > * .news-item-title,
 .news-container > * .title {
   display: -webkit-box;
-  -webkit-line-clamp: 2;       /* 최대 2줄 */
+  -webkit-line-clamp: 2; /* 최대 2줄 */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.4;
-  height: calc(1.4em * 2);     /* 2줄 높이 고정 */
+  height: calc(1.4em * 2); /* 2줄 높이 고정 */
 }
 
 /* ─── 품목 페이지 ─── */
@@ -947,7 +1089,7 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   border: none;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.8);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -958,16 +1100,23 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 3) 좌/우 위치 */
-.scroll-btn.left  { left: 8px;  }
-.scroll-btn.right { right: 8px; }
+.scroll-btn.left {
+  left: 8px;
+}
+.scroll-btn.right {
+  right: 8px;
+}
 
 .news-wrapper:hover .scroll-btn {
   /* hover 시에만 나타내고 싶다면 */
   opacity: 1;
 }
-.scroll-btn { opacity: 0; transition: opacity .2s; }
+.scroll-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 </style>

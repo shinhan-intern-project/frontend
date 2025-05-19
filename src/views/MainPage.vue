@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <div class="center-arrow">
+      <div class="center-arrow" @click="scrollToContent">
         <img
           src="@/assets/images/icons/arrow.png"
           alt="arrow"
@@ -80,7 +80,7 @@
       </div>
 
       <!-- 종목 거래량 / 수출입 통계 그래프  -->
-      <div class="layout">
+      <div class="layout" ref="statsSection">
         <div class="volume-section">
           <TopVolumeRanking
             :stocks="topStocks"
@@ -114,13 +114,23 @@
       <!-- 뉴스 섹션 -->
       <div class="detail-layout-content-item" ref="section4">
         <span class="header">무역 관련 뉴스</span>
-        <div class="news-container">
-          <NewsItem
-            :isBadge="true"
-            v-for="news in newsItems"
-            :key="news.id"
-            :news="news"
-          />
+        <template v-if="newsItems.length">
+          <div class="news-wrapper">
+            <button class="scroll-btn left" @click="scrollPrev">‹</button>
+            <div class="news-container" ref="newsContainer">
+              <NewsItem
+                :isBadge="true"
+                v-for="news in newsItems"
+                :key="news.id"
+                :news="news"
+              />
+            </div>
+            <button class="scroll-btn right" @click="scrollNext">›</button>
+          </div>
+        </template>
+        <div class="no-relation" v-else>
+          <img src="@/assets/images/icons/caution_navy.png" alt="정보" />
+          <p>관련된 뉴스가 없습니다.</p>
         </div>
       </div>
     </div>
@@ -234,6 +244,17 @@ export default {
     };
   },
   methods: {
+    scrollNext() {
+      const c = this.$refs.newsContainer;
+      if (!c) return;
+      c.scrollBy({ left: c.clientWidth, behavior: "smooth" });
+    },
+    scrollPrev() {
+      const c = this.$refs.newsContainer;
+      if (!c) return;
+      c.scrollBy({ left: -c.clientWidth, behavior: "smooth" });
+    },
+
     getTagColor(sentiment) {
       switch (sentiment) {
         case "호재":
@@ -275,11 +296,11 @@ export default {
 
     handleExportMarketChange(val) {
       this.exportCountryCode = val === "domestic" ? "KR" : "US";
-      console.log("바뀐 국가 코드 →", this.exportCountryCode);
+      // console.log("바뀐 국가 코드 →", this.exportCountryCode);
     },
     // 타입 변경 핸들러
     handleTypeChange(value) {
-      console.log(`타입 변경: ${value}`);
+      // console.log(`타입 변경: ${value}`);
     },
     // 품목 검색 핸들러
     handleProductSearch(keyword) {
@@ -298,7 +319,7 @@ export default {
         );
         if (responseData && responseData.status === "OK") {
           this.productItems = responseData.data;
-          console.log(this.productItems);
+          // console.log(this.productItems);
         } else {
           console.error(
             "품목 API 응답 형식이 올바르지 않습니다.",
@@ -375,16 +396,16 @@ export default {
     },
 
     handleCountryChange(country) {
-      console.log(`국가 변경: ${country}`);
+      // console.log(`국가 변경: ${country}`);
       this.selectedCountry = country;
     },
     handleDirectionChange(direction) {
-      console.log(`정렬 방향 변경: ${direction}`);
+      // console.log(`정렬 방향 변경: ${direction}`);
       this.sortDirection = direction;
     },
 
     loadInitialData() {
-      console.log("초기 데이터 로드 시작");
+      // console.log("초기 데이터 로드 시작");
       this.fetchTopStocks();
     },
     // 종목 검색 API 호출 함수
@@ -435,7 +456,7 @@ export default {
                 name: product.hscodeName,
                 code: product.hscode,
                 stockName: stock.name,
-                hscodeId: product.hscodeId
+                hscodeId: product.hscodeId,
               });
             }
           });
@@ -505,6 +526,13 @@ export default {
     selectHSCode(hsCode, index) {
       this.selectedHSCode = hsCode;
       this.selectedHSCodeIndex = index;
+    },
+
+    // 화살표 누르면 Content로 이동
+    scrollToContent() {
+      const el = this.$refs.statsSection;
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth" });
     },
   },
   mounted() {
@@ -598,11 +626,6 @@ export default {
   right: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at top right,
-    rgba(36, 40, 47, 0.1),
-    transparent 70%
-  );
   z-index: -1;
 }
 
@@ -622,6 +645,21 @@ html body {
   margin: 20px 0;
   font-size: 24px;
   color: #888;
+}
+
+.center-arrow img {
+  cursor: pointer;
+  animation: arrow-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes arrow-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
 }
 
 /* 종목 거래량 섹션 스타일 */
@@ -792,8 +830,46 @@ html body {
   font-weight: 700;
 }
 
+.news-wrapper {
+  position: relative;
+}
+
+/* 2) arrows */
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.scroll-btn.left {
+  left: 8px;
+}
+.scroll-btn.right {
+  right: 8px;
+}
+
+/* show arrows on hover */
+.news-wrapper:hover .scroll-btn {
+  opacity: 1;
+}
+
 .news-container {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   margin-top: 24px;
   gap: 20px;
@@ -801,6 +877,11 @@ html body {
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+.news-container > * {
+  flex: 0 0 215px;
+  max-width: 215px;
 }
 
 .news-container::-webkit-scrollbar {
