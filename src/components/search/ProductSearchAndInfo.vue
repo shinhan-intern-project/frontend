@@ -73,6 +73,8 @@
                 v-for="(stock, stockIdx) in item.relatedStocks"
                 :key="`stock-${itemIdx}-${stockIdx}`"
                 class="related-stock"
+                @click="goToStockPage(stock)"
+                style="cursor: pointer"
               >
                 <div class="related-stock-header">
                   <img
@@ -212,6 +214,9 @@ export default {
         name: "product",
         params: { productId: product.hsCodeId },
       });
+    },
+    goToStockPage(item) {
+      this.$router.push({ name: "stock", params: { stockId: item.stockId } });
     },
   },
   computed: {

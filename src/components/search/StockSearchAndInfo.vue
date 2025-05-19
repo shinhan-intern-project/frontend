@@ -163,12 +163,12 @@ export default {
     goToStockPage(item) {
       this.$router.push({ name: "stock", params: { stockId: item.stockId } });
     },
-    goToProductPage(stock) {
+    goToProductPage(product) {
       this.$router.push({
         name: "product",
-        params: { productId: stock.hscodeId },
+        params: { productId: product.hscodeId },
       });
-    },
+    }
   },
 };
 </script>

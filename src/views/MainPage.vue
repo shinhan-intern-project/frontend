@@ -443,6 +443,7 @@ export default {
         );
         if (responseData && responseData.status === "OK") {
           this.productItems = responseData.data;
+          console.log(this.productItems);
         } else {
           console.error(
             "품목 API 응답 형식이 올바르지 않습니다.",
@@ -579,6 +580,7 @@ export default {
                 name: product.hscodeName,
                 code: product.hscode,
                 stockName: stock.name,
+                hscodeId: product.hscodeId
               });
             }
           });
