@@ -182,7 +182,7 @@ export default {
         id,
         depth: depthMap[id] || 0,
       }));
-      console.table(nodesArray.slice(0, 5)); // 최소 1개 있나?
+      // console.table(nodesArray.slice(0, 5)); // 최소 1개 있나?
 
       const linksArray = Object.values(rawEdges)
         .filter((e) => allowed.includes(e.source) && allowed.includes(e.target))
