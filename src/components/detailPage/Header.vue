@@ -30,6 +30,7 @@
           :hide-network-graph="isDetailPage"
           @search="handleStockSearch"
           @select-stock="selectStock"
+          :is-detail-page="true"
         />
 
         <ProductSearchAndInfo
@@ -345,7 +346,7 @@ export default {
 nav {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 100px;
+  margin-bottom: 10px;
 }
 
 .logo {
@@ -417,5 +418,39 @@ nav {
 
 .custom-search-container .search-button img {
   height: 24px;
+}
+@media (max-width: 576px) {
+  nav {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch; /* 로고, 검색 박스 등 전부 좌측 정렬로 */
+  }
+
+  .search-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .custom-search-container {
+    width: 100%;
+  }
+
+  .custom-search-container .search-container {
+    width: 100%;
+  }
+
+  .custom-search-container .search-input {
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .custom-search-container .search-button {
+    align-self: flex-end;
+  }
+
+  .search-type-toggle {
+    width: 100%;
+  }
 }
 </style>
