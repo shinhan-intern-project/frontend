@@ -30,6 +30,7 @@
           :hide-network-graph="isDetailPage"
           @search="handleStockSearch"
           @select-stock="selectStock"
+          :is-detail-page="true"
         />
 
         <ProductSearchAndInfo

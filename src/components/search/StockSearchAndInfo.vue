@@ -94,6 +94,7 @@
                   </div>
                   <button
                     class="related-items-btn"
+                    v-if="!isDetailPage"
                     @click.stop="handleStockSelect(item, index)"
                   >
                     관련 품목 보기
@@ -137,6 +138,10 @@ export default {
     NetworkGraphCanvas,
   },
   props: {
+    isDetailPage: {
+      type: Boolean,
+      default: false, // 기본은 메인 페이지로 간주
+    },
     isLoading: {
       type: Boolean,
       default: false,
