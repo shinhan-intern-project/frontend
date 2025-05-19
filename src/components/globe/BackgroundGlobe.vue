@@ -44,7 +44,7 @@ const initGlobe = async () => {
       new THREE.MeshPhongMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.25,
         shininess: 0.2,
         specular: 0x77bbff,
       })

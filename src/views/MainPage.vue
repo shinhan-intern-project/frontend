@@ -97,17 +97,6 @@
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
           >
-            <!-- extra 슬롯에 토글 삽입 -->
-            <template #extra>
-              <ToggleSwitch
-                v-model="exportMarket"
-                :options="[
-                  { value: 'domestic', label: '국내' },
-                  { value: 'overseas', label: '미국' },
-                ]"
-                @change="handleExportMarketChange"
-              />
-            </template>
           </ExportImportStats>
 
           <!-- 무역 품목 최근 수출입량 -->
@@ -140,8 +129,7 @@
 
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
-import Globe from "globe.gl";
-import * as THREE from "three";
+
 import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
 import StockSearchAndInfo from "@/components/search/StockSearchAndInfo.vue";
@@ -186,7 +174,7 @@ export default {
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
-    let backgroundGlobe = null;
+    // let backgroundGlobe = null;
     fetchCountries();
     const activePoints = ref([
       { city: "서울", country: "한국", value: 3.2 },
@@ -201,116 +189,12 @@ export default {
         );
         const data = await res.json();
         countries.features = data.features;
-
-        initGlobe();
       } catch (error) {
         console.error("국가 데이터를 불러오는 데 실패했습니다:", error);
-        initGlobe();
-      }
-
-      window.addEventListener("resize", handleResize);
-    });
-
-    onBeforeUnmount(() => {
-      window.removeEventListener("resize", handleResize);
-      if (backgroundGlobe) {
-        backgroundGlobe._destructor && backgroundGlobe._destructor();
       }
     });
 
-    const initGlobe = () => {
-      if (backgroundGlobeContainer.value) {
-        backgroundGlobe = Globe()(backgroundGlobeContainer.value)
-          .backgroundColor("rgba(240, 248, 255, 0)")
-          .globeImageUrl(
-            "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-          )
-          .bumpImageUrl(
-            "//unpkg.com/three-globe/example/img/earth-topology.png"
-          )
-          .width(window.innerWidth * 0.5)
-          .height(window.innerHeight * 0.8)
-          .showGlobe(true)
-          .showAtmosphere(true)
-          .atmosphereColor("rgba(200, 219, 255, 0.3)")
-          .atmosphereAltitude(0.15)
-          .globeMaterial(
-            new THREE.MeshPhongMaterial({
-              color: 0xffffff,
-              transparent: true,
-              opacity: 0.9,
-              shininess: 0.2,
-              specular: 0x77bbff,
-            })
-          )
-          .pointsData([
-            { lat: 37.5665, lng: 126.978, value: 3.2, name: "서울" },
-            { lat: 35.6762, lng: 139.6503, value: 1.8, name: "도쿄" },
-            { lat: 40.7128, lng: -74.006, value: 2.5, name: "뉴욕" },
-            { lat: 1.3521, lng: 103.8198, value: 1.5, name: "싱가포르" },
-          ])
-          .pointColor((d) => {
-            const colors = {
-              서울: "rgba(25, 118, 210, 0.8)",
-              도쿄: "rgba(56, 142, 60, 0.8)",
-              뉴욕: "rgba(245, 124, 0, 0.8)",
-              싱가포르: "rgba(156, 39, 176, 0.8)",
-            };
-            return colors[d.name] || "rgba(255, 255, 255, 0.8)";
-          })
-          .pointRadius(0.4)
-          .pointAltitude(0.02)
-          .arcsData([
-            {
-              startLat: 37.5665,
-              startLng: 126.978,
-              endLat: 35.6762,
-              endLng: 139.6503,
-            },
-            {
-              startLat: 37.5665,
-              startLng: 126.978,
-              endLat: 40.7128,
-              endLng: -74.006,
-            },
-            {
-              startLat: 35.6762,
-              startLng: 139.6503,
-              endLat: 1.3521,
-              endLng: 103.8198,
-            },
-          ])
-          .arcColor(() => [
-            "rgba(0, 127, 255, 0.5)",
-            "rgba(44, 186, 0, 0.5)",
-            "rgba(255, 197, 0, 0.5)",
-          ])
-          .arcDashLength(0.4)
-          .arcDashGap(0.2)
-          .arcDashAnimateTime(1500)
-          .arcStroke(0.5);
-
-        backgroundGlobe.controls().autoRotate = true;
-        backgroundGlobe.controls().autoRotateSpeed = 0.3;
-        backgroundGlobe.controls().enableZoom = false;
-        backgroundGlobe.pointOfView({ lat: 25, lng: 120, altitude: 2.5 }, 1000);
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        backgroundGlobe.scene().add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-        directionalLight.position.set(1, 1, 1);
-        backgroundGlobe.scene().add(directionalLight);
-      }
-    };
-
-    const handleResize = () => {
-      if (backgroundGlobe) {
-        backgroundGlobe
-          .width(window.innerWidth * 0.4)
-          .height(window.innerHeight * 0.7);
-      }
-    };
+    onBeforeUnmount(() => {});
 
     return {
       backgroundGlobeContainer,
@@ -352,10 +236,13 @@ export default {
   methods: {
     getTagColor(sentiment) {
       switch (sentiment) {
-        case "호재": return "#E5484D";
-        case "악재": return "#3D8BFF";
+        case "호재":
+          return "#E5484D";
+        case "악재":
+          return "#3D8BFF";
         case "중립":
-        default: return "#A5A5A5";
+        default:
+          return "#A5A5A5";
       }
     },
     formatDate(datetime) {
@@ -371,7 +258,7 @@ export default {
       try {
         const res = await getLatestNewsAPI();
         const newsList = res.data;
-        this.newsItems  = newsList.map(news => ({
+        this.newsItems = newsList.map((news) => ({
           id: news.newsId,
           tag: news.sentiment,
           tagColor: this.getTagColor(news.sentiment),
@@ -411,6 +298,7 @@ export default {
         );
         if (responseData && responseData.status === "OK") {
           this.productItems = responseData.data;
+          console.log(this.productItems);
         } else {
           console.error(
             "품목 API 응답 형식이 올바르지 않습니다.",
@@ -547,6 +435,7 @@ export default {
                 name: product.hscodeName,
                 code: product.hscode,
                 stockName: stock.name,
+                hscodeId: product.hscodeId
               });
             }
           });
@@ -675,7 +564,7 @@ export default {
 .export-stats-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /* gap: 20px; */
 }
 
 .recent-trades-wrapper {
