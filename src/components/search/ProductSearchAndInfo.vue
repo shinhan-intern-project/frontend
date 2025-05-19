@@ -760,7 +760,7 @@ export default {
   /* display: flex; */
   position: absolute;
   top: 0px;
-  width: 1200px;
+  width: 100%;
 
   right: 0px;
 }

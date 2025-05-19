@@ -536,7 +536,6 @@ export default {
     },
   },
   mounted() {
-    // 초기 데이터 로드
     this.loadInitialData();
     this.fetchLatestNews();
   },
@@ -544,12 +543,12 @@ export default {
 </script>
 
 <style scoped>
-/* 전체 앱 스타일 */
 .header-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30px 20px 20px 20px; /* 기존 값 유지 */
+  padding: 30px 20px 20px 20px;
+  flex-direction: column;
 }
 .logo-image {
   max-width: 300px;
@@ -597,6 +596,8 @@ export default {
 
 .recent-trades-wrapper {
   margin-top: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .background-globe-container {
@@ -661,11 +662,6 @@ html body {
     transform: translate3d(0, -10px, 0);
   }
 }
-
-/* 종목 거래량 섹션 스타일 */
-/* .volume-section {
-  margin-bottom: 40px;
-} */
 
 .section-header {
   display: flex;
@@ -760,11 +756,6 @@ html body {
   text-align: right;
 }
 
-/* 수출입 통계 섹션 스타일 */
-/* .export-import-section {
-  margin-bottom: 40px;
-} */
-
 .export-import-section h2 {
   font-size: 18px;
   margin: 0 0 20px;
@@ -834,7 +825,6 @@ html body {
   position: relative;
 }
 
-/* 2) arrows */
 .scroll-btn {
   position: absolute;
   top: 50%;
@@ -862,7 +852,6 @@ html body {
   right: 8px;
 }
 
-/* show arrows on hover */
 .news-wrapper:hover .scroll-btn {
   opacity: 1;
 }
@@ -919,6 +908,25 @@ html body {
 }
 
 @media (max-width: 576px) {
+  .toggle-container {
+    margin-left: 10px;
+  }
+
+  .recent-trades-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .recent-trades table {
+    min-width: 100%;
+  }
+  .recent-trades td,
+  .recent-trades th {
+    padding: 6px 4px;
+    font-size: 14px;
+  }
+  .recent-trades td:first-child {
+    width: 35%;
+  }
   .company-details-small {
     display: none;
   }
@@ -929,6 +937,9 @@ html body {
 
   .statistics-table {
     font-size: 12px;
+  }
+  .export-stats-section {
+    padding: 0;
   }
 }
 </style>
