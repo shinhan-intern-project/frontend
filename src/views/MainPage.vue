@@ -486,6 +486,7 @@ export default {
             name: product.hscodeName,
             code: product.hscode,
             stockName: stock.name,
+            hscodeId:  product.hscodeId
           }));
       } else {
         this.relatedItems = [];

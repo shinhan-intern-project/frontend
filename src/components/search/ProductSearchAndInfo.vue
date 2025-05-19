@@ -147,6 +147,8 @@
                       v-for="(stock, idx) in selectedProduct.relatedStocks"
                       :key="idx"
                       class="related-stock"
+                      @click="goToStockPage(stock)"
+                      style="cursor: pointer"
                     >
                       <div class="related-stock-header">
                         <img
