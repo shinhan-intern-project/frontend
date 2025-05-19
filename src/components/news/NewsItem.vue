@@ -42,7 +42,7 @@ export default {
     },
     badgeColor() {
       switch (this.news.tag) {
-        case "호제":
+        case "호재":
           return "badge-positive";
         case "악재":
           return "badge-negative";
