@@ -801,7 +801,6 @@ export default {
   position: absolute;
   top: 0px;
   width: 100%;
-
   right: 0px;
 }
 </style>
