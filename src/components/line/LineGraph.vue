@@ -10,7 +10,14 @@
       {{ opt.label }}
     </button>
   </div>
-
+  <!-- 토글 스위치만 추가 -->
+  <div class="toggle-wrapper">
+    <ToggleSwitch
+      v-model="selectedCountry"
+      :options="countryOptions"
+      @change="onChangeCountry"
+    />
+  </div>
   <div id="chart">
     <apexchart
       ref="chart"
@@ -23,7 +30,7 @@
 
 <script>
 import { getProductTradeAPI, getTradeStatsGraph } from "@/apis/product.js";
-
+import ToggleSwitch from "../toggle/ToggleSwitch.vue";
 export default {
   name: "LineGraph",
   props: {
@@ -37,9 +44,17 @@ export default {
       default: "KR",
     },
   },
+  components: {
+    ToggleSwitch,
+  },
 
   data() {
     return {
+      selectedCountry: "KR",
+      countryOptions: [
+        { value: "KR", label: "국내" },
+        { value: "US", label: "미국" },
+      ],
       chartType: "month",
       series: [
         {
@@ -61,10 +76,15 @@ export default {
         },
         stroke: {
           width: [2, 2],
+          curve: "smooth",
+          lineCap: "round",
         },
         xaxis: {
           type: "datetime",
-          labels: { datetimeUTC: false },
+          labels: {
+            datetimeUTC: false,
+            format: "yyyy년 MM월",
+          },
         },
         yaxis: [
           {
@@ -84,6 +104,15 @@ export default {
           },
         },
         legend: { position: "bottom" },
+        annotations: {
+          yaxis: [],
+          xaxis: [],
+        },
+        forecastDataPoints: {
+          count: 0,
+          fillOpacity: 0,
+          strokeWidth: 0,
+        },
       },
     };
   },
@@ -98,6 +127,11 @@ export default {
   },
 
   methods: {
+    onChangeCountry(country) {
+      this.selectedCountry = country;
+      this.$emit("update:country", country);
+      this.getChartData();
+    },
     async getChartData() {
       try {
         const productId = this.$route.params.productId;
@@ -106,11 +140,11 @@ export default {
         if (this.apiMode === "all") {
           res = await getTradeStatsGraph({ country: this.country }); // 메인페이지
         } else {
-          res = await getProductTradeAPI(productId); // 개별품목페이지
+          res = await getProductTradeAPI(productId, { country: this.country }); // 개별품목페이지
         }
 
         const prod = res.data || [];
-        const countryKey = this.country.toLowerCase();
+        const countryKey = this.selectedCountry.toLowerCase();
 
         // 값이 0인 데이터 필터링하기 (exportValue와 importValue 모두 0인 경우 제외)
         if (prod[countryKey] && prod[countryKey].length > 0) {
@@ -125,6 +159,9 @@ export default {
               (item.exportValue !== 0 || item.importValue !== 0) &&
               !skipList.includes(item.date)
           );
+          filteredData.sort((a, b) => {
+            return a.date.localeCompare(b.date);
+          });
           // 수출 데이터
           this.series[0].data = filteredData.map((item) => ({
             x: new Date(
@@ -166,6 +203,17 @@ export default {
 </script>
 
 <style scoped>
+.toggle-wrapper {
+  /* position: absolute; */
+  top: -50px;
+  right: 0;
+  z-index: 1;
+}
+
+.line-graph {
+  position: relative;
+  width: 100%;
+}
 #chart {
   width: -webkit-fill-available;
   margin: 0 auto;

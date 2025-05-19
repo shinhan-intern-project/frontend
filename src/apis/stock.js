@@ -33,18 +33,20 @@ export async function getStockChartAPI(
     console.error(error);
   }
 }
-export async function getStockNetworkAPI(stockId) {
+export async function getStockNetworkAPI(stockId, depth, degree) {
   try {
-    const response = await networkAPI.get(`/stock/${stockId}?depth=10`);
+    const response = await networkAPI.get(
+      `/stock/${stockId}?depth=${depth}&maxDegree=${degree}`
+    );
     return response.data;
   } catch (error) {
     console.error(error);
   }
 }
 
-export async function getAllNetworkAPI() {
+export async function getAllNetworkAPI(allDegree) {
   try {
-    const response = await networkAPI.get(`/all?maxDegree=3`);
+    const response = await networkAPI.get(`/all?maxDegree=${allDegree}`);
     return response.data;
   } catch (error) {
     console.error(error);

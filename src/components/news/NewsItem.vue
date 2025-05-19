@@ -42,7 +42,7 @@ export default {
     },
     badgeColor() {
       switch (this.news.tag) {
-        case "호제":
+        case "호재":
           return "badge-positive";
         case "악재":
           return "badge-negative";
@@ -66,6 +66,7 @@ export default {
 
 <style scoped>
 .news-item {
+  width: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -103,7 +104,7 @@ export default {
 }
 
 .news-item img {
-  width: 180px;
+  width: 100%;
   height: 120px;
   border-radius: 8px;
   object-fit: cover;     /* ✅ 이미지 비율 유지하며 꽉 채우기 */

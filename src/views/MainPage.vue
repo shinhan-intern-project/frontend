@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <div class="center-arrow">
+      <div class="center-arrow" @click="scrollToContent">
         <img
           src="@/assets/images/icons/arrow.png"
           alt="arrow"
@@ -80,7 +80,7 @@
       </div>
 
       <!-- 종목 거래량 / 수출입 통계 그래프  -->
-      <div class="layout">
+      <div class="layout" ref="statsSection">
         <div class="volume-section">
           <TopVolumeRanking
             :stocks="topStocks"
@@ -97,17 +97,6 @@
             :stats-items="exportStats"
             :is-loading="isExportStatsLoading"
           >
-            <!-- extra 슬롯에 토글 삽입 -->
-            <template #extra>
-              <ToggleSwitch
-                v-model="exportMarket"
-                :options="[
-                  { value: 'domestic', label: '국내' },
-                  { value: 'overseas', label: '미국' },
-                ]"
-                @change="handleExportMarketChange"
-              />
-            </template>
           </ExportImportStats>
 
           <!-- 무역 품목 최근 수출입량 -->
@@ -140,8 +129,7 @@
 
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
-import Globe from "globe.gl";
-import * as THREE from "three";
+
 import ToggleSwitch from "@/components/toggle/ToggleSwitch.vue";
 import BackgroundGlobe from "@/components/globe/BackgroundGlobe.vue";
 import StockSearchAndInfo from "@/components/search/StockSearchAndInfo.vue";
@@ -150,6 +138,7 @@ import ExportImportStats from "@/components/main/ExportImportStats.vue";
 import RecentTrades from "@/components/main/RecentTrades.vue";
 import { getSearchAPI, getTopStocksAPI } from "@/apis/stock";
 import NewsItem from "@/components/news/NewsItem.vue";
+import { getLatestNewsAPI } from "@/apis/news";
 import ProductSearchAndInfo from "@/components/search/ProductSearchAndInfo.vue";
 import { getSearchProductAPI, getSearchHsCodeAPI } from "@/apis/product";
 // import HsToggle from "@/components/toggle/HsToggle.vue";
@@ -185,7 +174,7 @@ export default {
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
-    let backgroundGlobe = null;
+    // let backgroundGlobe = null;
     fetchCountries();
     const activePoints = ref([
       { city: "서울", country: "한국", value: 3.2 },
@@ -200,116 +189,12 @@ export default {
         );
         const data = await res.json();
         countries.features = data.features;
-
-        initGlobe();
       } catch (error) {
         console.error("국가 데이터를 불러오는 데 실패했습니다:", error);
-        initGlobe();
-      }
-
-      window.addEventListener("resize", handleResize);
-    });
-
-    onBeforeUnmount(() => {
-      window.removeEventListener("resize", handleResize);
-      if (backgroundGlobe) {
-        backgroundGlobe._destructor && backgroundGlobe._destructor();
       }
     });
 
-    const initGlobe = () => {
-      if (backgroundGlobeContainer.value) {
-        backgroundGlobe = Globe()(backgroundGlobeContainer.value)
-          .backgroundColor("rgba(240, 248, 255, 0)")
-          .globeImageUrl(
-            "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-          )
-          .bumpImageUrl(
-            "//unpkg.com/three-globe/example/img/earth-topology.png"
-          )
-          .width(window.innerWidth * 0.5)
-          .height(window.innerHeight * 0.8)
-          .showGlobe(true)
-          .showAtmosphere(true)
-          .atmosphereColor("rgba(200, 219, 255, 0.3)")
-          .atmosphereAltitude(0.15)
-          .globeMaterial(
-            new THREE.MeshPhongMaterial({
-              color: 0xffffff,
-              transparent: true,
-              opacity: 0.9,
-              shininess: 0.2,
-              specular: 0x77bbff,
-            })
-          )
-          .pointsData([
-            { lat: 37.5665, lng: 126.978, value: 3.2, name: "서울" },
-            { lat: 35.6762, lng: 139.6503, value: 1.8, name: "도쿄" },
-            { lat: 40.7128, lng: -74.006, value: 2.5, name: "뉴욕" },
-            { lat: 1.3521, lng: 103.8198, value: 1.5, name: "싱가포르" },
-          ])
-          .pointColor((d) => {
-            const colors = {
-              서울: "rgba(25, 118, 210, 0.8)",
-              도쿄: "rgba(56, 142, 60, 0.8)",
-              뉴욕: "rgba(245, 124, 0, 0.8)",
-              싱가포르: "rgba(156, 39, 176, 0.8)",
-            };
-            return colors[d.name] || "rgba(255, 255, 255, 0.8)";
-          })
-          .pointRadius(0.4)
-          .pointAltitude(0.02)
-          .arcsData([
-            {
-              startLat: 37.5665,
-              startLng: 126.978,
-              endLat: 35.6762,
-              endLng: 139.6503,
-            },
-            {
-              startLat: 37.5665,
-              startLng: 126.978,
-              endLat: 40.7128,
-              endLng: -74.006,
-            },
-            {
-              startLat: 35.6762,
-              startLng: 139.6503,
-              endLat: 1.3521,
-              endLng: 103.8198,
-            },
-          ])
-          .arcColor(() => [
-            "rgba(0, 127, 255, 0.5)",
-            "rgba(44, 186, 0, 0.5)",
-            "rgba(255, 197, 0, 0.5)",
-          ])
-          .arcDashLength(0.4)
-          .arcDashGap(0.2)
-          .arcDashAnimateTime(1500)
-          .arcStroke(0.5);
-
-        backgroundGlobe.controls().autoRotate = true;
-        backgroundGlobe.controls().autoRotateSpeed = 0.3;
-        backgroundGlobe.controls().enableZoom = false;
-        backgroundGlobe.pointOfView({ lat: 25, lng: 120, altitude: 2.5 }, 1000);
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        backgroundGlobe.scene().add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-        directionalLight.position.set(1, 1, 1);
-        backgroundGlobe.scene().add(directionalLight);
-      }
-    };
-
-    const handleResize = () => {
-      if (backgroundGlobe) {
-        backgroundGlobe
-          .width(window.innerWidth * 0.4)
-          .height(window.innerHeight * 0.7);
-      }
-    };
+    onBeforeUnmount(() => {});
 
     return {
       backgroundGlobeContainer,
@@ -345,81 +230,49 @@ export default {
       selectedHSCode: null,
       topStocks: [],
 
-      newsItems: [
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 2,
-          tag: "악재",
-          tagColor: "#2D7AFF",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "경제 일보",
-          date: "5일 전",
-        },
-        {
-          id: 3,
-          tag: "중립",
-          tagColor: "#6B6F76",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "한국 경제",
-          date: "1주일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-        {
-          id: 1,
-          tag: "호재",
-          tagColor: "#E5484D",
-          url: "https://google.com",
-          title:
-            "신한투자증권, 금융 IT 인재 키운다 '프로디지털아카데미' 6기 모집",
-          publisher: "조선 미디어",
-          date: "3일 전",
-        },
-      ],
+      newsItems: [],
     };
   },
   methods: {
+    getTagColor(sentiment) {
+      switch (sentiment) {
+        case "호재":
+          return "#E5484D";
+        case "악재":
+          return "#3D8BFF";
+        case "중립":
+        default:
+          return "#A5A5A5";
+      }
+    },
+    formatDate(datetime) {
+      if (!datetime || datetime.length < 8) return datetime;
+
+      const year = datetime.slice(0, 4);
+      const month = datetime.slice(4, 6);
+      const day = datetime.slice(6, 8);
+
+      return `${year}-${month}-${day}`;
+    },
+    async fetchLatestNews() {
+      try {
+        const res = await getLatestNewsAPI();
+        const newsList = res.data;
+        this.newsItems = newsList.map((news) => ({
+          id: news.newsId,
+          tag: news.sentiment,
+          tagColor: this.getTagColor(news.sentiment),
+          image: news.imageOriginLink,
+          url: news.newsOriginLink || "#",
+          title: news.title,
+          publisher: news.officeName,
+          date: this.formatDate(news.datetime),
+        }));
+      } catch (e) {
+        console.error("뉴스 가져오기 실패:", e);
+      }
+    },
+
     handleExportMarketChange(val) {
       this.exportCountryCode = val === "domestic" ? "KR" : "US";
       console.log("바뀐 국가 코드 →", this.exportCountryCode);
@@ -445,6 +298,7 @@ export default {
         );
         if (responseData && responseData.status === "OK") {
           this.productItems = responseData.data;
+          console.log(this.productItems);
         } else {
           console.error(
             "품목 API 응답 형식이 올바르지 않습니다.",
@@ -581,6 +435,7 @@ export default {
                 name: product.hscodeName,
                 code: product.hscode,
                 stockName: stock.name,
+                hscodeId: product.hscodeId,
               });
             }
           });
@@ -651,10 +506,18 @@ export default {
       this.selectedHSCode = hsCode;
       this.selectedHSCodeIndex = index;
     },
+
+    // 화살표 누르면 Content로 이동
+    scrollToContent() {
+      const el = this.$refs.statsSection;
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth" });
+    },
   },
   mounted() {
     // 초기 데이터 로드
     this.loadInitialData();
+    this.fetchLatestNews();
   },
 };
 </script>
@@ -681,7 +544,7 @@ export default {
 .stock-app {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 20px 60px;
   color: #333;
   position: relative;
 }
@@ -708,7 +571,7 @@ export default {
 .export-stats-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /* gap: 20px; */
 }
 
 .recent-trades-wrapper {
@@ -766,6 +629,21 @@ html body {
   margin: 20px 0;
   font-size: 24px;
   color: #888;
+}
+
+.center-arrow img {
+  cursor: pointer;
+  animation: arrow-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes arrow-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
 }
 
 /* 종목 거래량 섹션 스타일 */
@@ -927,6 +805,7 @@ html body {
   padding: 48px;
   box-sizing: border-box;
   margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .detail-layout-content-item .header {
