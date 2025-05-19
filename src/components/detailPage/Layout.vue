@@ -331,13 +331,17 @@
             <span class="header">관련 뉴스</span>
 
             <template v-if="relatedNews?.length">
-              <div class="news-container">
-                <NewsItem
-                  :isBadge="true"
-                  v-for="news in relatedNews"
-                  :key="news.id"
-                  :news="news"
-                />
+              <div class="news-wrapper">
+                <button class="scroll-btn left"  @click="scrollPrev">‹</button>
+                <div class="news-container" ref="newsContainer">
+                  <NewsItem
+                    :isBadge="true"
+                    v-for="news in relatedNews"
+                    :key="news.id"
+                    :news="news"
+                  />
+                </div>
+                <button class="scroll-btn right" @click="scrollNext">›</button>
               </div>
             </template>
 
@@ -426,6 +430,17 @@ export default {
     };
   },
   methods: {
+    scrollNext() {
+      const container = this.$refs.newsContainer
+      if (!container) return
+      container.scrollBy({ left: container.clientWidth, behavior: 'smooth' })
+    },
+    scrollPrev() {
+      const container = this.$refs.newsContainer
+      if (!container) return
+      container.scrollBy({ left: -container.clientWidth, behavior: 'smooth' })
+    },
+
     scrollToSection(idx) {
       const el = this.$refs[`section${idx}`];
       if (!el) return;
@@ -829,6 +844,7 @@ export default {
 /* 관련 뉴스 */
 .news-container {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   margin-top: 24px;
   gap: 20px;
@@ -919,4 +935,39 @@ export default {
 .network-graph-wrapper {
   margin-top: 28px;
 }
+
+/* 1) wrapper 포지션 설정 */
+.news-wrapper {
+  position: relative;
+}
+
+/* 2) 화살표 버튼 공통 스타일 */
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(255,255,255,0.8);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 3) 좌/우 위치 */
+.scroll-btn.left  { left: 8px;  }
+.scroll-btn.right { right: 8px; }
+
+.news-wrapper:hover .scroll-btn {
+  /* hover 시에만 나타내고 싶다면 */
+  opacity: 1;
+}
+.scroll-btn { opacity: 0; transition: opacity .2s; }
 </style>
