@@ -1,7 +1,7 @@
 <template>
   <div class="volume-ranking">
     <div class="header-section">
-      <h2>종목 등락률 Top 10</h2>
+      <h2>종목 등락률 Top 20</h2>
 
       <ToggleSwitch
         v-model="marketType"
@@ -160,13 +160,32 @@ export default {
 <style scoped>
 .volume-ranking {
   box-shadow: 0px 4px 20px #cfdef1 !important;
-
+  height: 837px;
   background-color: #f9fafb;
   border-radius: 16px;
   overflow: hidden;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+/* 스크롤바 스타일링*/
+.volume-table::-webkit-scrollbar {
+  width: 8px;
 }
 
+.volume-table::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.volume-table::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.volume-table::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
 .header-section {
   display: flex;
   flex-direction: row;
@@ -174,6 +193,7 @@ export default {
   align-items: center;
   margin-bottom: 0;
   padding: 20px 20px 15px 20px;
+  flex-shrink: 0;
 }
 
 .header-section h2 {
@@ -202,6 +222,7 @@ export default {
   font-size: 13px;
   border-bottom: 1px solid #f1f3f5;
   margin-top: 0;
+  flex-shrink: 0;
 }
 
 .col-header {
@@ -227,7 +248,8 @@ export default {
 }
 
 .volume-table {
-  overflow: hidden;
+  overflow: auto;
+  flex-grow: 1;
 }
 
 .volume-item {

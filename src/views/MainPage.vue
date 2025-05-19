@@ -562,7 +562,7 @@ export default {
 .export-stats-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /* gap: 20px; */
 }
 
 .recent-trades-wrapper {

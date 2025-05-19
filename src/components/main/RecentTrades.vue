@@ -225,6 +225,7 @@ export default {
 
 <style scoped>
 .recent-trades {
+  height: 350px;
   background-color: white;
   border-radius: 16px;
   overflow: hidden;
@@ -235,6 +236,8 @@ export default {
   box-shadow: 0px 4px 20px #cfdef1;
   margin-top: 20px;
   box-sizing: border-box;
+  flex-direction: column;
+  display: flex;
 }
 .toggle-container {
   margin-left: 145px;
@@ -275,6 +278,9 @@ export default {
 
 .trades-table {
   overflow: hidden;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .trades-header {
@@ -297,14 +303,13 @@ export default {
 }
 
 .trades-items {
-  overflow: hidden;
-  max-height: 400px;
   overflow-y: auto;
+  flex-grow: 1; /* 남은 공간을 모두 차지 */
 }
 
 .trade-item {
   display: flex;
-  height: 40px;
+  /* height: 30px; */
   padding: 14px 15px;
   align-items: center;
   background-color: white;
