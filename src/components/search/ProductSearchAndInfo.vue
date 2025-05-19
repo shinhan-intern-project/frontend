@@ -34,11 +34,44 @@
               <div class="header-right"></div>
             </div>
 
+
+        <!-- 오른쪽: 관련 종목 -->
+        <div class="related-stocks-list">
+          <div v-if="!hasRelatedStocks && !isLoading" class="no-related-stocks">
+            <span>관련 종목이 없습니다</span>
+          </div>
+          <div v-else-if="selectedProductIndex === -1 && hasRelatedStocks">
+            <div
+              v-for="(item, itemIdx) in productItemsWithStocks"
+              :key="`item-${itemIdx}`"
+              class="related-stock-group"
+            >
+              <div
+                v-for="(stock, stockIdx) in item.relatedStocks"
+                :key="`stock-${itemIdx}-${stockIdx}`"
+                class="related-stock"
+                @click="goToStockPage(stock)"
+                style="cursor: pointer"
+              >
+                <div class="related-stock-header">
+                  <img
+                    class="related-stock-logo"
+                    :src="`https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fpng-icons%2Fsecurities%2Ficn-sec-fill-${stock.ticker}.png`"
+                    alt="종목 아이콘"
+                    @error="
+                      (e) =>
+                        (e.target.src =
+                          'https://thumb.tossinvest.com/image/resized/96x0/https%3A%2F%2Fstatic.toss.im%2Fassets%2Ficon%2Fsecurities%2Ficn-isic-454010.png')
+                    "
+                  />
+                  <div class="related-stock-name">{{ stock.companyName }}</div>
+
             <div class="product-info-content">
               <!-- 왼쪽: 품목 리스트 -->
               <div class="product-list">
                 <div v-if="productItems.length === 0" class="no-results">
                   <span>검색 결과가 없습니다</span>
+
                 </div>
                 <div
                   v-else
@@ -247,6 +280,10 @@ export default {
         name: "product",
         params: { productId: product.hsCodeId },
       });
+    },
+
+    goToStockPage(item) {
+      this.$router.push({ name: "stock", params: { stockId: item.stockId } });
     },
     onClickOutside(event) {
       // 검색창 영역이나 결과 패널 내부를 클릭한 게 아니면 닫기
