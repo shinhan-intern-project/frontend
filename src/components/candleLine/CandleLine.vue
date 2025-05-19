@@ -80,6 +80,9 @@ export default {
           // },
         },
         plotOptions: {
+          line: {
+            connectNulls: false
+          },
           candlestick: {
             colors: {
               upward: "#E74142",
@@ -181,30 +184,42 @@ export default {
 
         relatedProducts.forEach((prod) => {
           const countryData = prod[this.selectedCountry] || [];
+          let exportSeries = countryData.map((item) => ({
+            x: new Date(
+              item.date.slice(0, 4),
+              item.date.slice(4, 6) - 1
+            ).getTime(),
+            y: item.exportValue
+          }));
+          if (exportSeries.length) {
+            exportSeries.unshift({ x: exportSeries[0].x, y: null })
+            exportSeries.push({ x: exportSeries[exportSeries.length-1].x, y: null })
+          }
 
           this.series.push({
             name: `${prod.hscode}번 품목 - 수출`,
             type: "line",
-            data: countryData.map((item) => ({
-              x: new Date(
-                +item.date.slice(0, 4),
-                +item.date.slice(4, 6) - 1
-              ).getTime(),
-              y: item.exportValue,
-            })),
+            data: exportSeries, 
             yAxisIndex: 1,
           });
+
+          // 동일하게 import
+          let importSeries = countryData.map((item) => ({
+            x: new Date(
+              item.date.slice(0, 4),
+              item.date.slice(4, 6) - 1
+            ).getTime(),
+            y: item.importValue
+          }));
+          if (importSeries.length) {
+            importSeries.unshift({ x: importSeries[0].x, y: null });
+            importSeries.push({ x: importSeries[importSeries.length-1].x, y: null });
+          }
 
           this.series.push({
             name: `${prod.hscode}번 품목 - 수입`,
             type: "line",
-            data: countryData.map((item) => ({
-              x: new Date(
-                +item.date.slice(0, 4),
-                +item.date.slice(4, 6) - 1
-              ).getTime(),
-              y: item.importValue,
-            })),
+            data: importSeries,
             yAxisIndex: 1,
           });
         });
