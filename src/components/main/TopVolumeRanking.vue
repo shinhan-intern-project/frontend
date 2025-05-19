@@ -1,7 +1,7 @@
 <template>
   <div class="volume-ranking">
     <div class="header-section">
-      <h2>종목 등락률 Top 20</h2>
+      <h2>종목 상승률 Top 20</h2>
 
       <ToggleSwitch
         v-model="marketType"

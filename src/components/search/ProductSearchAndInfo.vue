@@ -554,21 +554,6 @@ export default {
   margin-top: 3px;
 }
 
-/* 로딩 인디케이터 */
-.loading-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  flex: 1;
-
-  background-color: white;
-  border-radius: 10px;
-  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
-  margin-bottom: 30px;
-  color: #888;
-}
-
 /* 품목 정보 카드 스타일 */
 .product-info-card {
   min-height: 447px;
