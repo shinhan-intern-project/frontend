@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     imageSrc() {
-      return (this.news.image && this.news.image.trim() !== " ") ? this.news.image : defaultNewsImage;
+      return (this.news.image && this.news.image.trim() !== "") ? this.news.image : defaultNewsImage;
     },
 
     badgeColor() {
