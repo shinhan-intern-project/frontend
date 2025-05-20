@@ -77,7 +77,9 @@
                     >
                       {{
                         stockInfo?.changeRate != null
-                          ? Number(stockInfo.changeRate).toFixed(2)
+                          ? stockInfo?.marketType === "NASDAQ"
+                            ? Number(stockInfo.changeRate).toFixed(2)
+                            : (Number(stockInfo.changeRate) * 100).toFixed(2)
                           : "0.00"
                       }}%
                     </span>
