@@ -945,12 +945,31 @@ html body {
 }
 
 @media only screen and (max-width: 375px) {
-  :deep(.recent-trades-wrapper) {
-    padding: 10px 0 !important;
-    overflow-x: hidden !important;
-    transform: scale(0.8);
-    transform-origin: top center;
+  .recent-trades-wrapper {
+    width: 100% !important;
+    padding: 0 8px !important;
+    box-sizing: border-box;
+  }
+
+  ::v-deep .trades-table {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  ::v-deep .trades-header,
+  ::v-deep .trade-item {
+    display: flex !important;
+    font-size: 12px !important;
+    padding: 6px 4px !important;
+  }
+
+  ::v-deep .header-item {
+    flex: 1 !important;
+  }
+  ::v-deep .header-product {
+    flex: 2 !important; 
   }
 }
+
 
 </style>
