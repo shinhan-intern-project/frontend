@@ -426,6 +426,46 @@ nav {
 .custom-search-container .search-button img {
   height: 24px;
 }
+
+/* 992px 이하 (태블릿) */
+@media (max-width: 992px) {
+  .custom-search-container {
+    display: flex; /* flex 기본 유지 */
+    flex-direction: column; /* 컬럼 모드로 변경 */
+    gap: 8px; /* 아이템 간격 */
+  }
+
+  /* 토글을 최상단에 */
+  .search-type-toggle {
+    order: 0; /* 맨 위 */
+    margin-bottom: 8px; /* 아래 여백 */
+  }
+
+  /* 검색 컴포넌트들은 토글 다음에 */
+  .stock-search-and-info,
+  .product-search-and-info {
+    order: 1;
+  }
+}
+
+/* 768px 이하 (작은 태블릿 / 큰 폰) */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .logo {
+    margin: 0 auto 8px;
+  }
+  .search-type-toggle {
+    margin: 8px 0;
+  }
+  .custom-search-container {
+    flex-direction: row;
+    gap: 8px;
+  }
+}
+
 @media (max-width: 576px) {
   :deep(.search-container.is-detail-page) {
     width: 100% !important;
