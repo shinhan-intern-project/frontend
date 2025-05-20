@@ -299,4 +299,11 @@ export default {
   gap: 3px 40px;
   justify-content: start;
 }
+
+/* 캔들차트 반응형 */
+@media (max-width: 576px) {
+  .chart-controls {
+    flex-wrap: wrap;
+  }
+}
 </style>
