@@ -57,17 +57,6 @@
             :get-change-class="getChangeClass"
           />
         </div>
-        <div v-else>
-          <!-- HS 코드 검색-->
-          <HSCodeSearchAndInfo
-            :is-loading="isHSCodeLoading"
-            :hscode-items="hscodeItems"
-            :selected-hscode-index="selectedHSCodeIndex"
-            :search-keyword="hscodeSearchKeyword"
-            @search="handleHSCodeSearch"
-            @select-hscode="selectHSCode"
-          />
-        </div>
       </div>
 
       <div class="center-arrow" @click="scrollToContent">
@@ -152,7 +141,7 @@ import { getLatestNewsAPI } from "@/apis/news";
 import ProductSearchAndInfo from "@/components/search/ProductSearchAndInfo.vue";
 import { getSearchProductAPI, getSearchHsCodeAPI } from "@/apis/product";
 // import HsToggle from "@/components/toggle/HsToggle.vue";
-import HSCodeSearchAndInfo from "@/components/search/HSCodeSearchAndInfo.vue";
+// import HSCodeSearchAndInfo from "@/components/search/HSCodeSearchAndInfo.vue";
 const countries = {
   features: [],
 };
@@ -180,7 +169,7 @@ export default {
     RecentTrades,
     NewsItem,
     ProductSearchAndInfo,
-    HSCodeSearchAndInfo,
+    // HSCodeSearchAndInfo,
   },
   setup() {
     const backgroundGlobeContainer = ref(null);
