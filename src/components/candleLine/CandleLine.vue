@@ -305,5 +305,16 @@ export default {
   .chart-controls {
     flex-wrap: wrap;
   }
+
+  #chart {
+    width: 100%;
+    height: 300px !important;
+  }
+
+  ::v-deep .apexcharts-legend,
+  ::v-deep .apexcharts-toolbar,
+  ::v-deep .apexcharts-yaxis-title {
+    display: none !important;
+  }
 }
 </style>
