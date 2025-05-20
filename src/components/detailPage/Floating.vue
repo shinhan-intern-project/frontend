@@ -85,11 +85,3 @@ export default {
   color: #000c37;
 }
 </style>
-
-<style>
-@media (max-width: 576px) {
-  :deep .floating-container {
-    display: none !important;
-  }
-}
-</style>
