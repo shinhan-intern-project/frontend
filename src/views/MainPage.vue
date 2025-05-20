@@ -901,14 +901,7 @@ html body {
 
 @media (max-width: 576px) {
   .background-globe-container {
-    position: fixed;
-    top: 0;
-    /* 왼쪽을 0, 오른쪽은 auto로 바꿔서 */
-    left: 0;
-    right: auto;
-    width: 100vw; /* 뷰포트 너비만큼 */
-    height: 100vh; /* 뷰포트 높이만큼 */
-    transform: none;
+    display: none;
   }
   .toggle-container {
     margin-left: 10px;
