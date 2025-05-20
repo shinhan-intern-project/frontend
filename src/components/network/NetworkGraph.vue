@@ -90,7 +90,7 @@
           <div class="tooltip-wrapper">
             <img src="@/assets/images/icons/alert.png" alt="툴팁" />
 
-            <div class="tooltip">
+            <div class="tooltip" :class="{ 'all-mode': isAll }">
               <span class="title">차수(Degree)</span> <br />
               노드가 연결된 개수입니다. <br />
               노드는 <span class="red">국내 종목(빨강)</span>,
@@ -694,6 +694,9 @@ export default {
 
   input[type="range"] {
     width: 100%;
+  }
+  .tooltip.all-mode {
+    left: -260px;
   }
 }
 </style>

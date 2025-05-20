@@ -1305,6 +1305,10 @@ export default {
   .relation {
     justify-content: center;
   }
+  .product-header {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
 @media (max-width: 768px) {
