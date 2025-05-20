@@ -699,4 +699,24 @@ export default {
     left: -260px;
   }
 }
+
+@media (max-width: 692px) {
+  .network-tool-color-circle {
+    width: 12px;
+    height: 12px;
+  }
+
+  .network-tool-color-item-col:last-child
+    .network-tool-color-item:nth-child(2)
+    .network-tool-color-circle {
+    width: 8px;
+    height: 8px;
+  }
+
+  .network-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
 </style>
