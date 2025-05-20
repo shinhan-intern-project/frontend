@@ -136,6 +136,8 @@
                         v-for="(stock, stockIdx) in item.relatedStocks"
                         :key="`stock-${itemIdx}-${stockIdx}`"
                         class="related-stock"
+                        @click="goToStockPage(stock)"
+                        style="cursor: pointer"
                       >
                         <div class="related-stock-header">
                           <img
@@ -183,6 +185,8 @@
                         v-for="(stock, idx) in selectedProduct.relatedStocks"
                         :key="idx"
                         class="related-stock"
+                        @click="goToStockPage(stock)"
+                        style="cursor: pointer"
                       >
                         <div class="related-stock-header">
                           <img
@@ -722,7 +726,6 @@ export default {
   position: absolute;
   top: 0px;
   width: 100%;
-
   right: 0px;
 }
 </style>
