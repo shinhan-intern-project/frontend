@@ -943,4 +943,14 @@ html body {
     padding: 0;
   }
 }
+
+@media only screen and (max-width: 375px) {
+  :deep(.recent-trades-wrapper) {
+    padding: 10px 0 !important;
+    overflow-x: hidden !important;
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+}
+
 </style>
