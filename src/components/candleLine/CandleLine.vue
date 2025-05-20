@@ -81,7 +81,7 @@ export default {
         },
         plotOptions: {
           line: {
-            connectNulls: false
+            connectNulls: false,
           },
           candlestick: {
             colors: {
@@ -94,8 +94,8 @@ export default {
             barWidth: 150,
           },
         },
-         stroke: {
-          curve: "smooth",     
+        stroke: {
+          curve: "smooth",
           width: [1],
           connectNulls: false,
         },
@@ -186,38 +186,49 @@ export default {
 
         relatedProducts.forEach((prod) => {
           const countryData = prod[this.selectedCountry] || [];
-          let exportSeries = countryData.map((item) => ({
+          // 1) YYYYMM 문자열 기준으로 오름차순 정렬
+          const sorted = [...countryData].sort((a, b) =>
+            a.date.localeCompare(b.date)
+          );
+
+          // 공통으로 쓸 x 간격
+          const oneMonth = 1000 * 60 * 60 * 24 * 30;
+
+          // 2) exportSeries (수출)
+          const exportSeries = sorted.map((item) => ({
             x: new Date(
               item.date.slice(0, 4),
               item.date.slice(4, 6) - 1
             ).getTime(),
-            y: item.exportValue
+            y: item.exportValue,
           }));
           if (exportSeries.length) {
-            exportSeries.unshift({ x: exportSeries[0].x, y: null });
-            exportSeries.push({ x: exportSeries[exportSeries.length-1].x, y: null });
+            const firstX = exportSeries[0].x;
+            const lastX = exportSeries[exportSeries.length - 1].x;
+            exportSeries.unshift({ x: firstX - oneMonth, y: null });
+            exportSeries.push({ x: lastX + oneMonth, y: null });
           }
-
           this.series.push({
             name: `${prod.hscode}번 품목 - 수출`,
             type: "line",
-            data: exportSeries, 
+            data: exportSeries,
             yAxisIndex: 1,
           });
 
-          // 동일하게 import
-          let importSeries = countryData.map((item) => ({
+          // 3) importSeries (수입)
+          const importSeries = sorted.map((item) => ({
             x: new Date(
               item.date.slice(0, 4),
               item.date.slice(4, 6) - 1
             ).getTime(),
-            y: item.importValue
+            y: item.importValue,
           }));
           if (importSeries.length) {
-            importSeries.unshift({ x: importSeries[0].x, y: null });
-            importSeries.push({ x: importSeries[importSeries.length-1].x, y: null });
+            const firstX = importSeries[0].x;
+            const lastX = importSeries[importSeries.length - 1].x;
+            importSeries.unshift({ x: firstX - oneMonth, y: null });
+            importSeries.push({ x: lastX + oneMonth, y: null });
           }
-
           this.series.push({
             name: `${prod.hscode}번 품목 - 수입`,
             type: "line",
