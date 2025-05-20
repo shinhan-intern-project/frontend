@@ -120,15 +120,19 @@
                       <div class="related-stock-code">
                         {{ stock.ticker }} |
                         {{
-                          (console.log(stock),
+                          (console.log("stock"),
                           stock.marketType == "NASDAQ"
-                            ? stock.currentPrice
-                            : Math.floor(stock.currentPrice))
+                            ? stock.currentPrice.toLocaleString()
+                            : Math.floor(stock.currentPrice)).toLocaleString()
                         }}
                         {{ stock.marketType === "NASDAQ" ? "USD" : "원" }}
                         |
                         <span :class="getChangeClass(stock.changeRate)">
-                          {{ displayChangeRate(stock.changeRate) }}
+                          {{
+                            stock.marketType == "NASDAQ"
+                              ? displayChangeRate(stock.changeRate)
+                              : displayChangeRate(stock.changeRate * 100)
+                          }}
                         </span>
                         |
                         {{ stock.relationType === "EXPORT" ? "수출" : "수입" }}
@@ -169,7 +173,11 @@
                         {{ stock.ticker }} |
                         {{ formatPrice(stock.currentPrice) }}원 |
                         <span :class="getChangeClass(stock.changeRate)">
-                          {{ displayChangeRate(stock.changeRate) }}
+                          {{
+                            stock.marketType == "NASDAQ"
+                              ? displayChangeRate(stock.changeRate)
+                              : displayChangeRate(stock.changeRate * 100)
+                          }}
                         </span>
                         |
                         {{ stock.relationType === "EXPORT" ? "수출" : "수입" }}
