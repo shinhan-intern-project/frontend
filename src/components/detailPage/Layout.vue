@@ -67,13 +67,20 @@
                     </span>
                   </div>
                   <div>
-                    <span class="per">
+                    <span
+                      class="per"
+                      :class="{
+                        'positive-change': Number(stockInfo.changeRate) > 0,
+                        'negative-change': Number(stockInfo.changeRate) < 0,
+                        'zero-change': Number(stockInfo.changeRate) === 0,
+                      }"
+                    >
                       {{
                         stockInfo?.changeRate != null
                           ? Number(stockInfo.changeRate).toFixed(2)
                           : "0.00"
-                      }}%</span
-                    >
+                      }}%
+                    </span>
                   </div>
                 </div>
               </div>
@@ -876,12 +883,23 @@ export default {
   font-weight: 700;
 }
 
-.detail-layout-content-item .info-right .per {
-  color: #2d7aff;
+.detail-layout-content-item .info-right .positive-change {
+  color: #ff3b2f;
   font-size: 20px;
   font-weight: 700;
 }
 
+.detail-layout-content-item .info-right .negative-change {
+  color: #007aff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.detail-layout-content-item .info-right .zero-change {
+  color: #ababab;
+  font-size: 20px;
+  font-weight: 700;
+}
 /* 주식 개요 - 회사 설명 */
 .detail-layout-content-item .content {
   margin: 40px 0px;
