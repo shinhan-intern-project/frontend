@@ -81,8 +81,8 @@
                     <div class="current-price">
                       {{
                         item.marketType == "NASDAQ"
-                          ? item.price
-                          : Math.floor(item.price)
+                          ? $addComma(item.price)
+                          : $addComma(Math.floor(item.price))
                       }}
                       {{ item.marketType === "NASDAQ" ? "USD" : "원" }}
                     </div>
