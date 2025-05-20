@@ -142,4 +142,50 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
   align-items: flex-start;
 }
+
+@media (max-width: 576px) {
+  .background-globe-container {
+    position: fixed;
+    top: 0;
+    /* 왼쪽을 0, 오른쪽은 auto로 바꿔서 */
+    left: 0;
+    right: auto;
+    width: 100vw; /* 뷰포트 너비만큼 */
+    height: 100vh; /* 뷰포트 높이만큼 */
+    transform: none;
+  }
+  .toggle-container {
+    margin-left: 10px;
+  }
+
+  .recent-trades-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .recent-trades table {
+    min-width: 100%;
+  }
+  .recent-trades td,
+  .recent-trades th {
+    padding: 6px 4px;
+    font-size: 14px;
+  }
+  .recent-trades td:first-child {
+    width: 35%;
+  }
+  .company-details-small {
+    display: none;
+  }
+
+  .item-volume {
+    display: none;
+  }
+
+  .statistics-table {
+    font-size: 12px;
+  }
+  .export-stats-section {
+    padding: 0;
+  }
+}
 </style>
