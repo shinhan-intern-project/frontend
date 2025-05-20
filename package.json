@@ -16,6 +16,7 @@
     "github-markdown-css": "^5.8.1",
     "globe.gl": "^2.41.4",
     "markdown-it": "^14.1.0",
+    "swiper": "^11.2.7",
     "v-network-graph": "^0.9.21",
     "vue": "^3.2.13",
     "vue-router": "^4.5.1",

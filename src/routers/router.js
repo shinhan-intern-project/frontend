@@ -1,3 +1,4 @@
+import LandingPage from "@/views/LandingPage.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 // 페이지 컴포넌트 - 상대 경로 사용
@@ -8,6 +9,12 @@ const ErrorPage = () => import("../views/ErrorPage.vue");
 
 // 라우트 정의
 const routes = [
+  {
+    path: "/landing",
+    name: "landing",
+    component: LandingPage,
+
+  },
   {
     path: "/",
     name: "main",
