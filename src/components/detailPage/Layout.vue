@@ -167,43 +167,48 @@
           <!-- 개별 품목 페이지인 경우 -->
 
           <div class="detail-layout-content-item" ref="section1">
-            <div class="network-tool-description">
-              <span class="header">네트워크 그래프</span>
+            <div
+              class="detail-layout-content-item network-section"
+              ref="section1"
+            >
+              <div class="network-tool-description">
+                <span class="header">네트워크 그래프</span>
 
-              <div class="tooltip-wrapper">
-                <img src="@/assets/images/icons/alert.png" alt="툴팁" />
+                <div class="tooltip-wrapper">
+                  <img src="@/assets/images/icons/alert.png" alt="툴팁" />
 
-                <div class="tooltip">
-                  <span class="title">차수(Degree)</span> <br />
-                  노드가 연결된 개수입니다. <br />
-                  노드는 <span class="red">국내 종목(빨강)</span>,
-                  <span class="green">해외 종목(초록)</span>,
-                  <span class="blue">품목(파랑)</span>으로 구성돼요.
-                  <br />
-                  ex) 한 종목이 3개 품목과 연결되면 차수는 3입니다.
-                  <br />
-                  <br />
-                  <span class="title">깊이(Depth)</span> <br />
-                  중심 노드에서 <b>몇 단계 떨어져 있는지</b>를 나타냅니다.
-                  <br />
-                  ex) 중심에서 바로 연결되면 깊이 1, 그 다음은 깊이 2입니다.
-                  <br /><br />
+                  <div class="tooltip">
+                    <span class="title">차수(Degree)</span> <br />
+                    노드가 연결된 개수입니다. <br />
+                    노드는 <span class="red">국내 종목(빨강)</span>,
+                    <span class="green">해외 종목(초록)</span>,
+                    <span class="blue">품목(파랑)</span>으로 구성돼요.
+                    <br />
+                    ex) 한 종목이 3개 품목과 연결되면 차수는 3입니다.
+                    <br />
+                    <br />
+                    <span class="title">깊이(Depth)</span> <br />
+                    중심 노드에서 <b>몇 단계 떨어져 있는지</b>를 나타냅니다.
+                    <br />
+                    ex) 중심에서 바로 연결되면 깊이 1, 그 다음은 깊이 2입니다.
+                    <br /><br />
 
-                  <span class="title">노드 연결 기준</span><br />
-                  ChatGPT를 활용해 종목별 수출입 관련 품목을<b> 최대 3개</b>까지
-                  찾아 연결했습니다. <br />
-                  ex) A기업이 B품목을 수출하면 A와 B 노드가 선으로 연결됩니다.
+                    <span class="title">노드 연결 기준</span><br />
+                    ChatGPT를 활용해 종목별 수출입 관련 품목을<b> 최대 3개</b
+                    >까지 찾아 연결했습니다. <br />
+                    ex) A기업이 B품목을 수출하면 A와 B 노드가 선으로 연결됩니다.
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 임시 -->
-            <div class="network-graph-wrapper">
-              <NetworkGraph
-                :stockId="stockId"
-                :productId="productId"
-                :type="type"
-              />
+              <!-- 임시 -->
+              <div class="network-graph-wrapper">
+                <NetworkGraph
+                  :stockId="stockId"
+                  :productId="productId"
+                  :type="type"
+                />
+              </div>
             </div>
           </div>
           <div class="detail-layout-content-item" ref="section2">
@@ -1371,6 +1376,28 @@ export default {
 }
 
 @media (max-width: 576px) {
+  .tooltip {
+    position: absolute;
+    top: 32px;
+    left: -45px;
+    /* transform: translateX(-50%); */
+    background: #fff;
+    color: #665b5b;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 24px 20px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    display: none;
+    z-index: 10;
+    width: 360px;
+    height: 310px;
+  }
+  .network-tool-description {
+    flex-direction: column; /* row → column */
+    align-items: flex-start; /* 왼쪽 정렬 유지 */
+  }
   .header-controls {
     flex-direction: column;
     align-items: stretch;
