@@ -146,9 +146,10 @@ export default {
                 item.marketType === "NASDAQ"
                   ? parseFloat(item.currentPrice)
                   : parseInt(item.currentPrice, 10),
-              changePercent: `${(parseFloat(item.changeRate) * 100).toFixed(
-                1
-              )}%`,
+              changePercent:
+                item.marketType === "NASDAQ"
+                  ? parseFloat(item.changeRate) / 100
+                  : parseFloat(item.changeRate, 10),
               stockId: item.stockId,
               marketType: item.marketType,
             }));

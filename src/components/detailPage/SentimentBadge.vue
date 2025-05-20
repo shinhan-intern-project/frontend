@@ -124,4 +124,9 @@ export default {
   color: #9f9f9f;
   font-weight: 700;
 }
+@media (max-width: 576px) {
+  .badge {
+    margin-bottom: 16px;
+  }
+}
 </style>

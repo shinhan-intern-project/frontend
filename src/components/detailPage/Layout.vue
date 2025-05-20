@@ -1360,6 +1360,7 @@ export default {
   }
   .detail-layout-content-item {
     padding: 16px;
+    margin-top: 40px;
   }
   .news-container > * {
     flex: 0 0 180px;
@@ -1373,6 +1374,10 @@ export default {
   .relation-stocks-title {
     font-size: 13px;
     padding: 6px 14px;
+  }
+
+  :deep .floating-container {
+    display: none !important;
   }
 }
 </style>

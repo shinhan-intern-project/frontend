@@ -102,7 +102,7 @@
 
       <!-- 뉴스 섹션 -->
       <div class="detail-layout-content-item" ref="section4">
-        <span class="header">무역 관련 뉴스</span>
+        <span class="header">최근 뉴스</span>
         <template v-if="newsItems.length">
           <div class="news-wrapper">
             <button class="scroll-btn left" @click="scrollPrev">‹</button>
@@ -475,7 +475,6 @@ export default {
             name: product.hscodeName,
             code: product.hscode,
             stockName: stock.name,
-            hscodeId:  product.hscodeId
           }));
       } else {
         this.relatedItems = [];
@@ -932,33 +931,4 @@ html body {
     padding: 0;
   }
 }
-
-@media only screen and (max-width: 375px) {
-  .recent-trades-wrapper {
-    width: 100% !important;
-    padding: 0 8px !important;
-    box-sizing: border-box;
-  }
-
-  ::v-deep .trades-table {
-    width: 100% !important;
-    overflow: hidden !important;
-  }
-
-  ::v-deep .trades-header,
-  ::v-deep .trade-item {
-    display: flex !important;
-    font-size: 12px !important;
-    padding: 6px 4px !important;
-  }
-
-  ::v-deep .header-item {
-    flex: 1 !important;
-  }
-  ::v-deep .header-product {
-    flex: 2 !important; 
-  }
-}
-
-
 </style>
