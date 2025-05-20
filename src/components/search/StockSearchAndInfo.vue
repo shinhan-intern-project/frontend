@@ -75,14 +75,12 @@
                       <span class="company-code">{{ item.code }}</span>
                     </div>
                   </div>
-                  <!-- 관련 품목 보기 버튼 추가 -->
-
                   <div class="price-info">
                     <div class="current-price">
                       {{
                         item.marketType == "NASDAQ"
-                          ? item.price
-                          : Math.floor(item.price)
+                          ? item.price.toLocaleString()
+                          : Math.floor(item.price).toLocaleString()
                       }}
                       {{ item.marketType === "NASDAQ" ? "USD" : "원" }}
                     </div>
