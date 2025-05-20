@@ -96,7 +96,15 @@
                         'negative-change': parseFloat(item.changePercent) < 0,
                       }"
                     >
-                      {{ item.changePercent }}
+                      {{
+                        item.marketType === "NASDAQ"
+                          ? (parseFloat(item.changePercent) / 100 > 0
+                              ? "+"
+                              : "") +
+                            (parseFloat(item.changePercent) / 100).toFixed(2) +
+                            "%"
+                          : item.changePercent
+                      }}
                     </div>
                   </div>
                   <button
