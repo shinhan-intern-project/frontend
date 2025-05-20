@@ -1360,6 +1360,12 @@ export default {
   }
 }
 
+@media (max-width: 1013px) {
+  :deep .floating-container {
+    display: none !important;
+  }
+}
+
 @media (max-width: 576px) {
   .header-controls {
     flex-direction: column;
