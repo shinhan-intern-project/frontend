@@ -564,6 +564,21 @@ export default {
   margin-top: 3px;
 }
 
+/* 로딩 인디케이터 */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  flex: 1;
+
+  background-color: white;
+  border-radius: 10px;
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+  margin-bottom: 30px;
+  color: #888;
+}
+
 /* 품목 정보 카드 스타일 */
 .product-info-card {
   min-height: 447px;
@@ -798,6 +813,25 @@ export default {
 
   .product-stats {
     min-width: 80px;
+  }
+  .search-button {
+    width: 40px;
+  }
+
+  .search-button img {
+    height: 25px;
+  }
+
+  /* 검색창 패딩 축소 */
+  .search-input {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+
+  /* 헤더 크기 및 패딩 축소 */
+  .stock-info-header {
+    padding: 10px 15px;
+    font-size: 14px;
   }
 }
 .on-off {

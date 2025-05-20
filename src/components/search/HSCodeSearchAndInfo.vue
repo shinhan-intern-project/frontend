@@ -81,10 +81,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    selectedHscodeIndex: {
-      type: Number,
-      default: -1,
-    },
+
     searchKeyword: {
       type: String,
       default: "",

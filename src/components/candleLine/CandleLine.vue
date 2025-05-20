@@ -299,4 +299,22 @@ export default {
   gap: 3px 40px;
   justify-content: start;
 }
+
+/* 캔들차트 반응형 */
+@media (max-width: 576px) {
+  .chart-controls {
+    flex-wrap: wrap;
+  }
+
+  #chart {
+    width: 100%;
+    height: 300px !important;
+  }
+
+  ::v-deep .apexcharts-legend,
+  ::v-deep .apexcharts-toolbar,
+  ::v-deep .apexcharts-yaxis-title {
+    display: none !important;
+  }
+}
 </style>
