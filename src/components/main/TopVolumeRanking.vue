@@ -383,7 +383,7 @@ export default {
 
 @media (max-width: 576px) {
   .company-details {
-    display: none;
+    /* display: none; */
   }
 
   .item-volume,
