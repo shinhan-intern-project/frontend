@@ -40,7 +40,11 @@
           <div v-else>
             <div class="stock-info-header">
               <div class="header-left">종목</div>
-              <div class="header-center">종목과 관련된 품목</div>
+              <div class="header-center">
+                종목과<br class="mobile-br" />
+                관련된<br class="mobile-br" />
+                품목
+              </div>
               <div class="header-right"></div>
             </div>
 
@@ -228,6 +232,9 @@ export default {
 </script>
 
 <style scoped>
+.mobile-br {
+  display: none;
+}
 .loading-indicator {
   display: flex;
   flex-direction: column;
@@ -593,6 +600,13 @@ export default {
   right: 0px;
 }
 @media (max-width: 576px) {
+  .mobile-br {
+    display: block;
+  }
+  .header-center {
+    display: none;
+  }
+
   /* 검색 버튼 크기 조정 */
   .search-button {
     width: 40px;
